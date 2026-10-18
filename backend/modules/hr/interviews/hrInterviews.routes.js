@@ -16,4 +16,6 @@ router.put("/:id", upload.single("cv_file"), ctrl.updateInterview);
 router.get("/locations", ctrl.getLocations);
 
 router.get("/languages", ctrl.getLanguages);
+
+router.get("/clients", ctrl.getClients);
 export default router;

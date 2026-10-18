@@ -83,24 +83,25 @@ export default function MilestoneTracker() {
       action={
         <button
           onClick={() => setShowModal(true)}
-          className="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-indigo-700 shadow"
+          className="pbtn"
         >
-          <Plus size={16} /> New Milestone
+          <Plus size={16} />
+          <span>New Milestone</span>
         </button>
       }
     >
       {loading ? (
-        <div className="text-center py-10 text-gray-500">Loading...</div>
+        <div className="text-center py-10 text-[var(--mute)]">Loading...</div>
       ) : rows.length === 0 ? (
-        <div className="text-center py-10 bg-white rounded-2xl border border-gray-100 text-gray-500 text-sm">
-          No milestones yet.
+        <div className="empty">
+          No milestones yet. Click &ldquo;New Milestone&rdquo; to add one.
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {rows.map((m) => (
             <div
               key={m.id}
-              className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5"
+              className="it-card p-5"
             >
               <div className="flex items-center justify-between gap-2">
                 <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide">

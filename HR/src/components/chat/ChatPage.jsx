@@ -3,6 +3,7 @@ import ChatList from "./ChatList";
 import ChatWindow from "./ChatWindow";
 import InternalChatWindow from "./InternalChatWindow";
 import { MessageCircle } from "lucide-react";
+import PageHeader from "../common/PageHeader";
 
 const MY_TYPE = "hr";
 
@@ -11,7 +12,12 @@ export default function ChatPage() {
 
   return (
     <div className="min-h-screen bg-slate-100 p-3 sm:p-4 lg:p-6">
-<div className="mt-6 flex h-[calc(100vh-150px)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <PageHeader
+        icon={MessageCircle}
+        title="Chat"
+        subtitle="Message employees, HR contacts and clients in real time."
+      />
+      <div className="flex h-[calc(100vh-230px)] min-h-[420px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <ChatList setActiveChat={setActiveChat} activeChat={activeChat} />
         {activeChat?.internal ? (
           <InternalChatWindow activeChat={activeChat} myType={MY_TYPE} />

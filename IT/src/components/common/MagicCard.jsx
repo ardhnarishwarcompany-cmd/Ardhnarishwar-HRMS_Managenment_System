@@ -2,17 +2,12 @@ import { useRef, useState } from "react";
 
 /**
  * MagicCard — premium card with a mouse-tracked spotlight glow on the border
- * and a soft radial highlight on the surface. Pure CSS variables, no deps.
- *
- * Props:
- *  - glow: tailwind-free rgb triplet for the accent, e.g. "99 102 241" (indigo)
- *  - as: element type (default "div")
- *  - className, children, ...rest
+ * and a soft radial highlight on the surface. Matches the lavender/purple theme.
  */
 export default function MagicCard({
   children,
   className = "",
-  glow = "99 102 241",
+  glow = "124 58 237",
   as: Tag = "div",
   style: styleProp = {},
   ...rest
@@ -37,21 +32,22 @@ export default function MagicCard({
         "--my": `${pos.y}px`,
         "--mo": pos.o,
         "--glow": glow,
+        ...styleProp,
       }}
-      className={`magic-card relative rounded-2xl ${className}`}
+      className={`magic-card relative rounded-[24px] border border-[var(--line)] bg-[var(--card)] shadow-[var(--shadow)] transition-all duration-200 ${className}`}
       {...rest}
     >
       {/* border glow layer */}
       <span
         aria-hidden
-        className="magic-card__border pointer-events-none absolute inset-0 rounded-2xl"
+        className="magic-card__border pointer-events-none absolute inset-0 rounded-[24px]"
       />
       {/* surface */}
-      <div className="magic-card__surface relative h-full rounded-[15px] bg-white/90 dark:bg-slate-900/80 backdrop-blur-sm">
+      <div className="magic-card__surface relative h-full rounded-[23px] bg-[var(--card)]">
         {/* spotlight */}
         <span
           aria-hidden
-          className="magic-card__spot pointer-events-none absolute inset-0 rounded-[15px]"
+          className="magic-card__spot pointer-events-none absolute inset-0 rounded-[23px]"
         />
         <div className="relative h-full">{children}</div>
       </div>
@@ -60,24 +56,24 @@ export default function MagicCard({
 }
 
 /* Small KPI tile built on MagicCard */
-export function MagicStat({ label, value, hint, icon: Icon, glow, accent = "text-indigo-600 bg-indigo-50" }) {
+export function MagicStat({ label, value, hint, icon: Icon, glow = "124 58 237", accent = "text-purple-600 bg-purple-50 dark:bg-purple-950/40" }) {
   return (
     <MagicCard glow={glow} className="h-full">
-      <div className="p-4 flex items-start justify-between gap-3">
+      <div className="p-5 flex items-center justify-between gap-4">
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-400 dark:text-slate-400">
+          <p className="text-[11.5px] font-bold uppercase tracking-[0.14em] text-[var(--mute)]">
             {label}
           </p>
-          <p className="mt-1.5 text-2xl font-bold tabular-nums text-gray-900 dark:text-white">
+          <p className="mt-1.5 text-2xl font-extrabold tabular-nums text-[var(--ink)] tracking-tight">
             {value}
           </p>
           {hint && (
-            <p className="mt-0.5 text-xs text-gray-400 dark:text-slate-500 truncate">{hint}</p>
+            <p className="mt-0.5 text-xs text-[var(--mute)] truncate">{hint}</p>
           )}
         </div>
         {Icon && (
-          <span className={`shrink-0 inline-flex h-9 w-9 items-center justify-center rounded-xl ${accent}`}>
-            <Icon size={17} />
+          <span className={`shrink-0 inline-flex h-12 w-12 items-center justify-center rounded-2xl ${accent} shadow-sm`}>
+            <Icon size={22} />
           </span>
         )}
       </div>
@@ -90,12 +86,12 @@ export function MagicEmpty({ icon: Icon, title, text }) {
   return (
     <div className="flex flex-col items-center justify-center text-center py-12 px-6">
       {Icon && (
-        <span className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-500 dark:bg-indigo-500/10">
-          <Icon size={22} />
+        <span className="mb-3 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400">
+          <Icon size={26} />
         </span>
       )}
-      <p className="text-sm font-semibold text-gray-800 dark:text-slate-100">{title}</p>
-      {text && <p className="mt-1 text-xs text-gray-400 dark:text-slate-500 max-w-xs">{text}</p>}
+      <p className="text-sm font-bold text-[var(--ink)]">{title}</p>
+      {text && <p className="mt-1 text-xs text-[var(--mute)] max-w-xs">{text}</p>}
     </div>
   );
 }

@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GPS Field Radar • Global Attendance Management System</title>
-<link rel="icon" type="image/svg+xml" href="/favicon.ico">
+<title>GPS Field Radar • Ardhnarishwar Global Platform</title>
+<link rel="icon" type="image/png" href="/static/images/ardhnarishwar_logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/css/theme.css">
+<link rel="stylesheet" href="/static/css/ardhnarishwar_3d.css">
 <style>
 .clockin-container {
   min-height: 100vh;
@@ -174,16 +175,19 @@
   color: var(--amber);
 }
 </style>
+<link rel="stylesheet" href="/static/css/ardh_logo.css?v=1">
 </head>
 <body>
 <div class="clockin-container">
-  <div class="clockin-card">
+  <div class="clockin-card card-3d">
     <div class="hud-top">
       <div class="hud-title">
-        <div class="hud-icon">🚗</div>
+        <div class="ardh-medallion-nav" style="width:48px; height:48px;">
+          <img src="/static/images/ardhnarishwar_logo_emblem.png" alt="Ardhnarishwar Logo" class="ardh-medallion-img">
+        </div>
         <div>
-          <h1 style="font-size:18px; font-weight:800; letter-spacing:-0.3px;">Satellite GPS Field Radar</h1>
-          <p style="font-size:12px; color:var(--text-muted); font-family:var(--font-mono);">FIELD & CLIENT MEETING TELEMETRY</p>
+          <h1 style="font-size:18px; font-weight:900; letter-spacing:-0.3px; background:linear-gradient(135deg, #C084FC, #38BDF8, #FBBF24); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">ARDHNARISHWAR GPS RADAR</h1>
+          <p style="font-size:11.5px; color:var(--text-muted); font-family:var(--font-mono);">FIELD & CLIENT MEETING TELEMETRY</p>
         </div>
       </div>
       <div class="badge badge-amber">
@@ -238,7 +242,7 @@
     </button>
 
     <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--text-muted); margin-top:4px;">
-      <a href="/employee" style="color:var(--text-muted); text-decoration:none;">← Return to Portal</a>
+      <a href="/employee" class="btn btn-secondary btn-sm" style="text-decoration:none;">← Return to Portal</a>
       <span onclick="acquireGPS()" style="color:var(--cyan); cursor:pointer; text-decoration:underline;">🔄 Resync Radar</span>
     </div>
   </div>
@@ -325,11 +329,19 @@ function acquireGPS() {
       radarText.textContent = '⚠️ Location Access Denied / Blocked';
       showToast('Please enable browser GPS permission', 'error');
     },
-    { enableHighAccuracy: true, timeout: 10000 }
+    { enableHighAccuracy: true, timeout: 20000, maximumAge: 60000 }
   );
 }
 
 async function initPage() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const modeParam = (urlParams.get('mode') || '').toUpperCase();
+  if (modeParam === 'OUT') {
+    setMode('OUT');
+  } else {
+    setMode('IN');
+  }
+
   acquireGPS();
   try {
     const res = await fetch('/api/me');
@@ -346,13 +358,30 @@ async function submitFieldAttendance() {
   const clientName = document.getElementById('client-name').value.trim();
   const notes = document.getElementById('notes').value.trim();
 
+  // gps_wait_for_fix_v1: GPS ready na ho to error ki jagah fix milne tak wait karo
+  const btn = document.getElementById('btn-submit');
   if (userLat === null || userLng === null) {
-    showToast('GPS lock required. Please allow browser location access.', 'error');
-    acquireGPS();
-    return;
+    btn.innerHTML = '<span>Getting GPS location...</span>';
+    btn.disabled = true;
+    const waitFix = async (ms) => {
+      const t0 = Date.now();
+      while ((userLat === null || userLng === null) && Date.now() - t0 < ms) {
+        await new Promise(r => setTimeout(r, 300));
+      }
+    };
+    await waitFix(12000);
+    if (userLat === null || userLng === null) {
+      acquireGPS();
+      await waitFix(15000);
+    }
+    if (userLat === null || userLng === null) {
+      showToast('GPS lock required. Please allow browser location access.', 'error');
+      btn.disabled = false;
+      setMode(currentMode);
+      return;
+    }
   }
 
-  const btn = document.getElementById('btn-submit');
   btn.innerHTML = '<span>Transmitting Geolocation Packet...</span>';
   btn.disabled = true;
 
@@ -376,7 +405,7 @@ async function submitFieldAttendance() {
     if (data.ok) {
       playSuccessSound();
       showToast(data.message, 'success');
-      btn.innerHTML = '<span>Field Check-in Confirmed ✓</span>';
+      btn.innerHTML = `<span>Field Check-${currentMode === 'OUT' ? 'OUT' : 'IN'} Confirmed ✓</span>`;
       setTimeout(() => { window.location.href = '/employee'; }, 1800);
     } else {
       showToast(data.error || 'Failed to record field attendance', 'error');
@@ -406,5 +435,7 @@ window.onload = initPage;
 </script>
 <script src="/static/js/theme.js"></script>
 <script src="/static/js/telemetry.js"></script>
+<script src="/static/js/ardhnarishwar_runtime.js"></script>
+<script src="/static/js/ardh_logo.js?v=1"></script>
 </body>
 </html>

@@ -43,13 +43,22 @@ export const listDeliverables = async (req, res) => {
   try {
     await ensureTable();
     const { type } = req.query;
-    let sql = "SELECT * FROM it_deliverables";
+    const role = String(req.employee?.role || "").toUpperCase();
+    const isSuperAdmin = role === "SUPER_ADMIN";
+    const where = [];
     const params = [];
     if (type && TYPES.includes(type)) {
-      sql += " WHERE type = ?";
+      where.push("d.type = ?");
       params.push(type);
     }
-    sql += " ORDER BY created_at DESC";
+    // Everyone sees only their own uploads; Super Admin sees all.
+    if (!isSuperAdmin) {
+      where.push("d.uploaded_by = ?");
+      params.push(req.employee?.id ?? -1);
+    }
+    let sql = "SELECT d.id, d.type, d.title, d.description, d.file_path, d.file_name, d.file_size, d.uploaded_by, COALESCE(NULLIF(TRIM(e.name), ''), d.uploaded_by_name) AS uploaded_by_name, d.created_at FROM it_deliverables d LEFT JOIN employees e ON e.id = d.uploaded_by";
+    if (where.length) sql += " WHERE " + where.join(" AND ");
+    sql += " ORDER BY d.created_at DESC";
     const [rows] = await db.query(sql, params);
     res.json({
       success: true,

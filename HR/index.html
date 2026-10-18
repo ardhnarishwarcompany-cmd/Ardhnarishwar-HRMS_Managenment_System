@@ -33,22 +33,27 @@
     <!-- Optional: block indexing (recommended for dashboards) -->
     <meta name="robots" content="noindex, nofollow" />
 
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- Theme color -->
-    <meta name="theme-color" content="#4f46e5" />
+    <meta name="theme-color" content="#7c3aed" />
     <script>
-      // Apply saved theme before React loads to prevent white flash
       (function () {
         try {
-          var t = localStorage.getItem("hrms-theme") || "system";
-          var dark =
-            t === "dark" ||
-            (t === "system" &&
-              window.matchMedia("(prefers-color-scheme: dark)").matches);
-          if (dark) document.documentElement.classList.add("dark");
+          localStorage.removeItem("hrms-theme");
+          document.documentElement.classList.remove("dark");
+          document.documentElement.setAttribute("data-theme", "light");
         } catch (e) {}
       })();
     </script>
-  </head>
+    <link rel="stylesheet" href="/logo-3d-bounce.css?v=1">
+</head>
 
   <body>
     <div id="root"></div>

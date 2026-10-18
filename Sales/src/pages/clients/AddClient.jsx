@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import toast from "react-hot-toast";
 
-import { createClient } from "../../services/clientService";
+import { createClient, getMyClients, deleteClient } from "../../services/clientService";
+import PageHeader from "../../components/common/PageHeader";
+import MyClientsTable from "../../components/clients/MyClientsTable";
+import EditClientModal from "../../components/clients/EditClientModal";
 
 import {
   UserPlus,
@@ -21,7 +24,7 @@ import {
 } from "lucide-react";
 
 const inputClass =
-  "w-full rounded-xl border border-slate-200 bg-slate-50/60 py-2.5 pl-10 pr-4 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-500 focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100";
+  "w-full rounded-xl border border-slate-200 bg-slate-50/60 py-2.5 pl-10 pr-4 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-500 focus:border-brand-500 focus:bg-white focus:ring-4 focus:ring-brand-100";
 
 const labelClass = "mb-1.5 block text-sm font-semibold text-slate-700";
 
@@ -32,6 +35,51 @@ export default function AddClient() {
   const [loading, setLoading] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
+
+  const [clients, setClients] = useState([]);
+  const [clientsLoading, setClientsLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [highlightId, setHighlightId] = useState(null);
+  const listRef = useRef(null);
+
+  const loadClients = useCallback(async (q = "") => {
+    try {
+      setClientsLoading(true);
+      const rows = await getMyClients(q);
+      setClients(rows);
+    } catch (err) {
+      console.error(err);
+      toast.error(err?.response?.data?.message || "Failed to load your clients");
+    } finally {
+      setClientsLoading(false);
+    }
+  }, []);
+
+  /* initial load + debounced search (one effect so mount does not fetch twice) */
+  useEffect(() => {
+    const t = setTimeout(() => loadClients(search.trim()), 300);
+    return () => clearTimeout(t);
+  }, [search, loadClients]);
+
+  /* clear the "New" highlight after a short while */
+  useEffect(() => {
+    if (highlightId == null) return undefined;
+    const t = setTimeout(() => setHighlightId(null), 8000);
+    return () => clearTimeout(t);
+  }, [highlightId]);
+
+  const [editClient, setEditClient] = useState(null);
+
+  const handleDeleteClient = async (c) => {
+    if (!window.confirm(`Delete client "${c.company_name}" (${c.client_code})?`)) return;
+    try {
+      await deleteClient(c.id);
+      toast.success("Client deleted");
+      setClients((prev) => prev.filter((x) => x.id !== c.id));
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Failed to delete client");
+    }
+  };
 
   const [form, setForm] = useState({
     company_name: "",
@@ -64,7 +112,7 @@ export default function AddClient() {
     try {
       setLoading(true);
 
-      await createClient(form);
+      const result = await createClient(form);
 
       toast.success("Client created successfully");
 
@@ -79,6 +127,17 @@ export default function AddClient() {
         company_description: "",
         password: "",
       });
+
+      const created = result?.data;
+      if (created?.id) {
+        setSearch("");
+        setClients((prev) => [created, ...prev.filter((c) => c.id !== created.id)]);
+        setHighlightId(created.id);
+      } else {
+        await loadClients();
+      }
+
+      listRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (err) {
       console.error(err);
 
@@ -89,23 +148,16 @@ export default function AddClient() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6">
-      <div className="mx-auto max-w-4xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-        {/* HEADER */}
-        <div className="border-b border-slate-100 bg-gradient-to-r from-indigo-50 via-white to-white px-8 py-7">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-200">
-              <UserPlus size={20} aria-hidden="true" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
-                Add Client
-              </h1>
-
-              <p className="mt-0.5 text-sm text-slate-500">
-                Create a new client account
-              </p>
-            </div>
+    <div className="space-y-6">
+      <PageHeader title="Add Client" desc="Create a client account and give them access to the client portal" />
+      <div className="sp-card mx-auto max-w-4xl overflow-hidden">
+        <div className="flex items-center gap-3 border-b border-slate-100 px-8 py-5">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-gradient text-white shadow-brand">
+            <UserPlus size={18} aria-hidden="true" />
+          </div>
+          <div>
+            <h2 className="text-sm font-bold tracking-tight text-slate-900">Client details</h2>
+            <p className="text-xs text-slate-500">Fields marked * are required</p>
           </div>
         </div>
 
@@ -324,7 +376,7 @@ export default function AddClient() {
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-7 py-3 text-sm font-bold text-white shadow-md shadow-indigo-200 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-300 disabled:translate-y-0 disabled:opacity-60 disabled:shadow-none"
+              className="btn-primary px-7 py-3"
             >
               {loading ? (
                 <>
@@ -345,6 +397,28 @@ export default function AddClient() {
           </div>
         </form>
       </div>
+
+      {/* MY CLIENTS — everything this rep has added, newest first */}
+      <div ref={listRef} className="mx-auto max-w-6xl scroll-mt-6">
+        <MyClientsTable
+          clients={clients}
+          loading={clientsLoading}
+          search={search}
+          onSearch={setSearch}
+          onRefresh={() => loadClients(search.trim())}
+          highlightId={highlightId}
+          onEdit={setEditClient}
+          onDelete={handleDeleteClient}
+        />
+      </div>
+
+      {editClient && (
+        <EditClientModal
+          client={editClient}
+          onClose={() => setEditClient(null)}
+          onSaved={() => loadClients(search.trim())}
+        />
+      )}
     </div>
   );
 }

@@ -116,20 +116,20 @@ export default function OfficeLocation({ onSave, initialLocations = [] }) {
   };
 
   return (
-    <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl p-6 shadow-lg">
+    <div className="it-card">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-indigo-100 rounded-lg">
-            <Building2 className="w-5 h-5 text-indigo-600" />
+          <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-[var(--p)]">
+            <Building2 className="w-5 h-5 text-[var(--p)]" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-800">Office Locations</h3>
-            <p className="text-sm text-gray-500">Manage office locations for geofencing</p>
+            <h3 className="text-base font-bold text-[var(--ink)]">Office Locations</h3>
+            <p className="text-xs text-[var(--mute)]">Manage office locations for geofencing</p>
           </div>
         </div>
         <button
           onClick={() => setIsAdding(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white font-semibold text-sm shadow-md shadow-purple-500/25 transition hover:shadow-purple-500/40 hover:-translate-y-0.5 active:translate-y-0"
         >
           <Plus className="w-4 h-4" />
           Add Location
@@ -137,11 +137,11 @@ export default function OfficeLocation({ onSave, initialLocations = [] }) {
       </div>
 
       {isAdding && (
-        <div className="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
-          <h4 className="font-medium text-gray-800 mb-4">Add New Office Location</h4>
+        <div className="mb-6 p-5 bg-[var(--soft)]/50 rounded-2xl border border-[var(--line)]">
+          <h4 className="font-bold text-sm text-[var(--ink)] mb-4">Add New Office Location</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-bold text-[var(--mute)] uppercase tracking-wider mb-1.5">
                 Office Name *
               </label>
               <input
@@ -150,11 +150,11 @@ export default function OfficeLocation({ onSave, initialLocations = [] }) {
                 value={formData.name}
                 onChange={handleInputChange}
                 placeholder="e.g., Main Office"
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3.5 py-2.5 border border-[var(--line)] bg-white rounded-xl text-sm text-[var(--ink)] focus:outline-none focus:border-[var(--p)] focus:ring-2 focus:ring-purple-500/20 transition"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-bold text-[var(--mute)] uppercase tracking-wider mb-1.5">
                 Radius (km)
               </label>
               <input
@@ -164,11 +164,11 @@ export default function OfficeLocation({ onSave, initialLocations = [] }) {
                 onChange={handleInputChange}
                 step="0.01"
                 min="0.01"
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3.5 py-2.5 border border-[var(--line)] bg-white rounded-xl text-sm text-[var(--ink)] focus:outline-none focus:border-[var(--p)] focus:ring-2 focus:ring-purple-500/20 transition"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-bold text-[var(--mute)] uppercase tracking-wider mb-1.5">
                 Latitude *
               </label>
               <div className="flex gap-2">
@@ -178,19 +178,19 @@ export default function OfficeLocation({ onSave, initialLocations = [] }) {
                   value={formData.latitude}
                   onChange={handleInputChange}
                   placeholder="e.g., 28.6139"
-                  className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="flex-1 px-3.5 py-2.5 border border-[var(--line)] bg-white rounded-xl text-sm text-[var(--ink)] focus:outline-none focus:border-[var(--p)] focus:ring-2 focus:ring-purple-500/20 transition"
                 />
                 <button
                   onClick={getCurrentLocation}
-                  className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
+                  className="px-3.5 py-2.5 bg-white border border-[var(--line)] hover:bg-[var(--soft)] rounded-xl transition text-[var(--mute)] hover:text-[var(--p)]"
                   title="Use current location"
                 >
-                  <MapPin className="w-5 h-5 text-gray-600" />
+                  <MapPin className="w-5 h-5" />
                 </button>
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-bold text-[var(--mute)] uppercase tracking-wider mb-1.5">
                 Longitude *
               </label>
               <input
@@ -199,23 +199,23 @@ export default function OfficeLocation({ onSave, initialLocations = [] }) {
                 value={formData.longitude}
                 onChange={handleInputChange}
                 placeholder="e.g., 77.2090"
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3.5 py-2.5 border border-[var(--line)] bg-white rounded-xl text-sm text-[var(--ink)] focus:outline-none focus:border-[var(--p)] focus:ring-2 focus:ring-purple-500/20 transition"
               />
             </div>
           </div>
-          <div className="flex justify-end gap-3 mt-4">
+          <div className="flex justify-end gap-3 mt-5 pt-4 border-t border-[var(--line)]">
             <button
               onClick={() => {
                 setIsAdding(false);
                 setFormData({ name: "", latitude: "", longitude: "", radius: 0.1 });
               }}
-              className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition"
+              className="px-4 py-2 text-sm font-semibold rounded-xl border border-[var(--line)] text-[var(--mute)] hover:bg-white hover:text-[var(--ink)] transition"
             >
               Cancel
             </button>
             <button
               onClick={handleAdd}
-              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white font-semibold text-sm shadow-md shadow-purple-500/20 transition hover:shadow-purple-500/35 hover:-translate-y-0.5"
             >
               <Plus className="w-4 h-4" />
               Add
@@ -226,16 +226,16 @@ export default function OfficeLocation({ onSave, initialLocations = [] }) {
 
       <div className="space-y-3">
         {locations.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
-            <MapPin className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p>No office locations configured</p>
-            <p className="text-sm">Add locations to enable geofencing</p>
+          <div className="text-center py-12 text-[var(--mute)]">
+            <MapPin className="w-12 h-12 mx-auto mb-3 opacity-40 text-[var(--p)]" />
+            <p className="font-semibold text-sm text-[var(--ink)]">No office locations configured</p>
+            <p className="text-xs text-[var(--mute)] mt-1">Add locations to enable geofencing</p>
           </div>
         ) : (
           locations.map((location) => (
             <div
               key={location.id}
-              className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100"
+              className="flex items-center gap-4 p-4 rounded-2xl border border-[var(--line)] bg-[var(--soft)]/30 hover:bg-white hover:shadow-sm transition"
             >
               {editingId === location.id ? (
                 <div className="flex-1 grid grid-cols-4 gap-3">
@@ -244,21 +244,21 @@ export default function OfficeLocation({ onSave, initialLocations = [] }) {
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="px-3 py-2 border border-[var(--line)] bg-white rounded-xl text-sm focus:outline-none focus:border-[var(--p)]"
                   />
                   <input
                     type="text"
                     name="latitude"
                     value={formData.latitude}
                     onChange={handleInputChange}
-                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="px-3 py-2 border border-[var(--line)] bg-white rounded-xl text-sm focus:outline-none focus:border-[var(--p)]"
                   />
                   <input
                     type="text"
                     name="longitude"
                     value={formData.longitude}
                     onChange={handleInputChange}
-                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="px-3 py-2 border border-[var(--line)] bg-white rounded-xl text-sm focus:outline-none focus:border-[var(--p)]"
                   />
                   <input
                     type="number"
@@ -266,28 +266,28 @@ export default function OfficeLocation({ onSave, initialLocations = [] }) {
                     value={formData.radius}
                     onChange={handleInputChange}
                     step="0.01"
-                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="px-3 py-2 border border-[var(--line)] bg-white rounded-xl text-sm focus:outline-none focus:border-[var(--p)]"
                   />
                 </div>
               ) : (
                 <>
-                  <div className="flex-1">
-                    <p className="font-medium text-gray-800">{location.name}</p>
-                    <p className="text-sm text-gray-500">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-sm text-[var(--ink)]">{location.name}</p>
+                    <p className="text-xs text-[var(--mute)] mt-0.5">
                       {location.latitude}, {location.longitude}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-[11px] font-semibold text-[var(--p)] mt-1">
                       Radius: {location.radius} km
                     </p>
                   </div>
                 </>
               )}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 shrink-0">
                 {editingId === location.id ? (
                   <>
                     <button
                       onClick={handleUpdate}
-                      className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition"
+                      className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-xl transition"
                     >
                       <Save className="w-4 h-4" />
                     </button>
@@ -296,7 +296,7 @@ export default function OfficeLocation({ onSave, initialLocations = [] }) {
                         setEditingId(null);
                         setFormData({ name: "", latitude: "", longitude: "", radius: 0.1 });
                       }}
-                      className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition"
+                      className="p-2 text-[var(--mute)] hover:bg-gray-100 rounded-xl transition"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -305,13 +305,15 @@ export default function OfficeLocation({ onSave, initialLocations = [] }) {
                   <>
                     <button
                       onClick={() => handleEdit(location)}
-                      className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition"
+                      className="p-2 text-[var(--p)] hover:bg-purple-50 rounded-xl transition"
+                      title="Edit location"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(location.id)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                      className="p-2 text-rose-500 hover:bg-rose-50 rounded-xl transition"
+                      title="Delete location"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -324,11 +326,11 @@ export default function OfficeLocation({ onSave, initialLocations = [] }) {
       </div>
 
       {locations.length > 0 && (
-        <div className="mt-6 pt-6 border-t border-gray-100">
+        <div className="mt-6 pt-6 border-t border-[var(--line)]">
           <button
             onClick={handleSaveAll}
             disabled={saving}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 disabled:opacity-50 transition font-medium"
+            className="w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white font-bold text-sm shadow-lg shadow-purple-500/25 transition hover:shadow-purple-500/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-60 disabled:hover:translate-y-0"
           >
             {saving ? (
               <>

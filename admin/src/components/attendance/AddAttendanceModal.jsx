@@ -9,6 +9,16 @@ import Toggle from "../ui/Toggle";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+const toHHMM = (value) => (value ? String(value).slice(0, 5) : "");
+
+const to12h = (value) => {
+  const hhmm = toHHMM(value);
+  if (!hhmm) return "";
+  const [h, m] = hhmm.split(":").map(Number);
+  const suffix = h >= 12 ? "PM" : "AM";
+  return `${String(h % 12 || 12).padStart(2, "0")}:${String(m).padStart(2, "0")} ${suffix}`;
+};
+
 export default function AddAttendanceModal({
   open,
   onClose,
@@ -23,6 +33,8 @@ export default function AddAttendanceModal({
   );
 
   const [employees, setEmployees] = useState([]);
+  const [shifts, setShifts] = useState([]);
+  const [officeDefault, setOfficeDefault] = useState({ start: "", end: "" });
 
   const [form, setForm] = useState({
     employeeId: "",
@@ -31,10 +43,11 @@ export default function AddAttendanceModal({
     checkOutTime: "",
     statusId: defaultStatusId,
     isActive: true,
+    shiftId: "",
   });
 
   // =========================
-  // FETCH EMPLOYEES
+  // FETCH EMPLOYEES + SHIFTS
   // =========================
   useEffect(() => {
     if (!open) return;
@@ -53,7 +66,42 @@ export default function AddAttendanceModal({
       }
     };
 
+    // Shift definitions come from the IT / HR portal (shift_timings).
+    const fetchShifts = async () => {
+      try {
+        const res = await axios.get(
+          `${BASE_URL}/super-admin/attendance/shift-timings`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setShifts(res.data.data || []);
+      } catch (err) {
+        setShifts([]);
+      }
+    };
+
+    // Office default timing (login_settings) applies when no shift is chosen.
+    const fetchOfficeDefault = async () => {
+      try {
+        const res = await axios.get(
+          `${BASE_URL}/super-admin/attendance/settings`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setOfficeDefault({
+          start: toHHMM(res.data?.data?.shiftStartTime),
+          end: toHHMM(res.data?.data?.shiftEndTime),
+        });
+      } catch (err) {
+        setOfficeDefault({ start: "", end: "" });
+      }
+    };
+
     fetchEmployees();
+    fetchShifts();
+    fetchOfficeDefault();
   }, [open]);
 
   // =========================
@@ -69,6 +117,7 @@ export default function AddAttendanceModal({
       checkOutTime: "",
       statusId: statusList?.[0]?.id || 1,
       isActive: true,
+      shiftId: "",
     });
   }, [open, statusList]);
 
@@ -90,6 +139,41 @@ export default function AddAttendanceModal({
     value: emp.id,
     label: `${emp.employeeCode} - ${emp.name}`,
   }));
+
+  const defaultLabel =
+    officeDefault.start && officeDefault.end
+      ? `Office Hours (${to12h(officeDefault.start)} – ${to12h(officeDefault.end)} IST)`
+      : "Office Hours";
+
+  const shiftOptions = [
+    { value: "", label: defaultLabel },
+    ...shifts.map((s) => ({
+      value: s.id,
+      label: `${s.name} (${to12h(s.checkInStart)} – ${to12h(s.checkOutStart)})`,
+    })),
+  ];
+
+  const selectedShift = shifts.find((s) => String(s.id) === String(form.shiftId));
+  const expected = selectedShift
+    ? { start: toHHMM(selectedShift.checkInStart), end: toHHMM(selectedShift.checkOutStart) }
+    : officeDefault;
+
+  // Picking a shift (or the office default) pre-fills empty times; the admin can still override.
+  const handleShiftChange = (value) => {
+    const shift = shifts.find((s) => String(s.id) === String(value));
+    const times = shift
+      ? { start: toHHMM(shift.checkInStart), end: toHHMM(shift.checkOutStart) }
+      : officeDefault;
+    setForm((p) => ({
+      ...p,
+      shiftId: value,
+      checkInTime: p.checkInTime || times.start,
+      checkOutTime: p.checkOutTime || times.end,
+    }));
+  };
+
+  const fillExpectedTimes = () =>
+    setForm((p) => ({ ...p, checkInTime: expected.start, checkOutTime: expected.end }));
 
   // =========================
   // SUBMIT
@@ -113,6 +197,7 @@ export default function AddAttendanceModal({
       checkOutTime: form.checkOutTime,
       statusId: form.statusId,
       isActive: form.isActive,
+      shiftId: form.shiftId,
     });
   };
 
@@ -149,6 +234,29 @@ export default function AddAttendanceModal({
             options={statusOptions}
           />
         </div>
+
+        {/* SHIFT (from IT / HR portal shift timings) */}
+        <Select
+          label="Shift Timing"
+          value={form.shiftId}
+          onChange={(e) => handleShiftChange(e.target.value)}
+          options={shiftOptions}
+        />
+
+        {expected.start && expected.end && (
+          <div className="-mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-gray-500">
+            <span>
+              Expected {to12h(expected.start)} – {to12h(expected.end)} IST
+            </span>
+            <button
+              type="button"
+              onClick={fillExpectedTimes}
+              className="font-semibold text-indigo-600 hover:text-indigo-800"
+            >
+              Fill check-in / check-out
+            </button>
+          </div>
+        )}
 
         {/* TIME */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

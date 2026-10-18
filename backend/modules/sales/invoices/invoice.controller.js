@@ -78,8 +78,8 @@ export const downloadInvoiceController = async (req, res) => {
     // ================= GET INVOICE =================
 
     const [[invoice]] = await db.query(
-      `SELECT * FROM invoices WHERE id = ?`,
-      [id]
+      `SELECT * FROM invoices WHERE id = ? AND employee_id = ?`,
+      [id, req.salesUser.employeeId]
     );
 
     if (!invoice) {

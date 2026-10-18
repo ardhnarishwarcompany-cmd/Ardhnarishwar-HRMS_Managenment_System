@@ -239,7 +239,7 @@ export const updateSale = async (req, res) => {
         due_date = ?,
         subscription_status = ?,
         remarks = ?
-       WHERE id = ?`,
+       WHERE id = ? AND employee_id = ?`,
       [
         client_id,
         plan_name,
@@ -254,6 +254,7 @@ export const updateSale = async (req, res) => {
         subscription_status,
         remarks,
         saleId,
+        employeeId,
       ],
     );
 

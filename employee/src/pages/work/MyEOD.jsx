@@ -186,9 +186,20 @@ export default function MyEOD() {
               <div className="md:col-span-2"><Detail title="Additional Notes" text={selectedReport.notes} icon={<Edit size={20} />} /></div>
             </div>
             <div className="px-6 py-4 border-t bg-gray-50 flex justify-end gap-3">
-                <button onClick={() => handleDownload(selectedReport)} className="px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold flex items-center gap-2"><Download size={16} /> Download PDF</button>
-                <button onClick={() => setViewModal(false)} className="px-5 py-2.5 rounded-xl bg-slate-900 text-white font-semibold">Close</button>
-              </div>
+              <button
+                onClick={() => handleDownload(selectedReport)}
+                className="px-5 py-2.5 rounded-xl text-white font-bold flex items-center gap-2 shadow-md hover:opacity-95 transition active:scale-[0.98]"
+                style={{ background: "linear-gradient(135deg, #6d28d9, #c026d3)", boxShadow: "0 8px 18px rgba(124, 58, 237, 0.25)" }}
+              >
+                <Download size={16} /> Download PDF
+              </button>
+              <button
+                onClick={() => setViewModal(false)}
+                className="px-5 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 font-semibold hover:bg-gray-50 transition active:scale-[0.98]"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

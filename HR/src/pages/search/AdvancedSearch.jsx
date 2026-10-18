@@ -6,6 +6,8 @@ import {
   RotateCcw,
 } from "lucide-react";
 import API from "../../api/axios";
+import PageHeader from "../../components/common/PageHeader";
+import { Search as HrPageIcon } from "lucide-react";
 const EMPTY = {
   q: "", departmentId: "", designationId: "", statusId: "",
   salaryMin: "", salaryMax: "", joinedFrom: "", joinedTo: "", skill: "",
@@ -90,81 +92,26 @@ export default function AdvancedSearch() {
         }}
       />
 <div className="relative mx-auto max-w-7xl space-y-6 px-4 pb-16 pt-6 sm:px-6 lg:px-8">
-        {/* ── HERO ─────────────────────────────────────────── */}
-        <div
-          className="as-rise rounded-[26px] p-[1.5px]"
-          style={{
-            background:
-              "linear-gradient(120deg, rgba(99,102,241,0.9), rgba(217,70,239,0.7), rgba(14,165,233,0.7), rgba(99,102,241,0.9))",
-            backgroundSize: "300% 300%",
-            animation:
-              "as-border-flow 8s ease infinite, as-rise 0.55s cubic-bezier(0.22,1,0.36,1) both",
-          }}
+        <PageHeader
+          icon={HrPageIcon}
+          title="Advanced Search"
+          subtitle="Search across employees and candidates with rich filters."
         >
-          <div className="relative overflow-hidden rounded-[24.5px] bg-slate-950 px-6 py-9 sm:px-10">
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full blur-3xl"
-              style={{ background: "rgba(99,102,241,0.35)" }}
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute -right-16 top-0 h-64 w-64 rounded-full blur-3xl"
-              style={{ background: "rgba(217,70,239,0.25)" }}
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 opacity-[0.07]"
-              style={{
-                backgroundImage:
-                  "linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px)",
-                backgroundSize: "44px 44px",
-              }}
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent"
-              style={{ animation: "as-sheen 6s ease-in-out infinite" }}
-            />
-
-            <div className="relative flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-indigo-200 backdrop-blur">
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-                  </span>
-                  Directory
-                </span>
-                <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-white sm:text-4xl text-balance">
-                  Advanced{" "}
-                  <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-                    Search
-                  </span>
-                </h1>
-                <p className="mt-2 text-sm leading-relaxed text-slate-400">
-                  Search across employees and candidates with rich filters.
-                </p>
-              </div>
-
-              <div className="inline-flex overflow-hidden rounded-xl border border-white/15 bg-white/5 p-1 backdrop-blur">
-                {["employees", "candidates"].map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setType(t)}
-                    className={`rounded-lg px-4 py-2 text-sm font-semibold capitalize transition-all ${
-                      type === t
-                        ? "bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-900/40"
-                        : "text-slate-300 hover:bg-white/10"
-                    }`}
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
-            </div>
+          <div className="hr-seg" role="tablist">
+            {["employees", "candidates"].map((t) => (
+              <button
+                key={t}
+                type="button"
+                role="tab"
+                aria-selected={type === t}
+                onClick={() => setType(t)}
+                className={`hr-seg-btn ${type === t ? "is-on" : ""}`}
+              >
+                {t}
+              </button>
+            ))}
           </div>
-        </div>
+        </PageHeader>
 
         {/* ── FILTERS ──────────────────────────────────────── */}
         <form

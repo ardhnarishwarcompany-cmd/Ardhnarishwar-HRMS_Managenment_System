@@ -209,18 +209,22 @@ export default function ClientManagement() {
   };
 
   return (
-    <div className="space-y-6 p-4 sm:p-6">
+    <div className="flex h-full flex-col gap-4 p-4">
 
-      <PageHero
-        title="Client Directory"
-        subtitle="Provision client platforms, manage feature modules and access"
-        chips={[
-          { icon: <ShieldCheck size={12} />, label: `${filteredClients.length} Registered Accounts` },
-        ]}
-      />
+      {/* PageHero carries its own mb-6; the root gap handles spacing here. */}
+      <div className="shrink-0 [&>.adm-hero]:mb-0">
+        <PageHero
+          size="sm"
+          title="Client Directory"
+          subtitle="Provision client platforms, manage feature modules and access"
+          chips={[
+            { icon: <ShieldCheck size={12} />, label: `${filteredClients.length} Registered Accounts` },
+          ]}
+        />
+      </div>
 
       {/* ── Search + Buttons ── */}
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+      <div className="flex shrink-0 flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
         <div className="relative w-full md:flex-1 md:max-w-xl">
           <Search className="absolute left-4 top-3 h-5 w-5 text-slate-400 pointer-events-none" />
           <input
@@ -252,16 +256,16 @@ export default function ClientManagement() {
         </div>
       </div>
 
-      {/* ── Table ── */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm">
-        <div className="px-6 py-4 bg-slate-50 border-b border-slate-100">
+      {/* ── Table ── fills the remaining height; only the row list scrolls, not the page. */}
+      <div className="flex min-h-[260px] flex-1 flex-col bg-white rounded-2xl border border-slate-200/80 shadow-sm">
+        <div className="shrink-0 px-6 py-4 bg-slate-50 border-b border-slate-100 rounded-t-2xl">
           <h3 className="font-bold text-slate-800 text-sm tracking-wide uppercase">
             Registered Accounts ({filteredClients.length})
           </h3>
         </div>
 
         {/* ── Mobile card list (< md) ── */}
-        <div className="md:hidden divide-y divide-slate-100 max-h-[65vh] overflow-y-auto rounded-b-2xl">
+        <div className="md:hidden min-h-0 flex-1 divide-y divide-slate-100 overflow-y-auto rounded-b-2xl [contain:paint]">
           {filteredClients.map((c) => (
             <div key={c.id} className="p-4 space-y-3">
               <div className="flex items-start gap-3">
@@ -323,9 +327,11 @@ export default function ClientManagement() {
           )}
         </div>
 
-        {/* ✅ Desktop table — single scroll div, both X and Y */}
+        {/* ✅ Desktop table — single scroll div, both X and Y.
+            contain:paint keeps the clipped rows from inflating the page scroller
+            (the `main > *` page-in transform animation otherwise makes Chrome count them). */}
         <div
-          className="hidden md:block max-h-[65vh] w-full overflow-auto rounded-b-2xl overscroll-contain [scrollbar-gutter:stable]"
+          className="hidden md:block min-h-0 flex-1 w-full overflow-auto rounded-b-2xl overscroll-contain [scrollbar-gutter:stable] [contain:paint]"
           role="region"
           aria-label="Registered accounts table"
           tabIndex={0}

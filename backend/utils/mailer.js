@@ -20,7 +20,7 @@ const cfg = () => {
   };
 };
 
-export const sendEmail = async (to, subject, html) => {
+export const sendEmail = async (to, subject, html, opts = {}) => {
   const c = cfg();
   if (!c) {
     console.log(`[MAIL dev-mode] To ${to} | ${subject}`);
@@ -33,6 +33,8 @@ export const sendEmail = async (to, subject, html) => {
       to,
       subject,
       html,
+      ...(opts.text ? { text: opts.text } : {}),
+      ...(opts.replyTo ? { replyTo: opts.replyTo } : {}),
     });
     return { delivered: true };
   } catch (e) {

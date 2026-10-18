@@ -1,48 +1,273 @@
+import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { useEffect, useMemo, useState } from "react";
-import { ClipboardCheck, ListTodo, Loader, CheckCircle2, AlarmClock, Plus, RefreshCw, PackageCheck, UploadCloud, FileText, FileSpreadsheet, Code2, Video, FileType2, X } from "lucide-react";
+import {
+  ClipboardCheck,
+  ListTodo,
+  Loader,
+  CheckCircle2,
+  AlarmClock,
+  Plus,
+  RefreshCw,
+  PackageCheck,
+  Paperclip,
+  FolderOpen,
+} from "lucide-react";
 import StatCard from "../../components/common/StatCard";
+import PageHeader from "../../components/common/PageHeader";
+import EmptyState from "../../components/common/EmptyState";
 import WorkAssignmentFilters from "../../components/workassignment/WorkAssignmentFilters";
 import WorkAssignmentTable from "../../components/workassignment/WorkAssignmentTable";
 import AssignWorkModal from "../../components/workassignment/AssignWorkModal";
+import AssignmentFilesModal from "../../components/workassignment/AssignmentFilesModal";
+import { FileTypeIcon } from "../../components/workassignment/AssignmentFileWidgets";
+import { FILE_TYPES, STATUS_META } from "../../components/workassignment/fileTypes";
 import { useClientAuth } from "../../context/ClientAuthContext";
-import PageHeader from "../../components/common/PageHeader";
 import API from "../../services/api.js";
 
-const TYPES = [
-  {key:"video", label:"Video", icon:Video, accept:".mp4,.mov,.avi,.mkv,.webm,.m4v"},
-  {key:"document", label:"PDF / Document", icon:FileText, accept:".pdf,.txt,.rtf,.odt"},
-  {key:"word", label:"Word Document", icon:FileType2, accept:".doc,.docx"},
-  {key:"excel", label:"Excel / Data", icon:FileSpreadsheet, accept:".xls,.xlsx,.csv"},
-  {key:"code", label:"Source Code", icon:Code2, accept:".js,.jsx,.ts,.tsx,.py,.java,.c,.cpp,.cs,.php,.html,.css,.json,.xml,.sql,.sh,.yml,.yaml,.md,.zip"},
-];
+const BASE = "/client/work-assignment";
+
+function TypeSummary({ label, icon: Icon, files, tone }) {
+  return (
+    <div className="rounded-2xl border border-[var(--line)] bg-white p-4">
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-[var(--mute)]">
+          <Icon size={13} className={tone} aria-hidden="true" />
+          {label}
+        </span>
+        <span className="badge-premium badge-neutral">{files.length}</span>
+      </div>
+      <div className="grid grid-cols-5 gap-2">
+        {FILE_TYPES.map((t) => {
+          const count = files.filter((f) => f.type === t.key).length;
+          return (
+            <div
+              key={t.key}
+              className={`flex flex-col items-center gap-1 rounded-xl px-1 py-2 text-center ${count ? "bg-[var(--soft)]" : "opacity-45"}`}
+              title={t.label}
+            >
+              <FileTypeIcon type={t.key} size={15} className="!h-8 !w-8 !bg-white" />
+              <span className="text-xs font-bold tabular-nums text-[var(--ink)]">{count}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export default function WorkAssignment() {
   const { client } = useClientAuth();
   const isEmployee = client?.role === "CLIENT_EMPLOYEE";
-  const [stats,setStats]=useState({assigned:0,inProgress:0,completed:0,overdue:0});
-  const [assignments,setAssignments]=useState([]); const [loading,setLoading]=useState(false); const [lastUpdated,setLastUpdated]=useState(null); const [showAssign,setShowAssign]=useState(false);
-  const [tab,setTab]=useState("status"); const [selectedAssignment,setSelectedAssignment]=useState(null); const [deliverables,setDeliverables]=useState([]); const [allDeliverables,setAllDeliverables]=useState({}); const [uploading,setUploading]=useState(false);
-  const [filters,setFilters]=useState({status:"",priority:"",department:""});
 
-  const fetchAssignments=async()=>{try{setLoading(true);const q=new URLSearchParams(Object.fromEntries(Object.entries(filters).filter(([_,v])=>v))).toString();const r=await API.get(`/client/work-assignment?${q}`);const data=r.data.data||[];setAssignments(data);setStats({assigned:data.filter(x=>x.status==="assigned").length,inProgress:data.filter(x=>x.status==="in_progress").length,completed:data.filter(x=>x.status==="completed").length,overdue:data.filter(x=>x.status==="overdue").length});setLastUpdated(new Date());}catch(e){toast.error(e?.response?.data?.message||"Failed to load work assignments")}finally{setLoading(false)}};
-  const loadDeliverables=async(a)=>{try{const r=await API.get(`/client/work-assignment/${a.id}/deliverables`);return r.data.data||[]}catch(e){return []}};
-  const openDeliverables=async(a)=>{setSelectedAssignment(a);setDeliverables(await loadDeliverables(a));};
-  useEffect(()=>{fetchAssignments()},[filters]);
-  useEffect(()=>{if(tab!=="deliverables"||!assignments.length)return;let cancelled=false;(async()=>{const entries=await Promise.all(assignments.map(async a=>[a.id,await loadDeliverables(a)]));if(!cancelled)setAllDeliverables(Object.fromEntries(entries));})();return()=>{cancelled=true}},[tab,assignments]);
+  const [assignments, setAssignments] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [filters, setFilters] = useState({ status: "", priority: "", department: "" });
+  const [tab, setTab] = useState("status");
+  const [showAssign, setShowAssign] = useState(false);
+  const [selected, setSelected] = useState(null);
+  const [filesByAssignment, setFilesByAssignment] = useState({});
+  const [tabLoading, setTabLoading] = useState(false);
 
-  const uploadDeliverable=async(e,type)=>{e.preventDefault();const form=e.currentTarget;const file=form.file.files?.[0];if(!file||!selectedAssignment)return;const fd=new FormData();fd.append("file",file);fd.append("title",form.title.value||file.name);fd.append("type",type);fd.append("description",form.description.value||"");try{setUploading(true);await API.post(`/client/work-assignment/${selectedAssignment.id}/deliverables`,fd);toast.success(`${TYPES.find(x=>x.key===type)?.label||"Deliverable"} uploaded successfully`);form.reset();const list=await loadDeliverables(selectedAssignment);setDeliverables(list);setAllDeliverables(p=>({...p,[selectedAssignment.id]:list}));}catch(err){toast.error(err?.response?.data?.message||"Upload failed")}finally{setUploading(false)}};
+  const stats = {
+    assigned: assignments.filter((x) => x.status === "assigned").length,
+    inProgress: assignments.filter((x) => x.status === "in_progress").length,
+    completed: assignments.filter((x) => x.status === "completed").length,
+    overdue: assignments.filter((x) => x.status === "overdue").length,
+  };
 
-  return <div className="space-y-6">
-    <PageHeader icon={<ClipboardCheck size={22}/>} title="Work Assignment" desc={isEmployee?"Complete assigned work and submit your deliverables securely.":"Assign work, monitor status and review employee deliverables."} actions={!isEmployee&&<button onClick={()=>setShowAssign(true)} className="btn-primary-premium"><Plus size={16}/> Assign New Task</button>}/>
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"><StatCard title="Assigned" value={stats.assigned} subText="New tasks assigned" gradient="bg-gradient-to-tr from-blue-500 to-cyan-500" icon={<ListTodo size={22}/>}/><StatCard title="In Progress" value={stats.inProgress} subText="Tasks being worked on" gradient="bg-gradient-to-tr from-yellow-500 to-orange-500" icon={<Loader size={22}/>}/><StatCard title="Completed" value={stats.completed} subText="Tasks finished" gradient="bg-gradient-to-tr from-emerald-500 to-teal-500" icon={<CheckCircle2 size={22}/>}/><StatCard title="Overdue" value={stats.overdue} subText="Past deadline" gradient="bg-gradient-to-tr from-red-500 to-pink-500" icon={<AlarmClock size={22}/>}/></div>
+  const fetchAssignments = useCallback(async () => {
+    try {
+      setLoading(true);
+      const q = new URLSearchParams(
+        Object.fromEntries(Object.entries(filters).filter(([, v]) => v)),
+      ).toString();
+      const r = await API.get(`${BASE}?${q}`);
+      setAssignments(r.data.data || []);
+      setLastUpdated(new Date());
+    } catch (e) {
+      toast.error(e?.response?.data?.message || "Failed to load work assignments");
+    } finally {
+      setLoading(false);
+    }
+  }, [filters]);
 
-    <div className="card-premium p-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3"><div className="flex gap-2"><button onClick={()=>setTab("status")} className={`px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 ${tab==="status"?"bg-indigo-600 text-white":"bg-slate-100 text-slate-600"}`}><ClipboardCheck size={16}/> Work Status</button><button onClick={()=>setTab("deliverables")} className={`px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 ${tab==="deliverables"?"bg-violet-600 text-white":"bg-slate-100 text-slate-600"}`}><PackageCheck size={16}/> Deliverables</button></div><div className="flex items-center gap-3 text-xs text-slate-500"><span>{lastUpdated?`Updated ${lastUpdated.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}`:"Loading..."}</span><button onClick={fetchAssignments} className="px-3 py-2 rounded-lg border bg-white"><RefreshCw size={14}/></button></div></div>
+  useEffect(() => {
+    fetchAssignments();
+  }, [fetchAssignments]);
 
-    {tab==="status"?<><div className="card-premium p-4"><WorkAssignmentFilters filters={filters} onFilterChange={setFilters} onChange={setFilters}/></div><WorkAssignmentTable rows={assignments} loading={loading} onRefresh={fetchAssignments}/></>:<div className="space-y-5">
-      {assignments.length===0?<div className="card-premium p-12 text-center text-slate-400">No work assignments available.</div>:assignments.map(a=>{const list=allDeliverables[a.id]||[];return <div key={a.id} className="card-premium overflow-hidden"><div className="p-5 border-b bg-gradient-to-r from-slate-50 to-violet-50/40 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3"><div><div className="flex items-center gap-2"><span className="text-xs font-mono text-indigo-600">#{a.id}</span><h3 className="font-bold text-slate-900">{a.title}</h3></div><p className="text-xs text-slate-500 mt-1">{a.employee_name||"Assigned employee"} · {a.status?.replace("_"," ")}</p></div><button onClick={()=>openDeliverables(a)} className="px-3 py-2 rounded-lg bg-white border border-violet-200 text-violet-700 text-xs font-semibold">Open deliverables</button></div><div className="p-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3">{TYPES.map(t=>{const count=list.filter(d=>d.type===t.key).length;const Icon=t.icon;return <div key={t.key} className="rounded-xl border border-slate-200 p-4 bg-white"><div className="flex items-center justify-between"><span className="w-9 h-9 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center"><Icon size={18}/></span><span className="text-xs font-bold text-slate-500">{count}</span></div><p className="font-semibold text-sm mt-3">{t.label}</p><p className="text-xs text-slate-400 mt-1">{count?"Uploaded":"Not uploaded"}</p></div>})}</div>{list.length>0&&<div className="px-5 pb-5"><div className="border rounded-xl overflow-hidden"><table className="w-full"><thead className="bg-slate-50"><tr><th className="px-4 py-3 text-left text-xs text-slate-500">Type</th><th className="px-4 py-3 text-left text-xs text-slate-500">File</th><th className="px-4 py-3 text-left text-xs text-slate-500">Description</th><th className="px-4 py-3 text-left text-xs text-slate-500">Uploaded</th><th/></tr></thead><tbody className="divide-y">{list.map(d=><tr key={d.id}><td className="px-4 py-3 text-xs font-semibold capitalize">{d.type}</td><td className="px-4 py-3 text-sm font-medium">{d.file_name}</td><td className="px-4 py-3 text-xs text-slate-500">{d.description||"-"}</td><td className="px-4 py-3 text-xs text-slate-500">{d.created_at?new Date(d.created_at).toLocaleString("en-IN"):"-"}</td><td className="px-4 py-3 text-right"><a target="_blank" rel="noreferrer" href={`${(import.meta.env.VITE_API_BASE_URL||"").replace(/\/api\/?$/,'')}${d.file_url}`} className="text-xs font-semibold text-indigo-600">Open</a></td></tr>)}</tbody></table></div></div>}</div>})}
-    </div>}
+  // Deliverables tab: lazily pull task files + deliverables per assignment.
+  useEffect(() => {
+    if (tab !== "deliverables" || !assignments.length) return;
+    let cancelled = false;
+    (async () => {
+      setTabLoading(true);
+      const entries = await Promise.all(
+        assignments.map(async (a) => {
+          const [att, del] = await Promise.allSettled([
+            API.get(`${BASE}/${a.id}/attachments`),
+            API.get(`${BASE}/${a.id}/deliverables`),
+          ]);
+          return [
+            a.id,
+            {
+              attachments: att.status === "fulfilled" ? att.value.data?.data || [] : [],
+              deliverables: del.status === "fulfilled" ? del.value.data?.data || [] : [],
+            },
+          ];
+        }),
+      );
+      if (!cancelled) {
+        setFilesByAssignment(Object.fromEntries(entries));
+        setTabLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [tab, assignments]);
 
-    {selectedAssignment&&<div className="fixed inset-0 z-[80] bg-slate-950/50 backdrop-blur-sm flex items-center justify-center p-4"><div className="w-full max-w-5xl max-h-[92vh] overflow-auto bg-white rounded-2xl shadow-2xl"><div className="p-5 border-b flex justify-between gap-4"><div><h2 className="font-bold text-lg">Deliverables · {selectedAssignment.title}</h2><p className="text-xs text-slate-500 mt-1">Each file type has its own upload control. Only the selected file type is accepted.</p></div><button onClick={()=>setSelectedAssignment(null)} className="w-9 h-9 rounded-lg bg-slate-100 text-slate-500"><X size={18} className="mx-auto"/></button></div>{isEmployee&&<div className="p-5 border-b bg-slate-50"><div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">{TYPES.map(t=>{const Icon=t.icon;return <form key={t.key} onSubmit={e=>uploadDeliverable(e,t.key)} className="bg-white rounded-2xl border p-4 shadow-sm"><div className="flex items-center gap-2 mb-3"><span className="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center"><Icon size={17}/></span><div><p className="font-semibold text-sm">{t.label}</p><p className="text-[11px] text-slate-400">{t.accept}</p></div></div><input name="title" placeholder="Title" className="w-full border rounded-lg px-2.5 py-2 text-xs mb-2"/><textarea name="description" rows="2" placeholder="Short description" className="w-full border rounded-lg px-2.5 py-2 text-xs mb-2"/><label className="flex items-center justify-center gap-2 border border-dashed border-indigo-200 rounded-lg px-2 py-3 text-xs text-indigo-600 cursor-pointer bg-indigo-50/40"><UploadCloud size={15}/> Choose {t.label}<input name="file" type="file" accept={t.accept} required className="hidden"/></label><button disabled={uploading} className="w-full mt-2 py-2 rounded-lg bg-indigo-600 text-white text-xs font-semibold">{uploading?"Uploading...":"Upload"}</button></form>})}</div></div>}<div className="p-5">{deliverables.length===0?<div className="py-10 text-center text-slate-400">No deliverables uploaded yet.</div>:<div className="space-y-3">{deliverables.map(d=><div key={d.id} className="p-4 rounded-xl border flex items-center justify-between gap-4"><div><p className="font-semibold text-sm">{d.title}</p><p className="text-xs text-slate-500 mt-1 capitalize">{d.type} · {d.file_name}</p><p className="text-xs text-slate-400 mt-1">{d.description||""}</p></div><a target="_blank" rel="noreferrer" href={`${(import.meta.env.VITE_API_BASE_URL||"").replace(/\/api\/?$/,'')}${d.file_url}`} className="px-3 py-2 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-semibold">Open file</a></div>)}</div>}</div></div></div>}
-    {!isEmployee&&<AssignWorkModal open={showAssign} onClose={()=>setShowAssign(false)} onSuccess={fetchAssignments}/>}</div>;
+  const handleFilesChanged = () => fetchAssignments();
+
+  return (
+    <div className="space-y-6">
+      <PageHeader
+        icon={<ClipboardCheck size={22} />}
+        title="Work Assignment"
+        desc={
+          isEmployee
+            ? "Download the task files your client shared, complete the work and submit your deliverables."
+            : "Assign work, share videos, documents and project files, and review employee deliverables."
+        }
+        actions={
+          !isEmployee && (
+            <button type="button" onClick={() => setShowAssign(true)} className="btn-primary-premium">
+              <Plus size={16} aria-hidden="true" /> Assign New Task
+            </button>
+          )
+        }
+      />
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard title="Assigned" value={stats.assigned} subText="New tasks assigned" gradient="bg-gradient-to-tr from-blue-500 to-cyan-500" icon={<ListTodo size={22} />} />
+        <StatCard title="In Progress" value={stats.inProgress} subText="Tasks being worked on" gradient="bg-gradient-to-tr from-yellow-500 to-orange-500" icon={<Loader size={22} />} />
+        <StatCard title="Completed" value={stats.completed} subText="Tasks finished" gradient="bg-gradient-to-tr from-emerald-500 to-teal-500" icon={<CheckCircle2 size={22} />} />
+        <StatCard title="Overdue" value={stats.overdue} subText="Past deadline" gradient="bg-gradient-to-tr from-red-500 to-pink-500" icon={<AlarmClock size={22} />} />
+      </div>
+
+      <div className="card-premium flex flex-col gap-3 p-3 md:flex-row md:items-center md:justify-between">
+        <div className="flex gap-2" role="tablist" aria-label="Work assignment views">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === "status"}
+            onClick={() => setTab("status")}
+            className={`${tab === "status" ? "btn-primary-premium" : "btn-secondary-premium"} btn-inline !py-2.5`}
+          >
+            <ClipboardCheck size={16} aria-hidden="true" /> Work Status
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === "deliverables"}
+            onClick={() => setTab("deliverables")}
+            className={`${tab === "deliverables" ? "btn-primary-premium" : "btn-secondary-premium"} btn-inline !py-2.5`}
+          >
+            <PackageCheck size={16} aria-hidden="true" /> Files & Deliverables
+          </button>
+        </div>
+        <div className="flex items-center gap-3 text-xs text-[var(--mute)]">
+          <span>
+            {lastUpdated
+              ? `Updated ${lastUpdated.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+              : "Loading..."}
+          </span>
+          <button
+            type="button"
+            onClick={fetchAssignments}
+            className="btn-secondary-premium btn-inline !px-3 !py-2"
+            aria-label="Refresh assignments"
+          >
+            <RefreshCw size={14} className={loading ? "animate-spin" : ""} aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+
+      {tab === "status" ? (
+        <>
+          <div className="card-premium p-4">
+            <WorkAssignmentFilters filters={filters} onFilterChange={setFilters} onChange={setFilters} />
+          </div>
+          <WorkAssignmentTable
+            rows={assignments}
+            loading={loading}
+            onRefresh={fetchAssignments}
+            onOpen={setSelected}
+            isEmployee={isEmployee}
+          />
+        </>
+      ) : (
+        <div className="space-y-5">
+          {assignments.length === 0 ? (
+            <div className="card-premium">
+              <EmptyState
+                icon={<FolderOpen size={28} />}
+                title="No work assignments"
+                desc={isEmployee ? "Tasks assigned to you by your client will appear here." : "Assign a task to start sharing files with your team."}
+              />
+            </div>
+          ) : (
+            assignments.map((a) => {
+              const files = filesByAssignment[a.id] || { attachments: [], deliverables: [] };
+              const status = STATUS_META[a.status] || STATUS_META.assigned;
+              return (
+                <div key={a.id} className="card-premium overflow-hidden">
+                  <div className="flex flex-col gap-3 border-b border-[var(--line)] bg-gradient-to-r from-[var(--soft)] to-white p-5 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-mono text-xs text-[var(--p)]">#{a.id}</span>
+                        <h3 className="font-bold text-[var(--ink)]">{a.title}</h3>
+                        <span className={`badge-premium ${status.cls}`}>{status.label}</span>
+                      </div>
+                      <p className="mt-1 text-xs text-[var(--mute)]">
+                        {a.employee_name || "Assigned employee"}
+                        {a.deadline ? ` · due ${new Date(a.deadline).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}` : ""}
+                      </p>
+                    </div>
+                    <button type="button" onClick={() => setSelected(a)} className="btn-primary-premium btn-inline !py-2 text-xs">
+                      <FolderOpen size={14} aria-hidden="true" />
+                      {isEmployee ? "Open files & submit work" : "Open files"}
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 gap-4 p-5 xl:grid-cols-2">
+                    {tabLoading && !filesByAssignment[a.id] ? (
+                      <p className="col-span-full flex items-center gap-2 text-sm text-[var(--mute)]">
+                        <RefreshCw size={14} className="animate-spin" aria-hidden="true" /> Loading files...
+                      </p>
+                    ) : (
+                      <>
+                        <TypeSummary label="Task files from client" icon={Paperclip} files={files.attachments} tone="text-[var(--p)]" />
+                        <TypeSummary label="Deliverables from employee" icon={PackageCheck} files={files.deliverables} tone="text-emerald-600" />
+                      </>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      )}
+
+      <AssignmentFilesModal
+        assignment={selected}
+        isEmployee={isEmployee}
+        onClose={() => setSelected(null)}
+        onChanged={handleFilesChanged}
+      />
+
+      {!isEmployee && (
+        <AssignWorkModal open={showAssign} onClose={() => setShowAssign(false)} onSuccess={fetchAssignments} />
+      )}
+    </div>
+  );
 }

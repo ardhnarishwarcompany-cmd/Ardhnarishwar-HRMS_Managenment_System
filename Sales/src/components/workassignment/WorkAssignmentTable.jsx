@@ -1,4 +1,4 @@
-import { RefreshCw, ClipboardList, Inbox } from "lucide-react";
+import { RefreshCw, Target, Inbox } from "lucide-react";
 import {
   updateStatusAPI,
   updateProgressAPI,
@@ -105,21 +105,21 @@ export default function WorkAssignmentTable({ rows, loading, onRefresh }) {
   };
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div className="sp-card overflow-hidden">
       {/* HEADER */}
       <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
-            <ClipboardList size={15} aria-hidden="true" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-gradient text-white shadow-brand">
+            <Target size={15} aria-hidden="true" />
           </div>
           <h3 className="text-sm font-bold tracking-tight text-slate-900">
-            Work Assignments
+            My Targets
           </h3>
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
-            {rows.length} {rows.length === 1 ? "task" : "tasks"}
+          <span className="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-700">
+            {rows.length} {rows.length === 1 ? "target" : "targets"}
           </span>
           <button
             onClick={onRefresh}
@@ -141,10 +141,10 @@ export default function WorkAssignmentTable({ rows, loading, onRefresh }) {
         <table className="w-full min-w-[900px] text-sm">
           <thead className="sticky top-0 z-10 bg-slate-50">
             <tr className="border-b border-slate-200">
-              <th className={thClass}>Task ID</th>
-              <th className={thClass}>Title</th>
+              <th className={thClass}>Target ID</th>
+              <th className={thClass}>Target</th>
               <th className={`${thClass} text-center`}>Priority</th>
-              <th className={thClass}>Due Date</th>
+              <th className={thClass}>Deadline</th>
               <th className={thClass}>Days Left</th>
               <th className={thClass}>Progress</th>
               <th className={thClass}>Status</th>
@@ -162,7 +162,7 @@ export default function WorkAssignmentTable({ rows, loading, onRefresh }) {
                       className="animate-spin"
                     />
                     <span className="text-sm font-medium">
-                      Loading assignments...
+                      Loading targets...
                     </span>
                   </div>
                 </td>
@@ -171,15 +171,15 @@ export default function WorkAssignmentTable({ rows, loading, onRefresh }) {
               <tr>
                 <td colSpan={7} className="py-16">
                   <div className="flex flex-col items-center gap-3 text-center">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-500">
                       <Inbox size={24} aria-hidden="true" />
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-slate-700">
-                        No assignments found
+                        No targets found
                       </p>
                       <p className="mt-0.5 text-xs text-slate-400">
-                        New tasks will appear here once assigned.
+                        Targets set for you by the Super Admin will appear here.
                       </p>
                     </div>
                   </div>
@@ -203,7 +203,7 @@ export default function WorkAssignmentTable({ rows, loading, onRefresh }) {
                     key={row.id}
                     className="transition-colors hover:bg-slate-50"
                   >
-                    <td className="whitespace-nowrap px-4 py-4 font-mono text-xs font-semibold text-indigo-600">
+                    <td className="whitespace-nowrap px-4 py-4 font-mono text-xs font-semibold text-brand-700">
                       #{row.id}
                     </td>
 
@@ -298,7 +298,7 @@ export default function WorkAssignmentTable({ rows, loading, onRefresh }) {
       {/* FOOTER */}
       {!loading && rows.length > 0 && (
         <div className="border-t border-slate-100 bg-slate-50/60 px-5 py-3 text-xs font-medium text-slate-500">
-          Showing {rows.length} assignment{rows.length !== 1 ? "s" : ""}
+          Showing {rows.length} target{rows.length !== 1 ? "s" : ""}
         </div>
       )}
     </div>

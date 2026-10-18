@@ -9,6 +9,7 @@ import {
   fetchHRDashboardContext, fetchEmployeeDashboardContext,
   fetchClientDashboardContext, fetchSalesDashboardContext
 } from "../../services/queryService.js";
+import { answerSalesQuestion } from "../../services/salesAssistant.service.js";
 
 const OLLAMA_URL = process.env.OLLAMA_URL || "http://127.0.0.1:11434";
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "phi3";
@@ -256,7 +257,8 @@ if (blockedPatterns.some(p => message.toLowerCase().includes(p))) {
 }
 
   const userType = normalizeUserType(req.user?.role, clientUserType);
-  const userId = req.user?.id || null;
+  // Sales tokens carry `employeeId` instead of `id` (see salesAuth.controller.js)
+  const userId = req.user?.id || req.user?.employeeId || null;
  const rawIntent = detectIntent(message);
 const intent = (rawIntent || "").toUpperCase().trim();
 
@@ -264,6 +266,19 @@ const intent = (rawIntent || "").toUpperCase().trim();
   console.log("USER TYPE:", userType);
 console.log("INTENT:", intent);
 console.log("USER ID:", userId);
+
+  // Sales portal: answer straight from the rep's own data (no LLM round-trip).
+  if (userType === "SALES") {
+    const salesReply = await answerSalesQuestion(message, intent, userId);
+    if (salesReply) {
+      const sid = session_id || generateSessionId();
+      await db.query(
+        `INSERT INTO chatbot_conversations (user_type, user_id, session_id, message, response, is_ai_response) VALUES (?, ?, ?, ?, ?, ?)`,
+        [userType, userId, sid, message, salesReply, 0]
+      );
+      return res.json({ success: true, data: { session_id: sid, response: salesReply, user_type: userType } });
+    }
+  }
 
   // Greeting ka seedha reply
  const greetings = ["hi", "hii", "hello", "hey"];

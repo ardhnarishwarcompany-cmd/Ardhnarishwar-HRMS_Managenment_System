@@ -101,7 +101,7 @@ export default function Proposals() {
   const n = (k) => Number(stats?.[k] || 0);
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6">
       <PageHeader title="Proposals" desc="Draft quotations for your clients and send them for approval" />
 
       <ModuleHeading
@@ -189,7 +189,7 @@ export default function Proposals() {
                 onClick={() => setStatus(f.key)}
                 className={`whitespace-nowrap rounded-xl px-3.5 py-2 text-xs font-semibold transition ${
                   active
-                    ? "bg-slate-900 text-white shadow"
+                    ? "bg-brand-gradient text-white shadow-brand"
                     : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                 }`}
                 aria-pressed={active}

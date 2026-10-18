@@ -1,0 +1,55 @@
+/* ardh-logo-shared-v1: golden emblem, no blue ring, bouncing 3D logo */
+html body .ardh-medallion-nav,
+html body .ardh-hero-medallion {
+  --lb: 7px;
+  position: relative;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 50% !important;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 1px 0 #B8902F, 0 2px 0 #8F6D1E, 0 3px 0 #6B5115, 0 8px 12px rgba(0,0,0,.55) !important;
+  transform-origin: 50% 100%;
+  will-change: transform;
+  cursor: pointer;
+  animation: ardhLogoBounceShared 2.6s cubic-bezier(.36,.07,.19,.97) infinite !important;
+}
+html body .ardh-hero-medallion { --lb: 11px; }
+/* medium size (jahan page ne inline size nahi diya) */
+html body .ardh-medallion-nav:not([style*="width"]) { width: 56px !important; height: 56px !important; }
+/* ring / glow pseudo-elements band */
+html body .ardh-medallion-nav::before, html body .ardh-medallion-nav::after,
+html body .ardh-hero-medallion::before, html body .ardh-hero-medallion::after { display: none !important; }
+html body .ardh-medallion-nav img, html body .ardh-hero-medallion img {
+  width: 100% !important; height: 100% !important; object-fit: contain !important; border-radius: 50% !important; display: block;
+}
+html body .ardh-medallion-nav:hover, html body .ardh-hero-medallion:hover {
+  animation-play-state: paused !important;
+  filter: brightness(1.12) saturate(1.1) !important;
+  transform: perspective(500px) translateY(calc(var(--lb) * -1)) scale(1.1);
+}
+html body .ardh-medallion-nav.ardh-spin, html body .ardh-hero-medallion.ardh-spin {
+  animation: ardhLogoSpinShared .9s cubic-bezier(.45,.05,.25,1) 1 !important;
+}
+@keyframes ardhLogoBounceShared {
+  0%   { transform: perspective(500px) translateY(0) rotateY(-14deg) rotateX(4deg) scale(1.07,.91); }
+  16%  { transform: perspective(500px) translateY(calc(var(--lb) * -.55)) rotateY(-5deg) rotateX(2deg) scale(.97,1.05); }
+  40%  { transform: perspective(500px) translateY(calc(var(--lb) * -1)) rotateY(14deg) rotateX(0) scale(1,1); }
+  64%  { transform: perspective(500px) translateY(calc(var(--lb) * -.45)) rotateY(7deg) rotateX(-2deg) scale(.98,1.04); }
+  80%  { transform: perspective(500px) translateY(0) rotateY(-7deg) rotateX(3deg) scale(1.09,.89); }
+  88%  { transform: perspective(500px) translateY(calc(var(--lb) * -.22)) rotateY(-12deg) rotateX(2deg) scale(.99,1.02); }
+  100% { transform: perspective(500px) translateY(0) rotateY(-14deg) rotateX(4deg) scale(1.07,.91); }
+}
+@keyframes ardhLogoSpinShared {
+  0%   { transform: perspective(500px) translateY(0) rotateY(0deg) scale(1); }
+  45%  { transform: perspective(500px) translateY(calc(var(--lb) * -1.1)) rotateY(180deg) scale(1.15); }
+  100% { transform: perspective(500px) translateY(0) rotateY(360deg) scale(1); }
+}
+@media (max-width: 600px) {
+  html body .ardh-medallion-nav:not([style*="width"]) { width: 44px !important; height: 44px !important; }
+  html body .ardh-medallion-nav { --lb: 5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html body .ardh-medallion-nav, html body .ardh-hero-medallion { animation: none !important; }
+}

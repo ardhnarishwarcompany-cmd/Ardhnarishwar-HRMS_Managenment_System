@@ -214,7 +214,7 @@ export const updateCall = async (req, res) => {
         salary = ?,
         ctc = ?,
         lpa = ?
-       WHERE id = ?`,
+       WHERE id = ? AND employee_id = ?`,
       [
         client_id,
         call_id,
@@ -232,6 +232,7 @@ export const updateCall = async (req, res) => {
         ctc === "" || ctc === undefined ? null : ctc,
         lpa === "" || lpa === undefined ? null : lpa,
         callIdParam,
+        employeeId,
       ],
     );
 

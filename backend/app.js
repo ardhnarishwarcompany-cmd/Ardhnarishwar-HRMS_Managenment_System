@@ -187,6 +187,7 @@ import agreementTemplatesRoutes from "./modules/client/agreementTemplates/agreem
 import clientWorkTargetRoutes from "./modules/client/workTarget/workTarget.routes.js";
 import clientReportsRoutes from "./modules/client/reports/reports.routes.js";
 
+import websiteBridgeRoutes from "./modules/website-bridge/websiteBridge.routes.js";
 const app = express();
 
 // CORS: in production set CORS_ORIGINS in .env to a comma-separated list
@@ -223,6 +224,7 @@ app.get("/test-agreement", (req, res) => {
   });
 });
 // serve uploaded files
+app.use("/api/website-bridge", websiteBridgeRoutes);
 app.use("/api/uploads", express.static("uploads"));
 app.use("/uploads", express.static("uploads"));
 

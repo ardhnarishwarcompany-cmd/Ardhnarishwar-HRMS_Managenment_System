@@ -1,222 +1,202 @@
-import { RefreshCw } from "lucide-react";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { RefreshCw, Paperclip, PackageCheck, FolderOpen } from "lucide-react";
 import API from "../../services/api.js";
+import EmptyState from "../common/EmptyState";
+import { STATUS_META, PRIORITY_META, formatDate } from "./fileTypes";
 
-export default function WorkAssignmentTable({ rows, loading, onRefresh }) {
-  const getStatusBadge = (status) => {
-    const styles = {
-      pending: "bg-blue-100 text-blue-700 border-blue-200",
-      in_progress: "bg-yellow-100 text-yellow-700 border-yellow-200",
-      completed: "bg-emerald-100 text-emerald-700 border-emerald-200",
-      overdue: "bg-red-100 text-red-700 border-red-200",
-    };
-    const labels = {
-      assigned: "Assigned",
-      in_progress: "In Progress",
-      completed: "Completed",
-      overdue: "Overdue",
-    };
-    const icons = {
-      pending: "Pending",
-      in_progress: "⚙️",
-      completed: "✅",
-      overdue: "⏰",
-    };
+function ProgressBar({ progress, status }) {
+  let color = "bg-blue-500";
+  if (status === "completed") color = "bg-emerald-500";
+  else if (status === "overdue") color = "bg-rose-500";
+  else if (progress > 50) color = "bg-amber-500";
 
-    return (
-      <span
-        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border ${styles[status]}`}
-      >
-        {icons[status]} {labels[status]}
-      </span>
-    );
-  };
-
-  const getPriorityBadge = (priority) => {
-    const styles = {
-      high: "bg-red-100 text-red-700",
-      medium: "bg-yellow-100 text-yellow-700",
-      low: "bg-green-100 text-green-700",
-    };
-    const labels = { high: "High", medium: "Medium", low: "Low" };
-
-    return (
-      <span
-        className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${styles[priority]}`}
-      >
-        {labels[priority]}
-      </span>
-    );
-  };
-
-  const getProgressBar = (progress, status) => {
-    let color = "bg-blue-500";
-    if (status === "completed") color = "bg-emerald-500";
-    else if (status === "overdue") color = "bg-red-500";
-    else if (progress > 50) color = "bg-yellow-500";
-
-    return (
-      <div className="flex items-center gap-2 w-32">
-        <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all ${color}`}
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <span className="text-xs font-medium text-gray-600 w-8">
-          {progress}%
-        </span>
+  return (
+    <div className="flex w-32 items-center gap-2">
+      <div className="h-2 flex-1 overflow-hidden rounded-full bg-[var(--soft-2)]">
+        <div className={`h-full rounded-full transition-all ${color}`} style={{ width: `${progress}%` }} />
       </div>
-    );
+      <span className="w-9 text-xs font-semibold tabular-nums text-[var(--ink-2)]">{progress}%</span>
+    </div>
+  );
+}
+
+function ProgressUpdater({ row, onSaved }) {
+  const [value, setValue] = useState("");
+  const [saving, setSaving] = useState(false);
+  const target = Number(row.target_value) || 100;
+
+  const save = async () => {
+    if (value === "") return;
+    try {
+      setSaving(true);
+      const next = Number(value);
+      await API.patch(`/client/work-assignment/status/${row.id}`, {
+        current_value: next,
+        status: next >= target ? "completed" : "in_progress",
+      });
+      toast.success("Progress updated");
+      setValue("");
+      onSaved();
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Could not update progress");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
-    <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl shadow-lg overflow-hidden">
-      <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-800">
-          Work Assignments
-        </h3>
+    <div className="mt-2 flex items-center gap-2">
+      <label htmlFor={`progress-${row.id}`} className="sr-only">
+        Update progress for {row.title}
+      </label>
+      <input
+        id={`progress-${row.id}`}
+        type="number"
+        min="0"
+        max={target}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        placeholder={`0-${target}`}
+        className="input-premium !w-24 !px-2.5 !py-1.5 text-xs"
+      />
+      <button
+        type="button"
+        onClick={save}
+        disabled={saving || value === ""}
+        className="btn-primary-premium btn-inline !px-3 !py-1.5 text-xs"
+      >
+        {saving ? "Saving..." : "Save"}
+      </button>
+    </div>
+  );
+}
+
+export default function WorkAssignmentTable({ rows, loading, onRefresh, onOpen, isEmployee }) {
+  return (
+    <div className="card-premium overflow-hidden">
+      <div className="flex items-center justify-between gap-3 border-b border-[var(--line)] p-4 sm:p-5">
+        <div>
+          <h3 className="font-semibold text-[var(--ink)]">Work Assignments</h3>
+          <p className="text-xs text-[var(--mute)]">
+            {isEmployee ? "Open a task to download the client's files and submit your work." : "Open a task to attach files or review deliverables."}
+          </p>
+        </div>
         <button
+          type="button"
           onClick={onRefresh}
           disabled={loading}
-          className="flex items-center gap-2 px-3 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition"
+          className="btn-secondary-premium btn-inline !px-3 !py-2 text-xs"
         >
-          <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+          <RefreshCw size={14} className={loading ? "animate-spin" : ""} aria-hidden="true" />
           Refresh
         </button>
       </div>
 
-      <div className="overflow-auto max-h-[60vh]">
-        <table className="w-full">
-          <thead className="sticky top-0 z-10 bg-gray-50/50">
+      <div className="max-h-[60vh] overflow-auto scrollbar-thin-premium">
+        <table className="table-premium w-full min-w-[1040px] text-sm">
+          <thead className="sticky top-0 z-10">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                Task ID
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                Title
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                Assigned To
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                Department
-              </th>
-              <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase">
-                Priority
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                Due Date
-              </th>
-              <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase">
-                Progress
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
+              <th className="px-5 py-4 text-left">Task</th>
+              <th className="px-5 py-4 text-left">Assigned To</th>
+              <th className="px-5 py-4 text-left">Priority</th>
+              <th className="px-5 py-4 text-left">Due Date</th>
+              <th className="px-5 py-4 text-left">Progress</th>
+              <th className="px-5 py-4 text-left">Files</th>
+              <th className="px-5 py-4 text-left">Status</th>
+              <th className="px-5 py-4 text-right">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody>
             {loading ? (
               <tr>
-                <td
-                  colSpan={8}
-                  className="px-6 py-12 text-center text-gray-500"
-                >
-                  <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-2" />
-                  Loading...
+                <td colSpan={8} className="px-6 py-12 text-center text-[var(--mute)]">
+                  <RefreshCw className="mx-auto mb-2 h-6 w-6 animate-spin" aria-hidden="true" />
+                  Loading assignments...
                 </td>
               </tr>
             ) : rows.length === 0 ? (
               <tr>
-                <td
-                  colSpan={8}
-                  className="px-6 py-12 text-center text-gray-500"
-                >
-                  No assignments found.
+                <td colSpan={8}>
+                  <EmptyState
+                    icon={<FolderOpen size={28} />}
+                    title="No work assignments"
+                    desc={isEmployee ? "Tasks assigned to you by your client will appear here." : "Use Assign New Task to delegate work and share files."}
+                  />
                 </td>
               </tr>
             ) : (
               rows.map((row) => {
                 const progress = row.target_value
-                  ? Math.min(
-                      Math.round((row.current_value / row.target_value) * 100),
-                      100,
-                    )
-                  : 0;
+                  ? Math.min(Math.round((row.current_value / row.target_value) * 100), 100)
+                  : row.status === "completed"
+                    ? 100
+                    : 0;
+                const status = STATUS_META[row.status] || STATUS_META.assigned;
+                const priority = PRIORITY_META[row.priority] || PRIORITY_META.medium;
+                const attachments = Number(row.attachment_count) || 0;
+                const deliverables = Number(row.deliverable_count) || 0;
+
                 return (
-                  <tr key={row.id} className="hover:bg-gray-50/50 transition">
-                    <td className="px-4 py-4 text-sm font-mono text-indigo-600">
-                      {row.id}
+                  <tr key={row.id}>
+                    <td className="px-5 py-4">
+                      <div className="flex items-start gap-3">
+                        <span className="mt-0.5 font-mono text-xs text-[var(--p)]">#{row.id}</span>
+                        <div className="min-w-0">
+                          <button
+                            type="button"
+                            onClick={() => onOpen(row)}
+                            className="text-left font-semibold text-[var(--ink)] transition-colors hover:text-[var(--p)]"
+                          >
+                            {row.title}
+                          </button>
+                          {row.description ? (
+                            <p className="mt-0.5 max-w-xs truncate text-xs text-[var(--mute)]">{row.description}</p>
+                          ) : null}
+                        </div>
+                      </div>
                     </td>
-                    <td className="px-4 py-4">
-                      <p className="font-medium text-gray-800 text-sm">
-                        {row.title}
-                      </p>
-                      <p className="text-xs text-gray-500 truncate max-w-xs">
-                        {row.description}
-                      </p>
+                    <td className="px-5 py-4">
+                      <p className="font-medium text-[var(--ink-2)]">{row.employee_name || "—"}</p>
+                      <p className="text-xs text-[var(--mute)]">{row.department_name || row.employeeCode || ""}</p>
                     </td>
-                    <td className="px-4 py-4">
-                      <div className="flex items-center gap-2">
-                        {row.employee_name}
-                        <span className="text-sm text-gray-700">
-                          {row.employee}
+                    <td className="px-5 py-4">
+                      <span className={`badge-premium ${priority.cls}`}>{priority.label}</span>
+                    </td>
+                    <td className="px-5 py-4 whitespace-nowrap text-[var(--ink-2)]">{formatDate(row.deadline)}</td>
+                    <td className="px-5 py-4">
+                      <ProgressBar progress={progress} status={row.status} />
+                      {isEmployee && row.status !== "completed" ? (
+                        <ProgressUpdater row={row} onSaved={onRefresh} />
+                      ) : null}
+                    </td>
+                    <td className="px-5 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-3 text-xs font-semibold text-[var(--ink-2)]">
+                        <span className="inline-flex items-center gap-1" title="Task files from client">
+                          <Paperclip size={13} className="text-[var(--p)]" aria-hidden="true" />
+                          {attachments}
+                          <span className="sr-only"> task files</span>
+                        </span>
+                        <span className="inline-flex items-center gap-1" title="Deliverables from employee">
+                          <PackageCheck size={13} className="text-emerald-600" aria-hidden="true" />
+                          {deliverables}
+                          <span className="sr-only"> deliverables</span>
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-sm text-gray-600">
-                      {row.department_name}
+                    <td className="px-5 py-4">
+                      <span className={`badge-premium ${status.cls}`}>{status.label}</span>
                     </td>
-                    <td className="px-4 py-4 text-center">
-                      {getPriorityBadge(row.priority)}
+                    <td className="px-5 py-4 text-right whitespace-nowrap">
+                      <button
+                        type="button"
+                        onClick={() => onOpen(row)}
+                        className="btn-secondary-premium btn-inline !px-3 !py-1.5 text-xs"
+                      >
+                        <FolderOpen size={13} aria-hidden="true" />
+                        {isEmployee ? "Files & submit" : "Files"}
+                      </button>
                     </td>
-                    <td className="px-4 py-4 text-sm text-gray-600">
-                      {row.deadline
-                        ? new Date(row.deadline).toLocaleDateString("en-GB")
-                        : "-"}
-                    </td>
-                    <td className="px-4 py-4">
-                      {getProgressBar(progress, row.status)}
-
-                      {/* ✅ employee progress update */}
-                      {row.status !== "completed" && (
-                        <div className="mt-2 flex gap-2">
-                          <input
-                            type="number"
-                            min="0"
-                            max={row.target_value || 100}
-                            placeholder="Update"
-                            className="w-20 px-2 py-1 border rounded text-xs"
-                            onChange={(e) => {
-                              row._newProgress = e.target.value;
-                            }}
-                          />
-
-                          <button
-                            onClick={async () => {
-                              try {
-                                await API.patch(
-                                  `/client/work-assignment/status/${row.id}`,
-                                  {
-                                    current_value: row._newProgress,
-                                    status:
-                                      row._newProgress >= row.target_value
-                                        ? "completed"
-                                        : "in_progress",
-                                  },
-                                );
-
-                                onRefresh();
-                              } catch (err) {
-                                console.error(err);
-                              }
-                            }}
-                            className="px-2 py-1 bg-indigo-500 text-white text-xs rounded"
-                          >
-                            Save
-                          </button>
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-4 py-4">{getStatusBadge(row.status)}</td>
                   </tr>
                 );
               })
@@ -226,7 +206,7 @@ export default function WorkAssignmentTable({ rows, loading, onRefresh }) {
       </div>
 
       {!loading && rows.length > 0 && (
-        <div className="px-6 py-3 bg-gray-50/50 border-t border-gray-100 text-sm text-gray-500">
+        <div className="border-t border-[var(--line)] px-5 py-3 text-xs text-[var(--mute)]">
           Showing {rows.length} assignment{rows.length !== 1 ? "s" : ""}
         </div>
       )}

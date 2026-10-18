@@ -151,12 +151,8 @@ export default function OtpAttendance() {
   const summary = history?.summary;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <main className="mx-auto max-w-5xl px-4 pb-28 pt-6 sm:px-6">
-        <header className="mb-6">
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Attendance</h1>
-          <p className="text-sm text-gray-500">Mark today&apos;s attendance with a one-time code sent to your registered email.</p>
-        </header>
+    <div className="w-full space-y-6 pb-12">
+      <main className="mx-auto max-w-5xl space-y-6">
 
         <div className="grid gap-6 lg:grid-cols-5">
           {/* Punch card */}
@@ -196,7 +192,8 @@ export default function OtpAttendance() {
                       type="button"
                       onClick={checkOut}
                       disabled={checkingOut}
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gray-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800 disabled:opacity-60 sm:w-auto"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-xl text-white px-5 py-3 text-sm font-bold shadow-md hover:opacity-95 transition active:scale-[0.98] disabled:opacity-60 sm:w-auto"
+                      style={{ background: "linear-gradient(135deg, #f43f5e, #e11d48)", boxShadow: "0 8px 18px rgba(244, 63, 94, 0.25)" }}
                     >
                       {checkingOut ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <LogOut size={16} aria-hidden="true" />}
                       Check out now
@@ -212,7 +209,8 @@ export default function OtpAttendance() {
                     type="button"
                     onClick={requestOtp}
                     disabled={sending || cooldown > 0}
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-60 sm:w-auto"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl text-white px-5 py-3 text-sm font-bold shadow-md hover:opacity-95 transition active:scale-[0.98] disabled:opacity-60 sm:w-auto"
+                    style={{ background: "linear-gradient(135deg, #6d28d9, #c026d3)", boxShadow: "0 8px 18px rgba(124, 58, 237, 0.25)" }}
                   >
                     {sending ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <LogIn size={16} aria-hidden="true" />}
                     {cooldown > 0 ? `Resend in ${cooldown}s` : "Send OTP & check in"}
@@ -266,7 +264,8 @@ export default function OtpAttendance() {
                     type="button"
                     onClick={() => verify()}
                     disabled={verifying || digits.some((d) => !d)}
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-60 sm:w-auto"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl text-white px-5 py-3 text-sm font-bold shadow-md hover:opacity-95 transition active:scale-[0.98] disabled:opacity-60 sm:w-auto"
+                    style={{ background: "linear-gradient(135deg, #6d28d9, #c026d3)", boxShadow: "0 8px 18px rgba(124, 58, 237, 0.25)" }}
                   >
                     {verifying ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <ShieldCheck size={16} aria-hidden="true" />}
                     Verify & mark attendance

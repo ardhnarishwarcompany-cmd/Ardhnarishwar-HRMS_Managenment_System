@@ -16,6 +16,10 @@ import {
   Pencil,
   Trash2,
   Inbox,
+  Clock,
+  Building2,
+  ShieldCheck,
+  UserCog,
 } from "lucide-react";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -28,6 +32,38 @@ const STATUS_CHIP = {
   "HALF DAY": "bg-[#fff8e1] text-[#8a6d1a]",
   WFH: "bg-[#eef0fe] text-[#4f63f0]",
   LEAVE: "bg-[#f3eefe] text-[#7c5cd6]",
+};
+
+const isClientRow = (record) => record?.source === "client";
+
+/* "09:05:00" -> "9:05 AM" */
+const formatTime = (value) => {
+  if (!value) return "—";
+  const match = String(value).match(/(\d{2}):(\d{2})/);
+  if (!match) return String(value);
+  let hour = Number(match[1]);
+  const suffix = hour >= 12 ? "PM" : "AM";
+  hour = hour % 12 || 12;
+  return `${hour}:${match[2]} ${suffix}`;
+};
+
+/* API TIME value -> "HH:MM" for <input type="time"> */
+const toTimeInput = (value) => {
+  if (!value) return "";
+  const match = String(value).match(/(\d{2}):(\d{2})/);
+  return match ? `${match[1]}:${match[2]}` : "";
+};
+
+const formatMarkedAt = (value) => {
+  if (!value) return null;
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 };
 
 export default function AttendanceTracker() {
@@ -68,6 +104,9 @@ export default function AttendanceTracker() {
   const [openDelete, setOpenDelete] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
 
+  // Office default timing (login_settings) shown for rows without a shift.
+  const [officeDefault, setOfficeDefault] = useState({ start: "", end: "" });
+
   // =========================
   // FETCH DATA
   // =========================
@@ -83,15 +122,29 @@ export default function AttendanceTracker() {
 
       const mapped = res.data.data.map((r) => ({
         id: r.id,
-        attendanceId: `ATT${r.id}`,
+        // Internal and client-portal rows live in different tables, so the
+        // same numeric id can appear twice; prefix client rows to keep the
+        // displayed id (and the React key) unique.
+        attendanceId: r.source === "client" ? `CATT${r.id}` : `ATT${r.id}`,
         employeeId: r.employee_id,
         employeeName: r.employee_name,
+        employeeCode: r.employeeCode,
         date: r.date,
-        checkInTime: r.check_in,
-        checkOutTime: r.check_out,
+        checkInTime: toTimeInput(r.check_in),
+        checkOutTime: toTimeInput(r.check_out),
         statusId: statusList.find((s) => s.value === r.status)?.id || 1,
         isActive: r.is_active ? 1 : 0,
         createdAt: r.created_at,
+        source: r.source || "internal",
+        clientCode: r.client_code,
+        clientName: r.client_name,
+        shiftId: r.shift_id,
+        shiftName: r.shift_name,
+        shiftStart: r.shift_start,
+        shiftEnd: r.shift_end,
+        markedByName: r.marked_by_name,
+        markedByRole: r.marked_by_role,
+        markedByAt: r.marked_by_at,
       }));
 
       setRecords(mapped);
@@ -105,12 +158,29 @@ export default function AttendanceTracker() {
     fetchAttendance();
   }, [search, statusFilter]);
 
+  useEffect(() => {
+    const fetchOfficeDefault = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/super-admin/attendance/settings`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setOfficeDefault({
+          start: res.data?.data?.shiftStartTime || "",
+          end: res.data?.data?.shiftEndTime || "",
+        });
+      } catch {
+        setOfficeDefault({ start: "", end: "" });
+      }
+    };
+    fetchOfficeDefault();
+  }, [openAdd, openEdit]);
+
   // =========================
   // CREATE
   // =========================
   const handleCreate = async (payload) => {
     try {
-      await axios.post(
+      const res = await axios.post(
         `${BASE_URL}/super-admin/attendance`,
         {
           employee_id: payload.employeeId,
@@ -119,17 +189,23 @@ export default function AttendanceTracker() {
           check_in: payload.checkInTime,
           check_out: payload.checkOutTime,
           status: statusById[payload.statusId]?.value,
+          is_active: payload.isActive !== false,
+          shift_id: payload.shiftId || "",
         },
         {
           headers: { Authorization: `Bearer ${token}` },
         },
       );
 
-      toast.success("Attendance added");
+      toast.success(
+        res?.data?.updated
+          ? "Attendance for that day already existed and was updated"
+          : "Attendance added",
+      );
       setOpenAdd(false);
       fetchAttendance();
     } catch (err) {
-      toast.error("Create failed");
+      toast.error(err?.response?.data?.message || "Create failed");
     }
   };
 
@@ -137,6 +213,10 @@ export default function AttendanceTracker() {
   // EDIT
   // =========================
   const openEditModal = (record) => {
+    if (isClientRow(record)) {
+      toast.error("Client portal records are managed by the client");
+      return;
+    }
     setSelectedRecord(record);
     setOpenEdit(true);
   };
@@ -152,6 +232,7 @@ export default function AttendanceTracker() {
           check_out: updated.checkOutTime,
           status: statusById[updated.statusId]?.value,
           is_active: updated.isActive === 1,
+          ...(updated.keepShift ? {} : { shift_id: updated.shiftId || "" }),
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -162,21 +243,21 @@ export default function AttendanceTracker() {
       setOpenEdit(false);
       fetchAttendance();
     } catch (err) {
-      toast.error("Update failed");
+      toast.error(err?.response?.data?.message || "Update failed");
     }
   };
 
   // =========================
   // DELETE
   // =========================
-  const openDeleteModal = (id) => {
-    setDeleteId(id);
+  const openDeleteModal = (id, source) => {
+    setDeleteId({ id, source });
     setOpenDelete(true);
   };
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`${BASE_URL}/super-admin/attendance/${deleteId}`, {
+      await axios.delete(`${BASE_URL}/super-admin/attendance/${deleteId?.id}?source=${deleteId?.source || "internal"}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -184,7 +265,7 @@ export default function AttendanceTracker() {
       setOpenDelete(false);
       fetchAttendance();
     } catch (err) {
-      toast.error("Delete failed");
+      toast.error(err?.response?.data?.message || "Delete failed");
     }
   };
 
@@ -275,10 +356,10 @@ export default function AttendanceTracker() {
         </div>
 
         <div className="max-h-[60vh] overflow-auto">
-          <table className="w-full min-w-[760px] text-sm">
+          <table className="w-full min-w-[1080px] text-sm">
             <thead className="sticky top-0 z-10 bg-[#f7f8fb]">
               <tr className="border-b border-[#e6e9f0]">
-                {["ID", "Employee", "Date", "Status"].map((h) => (
+                {["ID", "Employee", "Date", "Shift", "Check In / Out", "Source", "Status"].map((h) => (
                   <th
                     key={h}
                     className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[#7b8698]"
@@ -298,7 +379,7 @@ export default function AttendanceTracker() {
 
                 return (
                   <tr
-                    key={r.id}
+                    key={`${r.source}-${r.id}`}
                     className="border-b border-[#eceff4] last:border-0 hover:bg-[#f9faff]"
                   >
                     <td className="num px-4 py-3 text-xs font-bold text-[#7b8698]">
@@ -310,7 +391,7 @@ export default function AttendanceTracker() {
                         {r.employeeName}
                       </div>
                       <div className="num mt-0.5 text-[11px] text-[#7b8698]">
-                        #{r.employeeId}
+                        {r.employeeCode || `#${r.employeeId}`}
                       </div>
                     </td>
 
@@ -330,6 +411,77 @@ export default function AttendanceTracker() {
                     </td>
 
                     <td className="px-4 py-3">
+                      {r.shiftName ? (
+                        <div className="flex items-start gap-2">
+                          <Clock size={14} className="mt-0.5 shrink-0 text-[#4f63f0]" />
+                          <div>
+                            <div className="text-[13px] font-semibold text-[#0b1220]">
+                              {r.shiftName}
+                            </div>
+                            <div className="num mt-0.5 text-[11px] text-[#7b8698]">
+                              {formatTime(r.shiftStart)} – {formatTime(r.shiftEnd)}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div>
+                          <span className="text-[12px] text-[#9aa3b5]">
+                            {isClientRow(r) ? "Client schedule" : "Office Hours"}
+                          </span>
+                          {!isClientRow(r) && officeDefault.start && officeDefault.end && (
+                            <div className="num mt-0.5 text-[11px] text-[#7b8698]">
+                              {formatTime(officeDefault.start)} – {formatTime(officeDefault.end)} IST
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </td>
+
+                    <td className="px-4 py-3">
+                      <div className="num text-[13px] font-semibold text-[#33405c]">
+                        {formatTime(r.checkInTime)}
+                      </div>
+                      <div className="num mt-0.5 text-[11px] text-[#7b8698]">
+                        out {formatTime(r.checkOutTime)}
+                      </div>
+                    </td>
+
+                    <td className="px-4 py-3">
+                      {isClientRow(r) ? (
+                        <div className="flex items-start gap-2">
+                          <Building2 size={14} className="mt-0.5 shrink-0 text-[#7c5cd6]" />
+                          <div>
+                            <div className="text-[12px] font-semibold text-[#0b1220]">
+                              Client Portal
+                            </div>
+                            <div className="mt-0.5 text-[11px] text-[#7b8698]">
+                              {r.clientName || r.clientCode || "Client"}
+                            </div>
+                          </div>
+                        </div>
+                      ) : r.markedByRole === "SUPER_ADMIN" ? (
+                        <div className="flex items-start gap-2">
+                          <ShieldCheck size={14} className="mt-0.5 shrink-0 text-[#148662]" />
+                          <div>
+                            <div className="text-[12px] font-semibold text-[#0b1220]">
+                              {r.markedByName || "Super Admin"}
+                            </div>
+                            {formatMarkedAt(r.markedByAt) && (
+                              <div className="mt-0.5 text-[11px] text-[#7b8698]">
+                                {formatMarkedAt(r.markedByAt)}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 text-[12px] text-[#7b8698]">
+                          <UserCog size={14} className="shrink-0" />
+                          System / Manual
+                        </div>
+                      )}
+                    </td>
+
+                    <td className="px-4 py-3">
                       <span
                         className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold ${
                           STATUS_CHIP[statusName] || "bg-[#eceff4] text-[#7b8698]"
@@ -344,14 +496,19 @@ export default function AttendanceTracker() {
                       <div className="flex justify-end gap-1.5">
                         <button
                           onClick={() => openEditModal(r)}
-                          className="flex items-center gap-1 rounded-lg bg-[#eef0fe] px-2.5 py-1.5 text-[11px] font-bold text-[#4f63f0] transition hover:bg-[#4f63f0] hover:text-white"
-                          title="Edit record"
+                          disabled={isClientRow(r)}
+                          className="flex items-center gap-1 rounded-lg bg-[#eef0fe] px-2.5 py-1.5 text-[11px] font-bold text-[#4f63f0] transition hover:bg-[#4f63f0] hover:text-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-[#eef0fe] disabled:hover:text-[#4f63f0]"
+                          title={
+                            isClientRow(r)
+                              ? "Managed in the Client Portal"
+                              : "Edit record"
+                          }
                         >
                           <Pencil size={12} /> Edit
                         </button>
 
                         <button
-                          onClick={() => openDeleteModal(r.id)}
+                          onClick={() => openDeleteModal(r.id, r.source)}
                           className="flex items-center gap-1 rounded-lg bg-[#fdeef0] px-2.5 py-1.5 text-[11px] font-bold text-[#c73e4c] transition hover:bg-[#c73e4c] hover:text-white"
                           title="Delete record"
                         >
@@ -365,7 +522,7 @@ export default function AttendanceTracker() {
 
               {filteredRecords.length === 0 && (
                 <tr>
-                  <td colSpan="5" className="px-4 py-12 text-center">
+                  <td colSpan="8" className="px-4 py-12 text-center">
                     <Inbox size={22} className="mx-auto text-[#7b8698]" />
                     <p className="mt-2 text-sm font-medium text-[#33405c]">
                       No attendance records found

@@ -83,3 +83,27 @@ AI-Robotics-Frontend/
 
 # Local backup copies
 **/*-backup
+
+.env
+.env.*
+!.env.example
+!.env.*.example
+node_modules/
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+dist/
+*.log
+*.db
+hrms_db.sql
+*.bak*
+*.backup*
+*.before-*
+*.pem
+*.key
+backend/logs/
+backend/uploads/
+backend/modules/hr/form/uploads/joining/
+backend/modules/hr/interviews/uploads/
+backend/integrations/ai-robotics/storage/

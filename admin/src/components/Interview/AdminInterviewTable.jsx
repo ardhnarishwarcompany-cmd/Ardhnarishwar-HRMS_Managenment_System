@@ -40,6 +40,12 @@ export default function AdminInterviewTable({
     9: "NOT REACHABLE",
   };
 
+  const clientStatusBadge = {
+    accepted: "bg-emerald-50 text-emerald-700 ring-emerald-200",
+    rejected: "bg-rose-50 text-rose-700 ring-rose-200",
+    pending: "bg-amber-50 text-amber-700 ring-amber-200",
+  };
+
   useEffect(() => {
     const fetchJobProfiles = async () => {
       try {
@@ -163,7 +169,7 @@ const handleJoinedChange = async (id, joined, joining_date, selection_date) => {
               <th className="p-3 text-left">Time</th>
               <th className="p-3 text-left">Joining Date</th>
               {/* <th className="p-3 text-left">CV</th> */}
-              {/* <th className="p-3 text-left">Client Status</th> */}
+              <th className="p-3 text-left">Client Status</th>
               <th className="p-3 text-left">Joined</th>
               <th className="p-3 text-left">Delete</th>
             </tr>
@@ -236,7 +242,20 @@ const handleJoinedChange = async (id, joined, joining_date, selection_date) => {
                   )}
                 </td> */}
 
-                {/* <td className="p-3">{item.client_status || "pending"}</td> */}
+                <td className="p-3">
+                  {isFormRow(item.id) ? (
+                    <span className="text-gray-400">-</span>
+                  ) : (
+                    <span
+                      className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ring-1 ${
+                        clientStatusBadge[item.client_status] || clientStatusBadge.pending
+                      }`}
+                      title={item.client_remarks ? `Client remarks: ${item.client_remarks}` : undefined}
+                    >
+                      {item.client_status || "pending"}
+                    </span>
+                  )}
+                </td>
 
                 <td className="p-3">
                   <select

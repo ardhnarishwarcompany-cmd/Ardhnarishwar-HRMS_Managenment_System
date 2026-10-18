@@ -153,7 +153,7 @@ export default function DeploymentLog() {
               <button
                 type="submit"
                 disabled={saving}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 disabled:opacity-60"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-purple-500/25 transition hover:shadow-purple-500/40 hover:-translate-y-0.5 disabled:opacity-60"
               >
                 <Rocket size={15} /> {saving ? "Logging…" : "Log Deployment"}
               </button>
@@ -174,7 +174,7 @@ export default function DeploymentLog() {
             onClick={() => setEnvFilter(env)}
             className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
               envFilter === env
-                ? "bg-indigo-600 text-white shadow-sm"
+                ? "bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white shadow-sm"
                 : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-700"
             }`}
           >

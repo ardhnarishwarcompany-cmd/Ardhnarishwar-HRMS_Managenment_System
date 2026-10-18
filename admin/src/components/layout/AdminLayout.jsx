@@ -1,42 +1,45 @@
-import { Outlet } from "react-router-dom";
-import { useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import VoiceAssistant from "../VoiceAssistant";
 
 export default function AdminLayout() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false); // mobile drawer
+  const [collapsed, setCollapsed] = useState(false); // desktop hide
+  const location = useLocation();
+
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
+
+  const toggleSidebar = () => {
+    if (window.innerWidth < 1024) setOpen((v) => !v);
+    else setCollapsed((v) => !v);
+  };
 
   return (
-    <div className="h-screen bg-[#f7f8fb] flex overflow-hidden">
-      {/* Mobile Overlay */}
+    <div className="adm-shell">
       {open && (
         <div
           onClick={() => setOpen(false)}
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="adm-overlay lg:hidden"
+          aria-hidden="true"
         />
       )}
 
-      {/* Sidebar — fixed height, no scroll */}
       <div
-        className={`fixed z-50 inset-y-0 left-0 transform 
-        ${open ? "translate-x-0" : "-translate-x-full"} 
-        transition duration-300 ease-in-out 
-        lg:translate-x-0 lg:static lg:shrink-0`}
+        className={`adm-side ${open ? "is-open" : ""} ${collapsed ? "is-collapsed" : ""}`}
       >
-        <Sidebar />
+        <Sidebar onNavigate={() => setOpen(false)} />
       </div>
 
-      {/* Main Content — yahan scroll hoga */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <Topbar setOpen={setOpen} />
+      <div className="adm-main">
+        <Topbar onToggleSidebar={toggleSidebar} sidebarCollapsed={collapsed} />
 
-<main
-  style={{ overflow: "auto", flex: 1 }}
-  className="p-4 sm:p-6"
->
-  <Outlet />
-</main>
+        <main className="adm-content">
+          <Outlet />
+        </main>
       </div>
 
       <VoiceAssistant />

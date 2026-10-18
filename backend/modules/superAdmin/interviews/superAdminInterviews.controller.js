@@ -92,6 +92,27 @@ export const updateJoinedStatus = async (req, res) => {
   }
 };
 
+// ================= CLIENT DECISIONS =================
+export const getClientDecisions = async (req, res) => {
+  try {
+    const data = await service.getClientDecisions(req.query);
+    res.json({ success: true, data });
+  } catch (err) {
+    console.error("Client decisions error:", err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const getClientDecisionSummary = async (req, res) => {
+  try {
+    const data = await service.getClientDecisionSummary();
+    res.json({ success: true, data });
+  } catch (err) {
+    console.error("Client decision summary error:", err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 // ================= SCHEDULED INTERVIEWS (LEGACY) =================
 export const getAllScheduledInterviews = async (req, res) => {
   try {

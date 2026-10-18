@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Office Wi-Fi Clock-In • Global Attendance Management System</title>
-<link rel="icon" type="image/svg+xml" href="/favicon.ico">
+<title>Office Wi-Fi Clock-In • Ardhnarishwar Global Platform</title>
+<link rel="icon" type="image/png" href="/static/images/ardhnarishwar_logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/css/theme.css">
+<link rel="stylesheet" href="/static/css/ardhnarishwar_3d.css">
 <style>
 .clockin-container {
   min-height: 100vh;
@@ -91,13 +92,18 @@
   font-size: 13px;
 }
 </style>
+<link rel="stylesheet" href="/static/css/ardh_logo.css?v=1">
 </head>
 <body>
 <div class="clockin-container">
-  <div class="clockin-card">
+  <div class="clockin-card card-3d">
     <div class="clockin-header">
-      <div class="clockin-icon">📶</div>
-      <h1>Corporate Wi-Fi Clock-In</h1>
+      <div style="display:flex; justify-content:center; margin-bottom:12px;">
+        <div class="ardh-medallion-nav" style="width:56px; height:56px;">
+          <img src="/static/images/ardhnarishwar_logo_emblem.png" alt="Ardhnarishwar Logo" class="ardh-medallion-img">
+        </div>
+      </div>
+      <h1 style="background:linear-gradient(135deg, #C084FC, #38BDF8, #FBBF24); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-size:22px; font-weight:900;">ARDHNARISHWAR WI-FI CLOCK-IN</h1>
       <p>Authorized corporate office network verification</p>
     </div>
 
@@ -109,6 +115,16 @@
       <div class="badge badge-cyan">
         <span class="badge-dot"></span> <span id="comp-id">COMPANY</span>
       </div>
+    </div>
+
+    <!-- Clock-IN / Clock-OUT Selector -->
+    <div style="display:flex; background:var(--bg-input); padding:4px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle); margin-bottom:14px;">
+      <button type="button" id="toggle-punch-in" onclick="setPunchType('IN')" style="flex:1; padding:8px 12px; border-radius:6px; border:none; font-weight:700; font-size:12.5px; cursor:pointer; background:var(--emerald); color:#fff; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;">
+        <span>🟢 Clock-IN</span>
+      </button>
+      <button type="button" id="toggle-punch-out" onclick="setPunchType('OUT')" style="flex:1; padding:8px 12px; border-radius:6px; border:none; font-weight:700; font-size:12.5px; cursor:pointer; background:transparent; color:var(--text-secondary); display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;">
+        <span>🔴 Clock-OUT</span>
+      </button>
     </div>
 
     <div class="network-gauge">
@@ -132,9 +148,7 @@
       Record Wi-Fi Attendance →
     </button>
 
-    <a href="/employee" style="text-align:center; color:var(--text-muted); font-size:13px; text-decoration:none; margin-top:4px;">
-      ← Return to Employee Dashboard
-    </a>
+    <a href="/employee" class="btn btn-secondary btn-sm" style="text-decoration:none; margin-top:4px;">← Return to Portal</a>
   </div>
 </div>
 
@@ -144,8 +158,50 @@
 <script>
 let currentCompanyId = "";
 let currentEmpId = "";
+let currentPunchType = "IN";
+
+function setPunchType(type) {
+  currentPunchType = type;
+  const inBtn = document.getElementById('toggle-punch-in');
+  const outBtn = document.getElementById('toggle-punch-out');
+  const clockBtn = document.getElementById('btn-clockin');
+
+  if (type === 'OUT') {
+    if (inBtn) {
+      inBtn.style.background = 'transparent';
+      inBtn.style.color = 'var(--text-secondary)';
+    }
+    if (outBtn) {
+      outBtn.style.background = 'var(--rose)';
+      outBtn.style.color = '#fff';
+    }
+    if (clockBtn && !clockBtn.disabled) {
+      clockBtn.textContent = 'Record Wi-Fi Clock-OUT →';
+    }
+  } else {
+    if (inBtn) {
+      inBtn.style.background = 'var(--emerald)';
+      inBtn.style.color = '#fff';
+    }
+    if (outBtn) {
+      outBtn.style.background = 'transparent';
+      outBtn.style.color = 'var(--text-secondary)';
+    }
+    if (clockBtn && !clockBtn.disabled) {
+      clockBtn.textContent = 'Record Wi-Fi Clock-IN →';
+    }
+  }
+}
 
 async function initPage() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const modeParam = (urlParams.get('mode') || '').toUpperCase();
+  if (modeParam === 'OUT') {
+    setPunchType('OUT');
+  } else {
+    setPunchType('IN');
+  }
+
   try {
     const res = await fetch('/api/me');
     const data = await res.json();
@@ -191,23 +247,27 @@ async function markWifiAttendance() {
     const res = await fetch('/api/attendance/mark-wifi', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ company_id: currentCompanyId, emp_id: currentEmpId })
+      body: JSON.stringify({ 
+        company_id: currentCompanyId, 
+        emp_id: currentEmpId,
+        check_type: currentPunchType 
+      })
     });
     const data = await res.json();
 
     if (data.ok) {
       showToast(data.message, 'success');
-      btn.textContent = 'Attendance Recorded ✓';
+      btn.textContent = `Clock-${currentPunchType} Recorded ✓`;
       setTimeout(() => { window.location.href = '/employee'; }, 2000);
     } else {
-      showToast(data.error || 'Wi-Fi clock-in failed', 'error');
+      showToast(data.error || 'Wi-Fi attendance failed', 'error');
       btn.disabled = false;
-      btn.textContent = 'Record Wi-Fi Attendance →';
+      btn.textContent = `Record Wi-Fi Clock-${currentPunchType} →`;
     }
   } catch (err) {
     showToast('Network communication failure', 'error');
     btn.disabled = false;
-    btn.textContent = 'Record Wi-Fi Attendance →';
+    btn.textContent = `Record Wi-Fi Clock-${currentPunchType} →`;
   }
 }
 
@@ -227,5 +287,7 @@ window.onload = initPage;
 </script>
 <script src="/static/js/theme.js"></script>
 <script src="/static/js/telemetry.js"></script>
+<script src="/static/js/ardhnarishwar_runtime.js"></script>
+<script src="/static/js/ardh_logo.js?v=1"></script>
 </body>
 </html>

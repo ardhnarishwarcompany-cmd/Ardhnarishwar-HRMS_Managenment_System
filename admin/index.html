@@ -31,31 +31,19 @@
     <meta property="og:type" content="website" />
 
     <!-- Theme color (mobile UI color) -->
-    <meta name="theme-color" content="#4f46e5" />
-
-    <!-- Dark mode: apply saved/system theme BEFORE React loads (no white flash) -->
-    <script>
-      (function () {
-        try {
-          var t = localStorage.getItem("hrms-theme");
-          var dark =
-            t === "dark" ||
-            ((!t || t === "system") &&
-              window.matchMedia("(prefers-color-scheme: dark)").matches);
-          if (dark) document.documentElement.classList.add("dark");
-        } catch (e) {}
-      })();
-    </script>
+    <meta name="theme-color" content="#7c3aed" />
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="apple-touch-icon" href="/pwa-192.png" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-  </head>
+  <link rel="stylesheet" href="/logo-fx-react.css">
+  <link rel="stylesheet" href="/logo-3d-bounce.css?v=1">
+</head>
 
   <body>
-    <div id="root"></div>
+    <div id="root" class="adm-root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

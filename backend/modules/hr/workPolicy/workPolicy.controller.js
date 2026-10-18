@@ -132,6 +132,7 @@ export const createPolicy = async (req, res) => {
         [department]
       );
       if (dept) departmentId = dept.id;
+      else return res.status(400).json({ success: false, message: `Department "${department}" not found` });
     }
 
     // work_policies.client_id is NOT NULL — tokens from HR/IT/Super Admin
@@ -178,6 +179,7 @@ export const updatePolicy = async (req, res) => {
         [department]
       );
       if (dept) departmentId = dept.id;
+      else return res.status(400).json({ success: false, message: `Department "${department}" not found` });
     }
 
     await db.query(

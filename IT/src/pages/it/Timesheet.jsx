@@ -173,7 +173,7 @@ export default function Timesheet() {
               <button
                 type="submit"
                 disabled={saving}
-                className="h-[42px] rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0"
+                className="h-[42px] rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-600 text-sm font-semibold text-white shadow-lg shadow-purple-500/25 transition hover:shadow-purple-500/40 hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0"
               >
                 {saving ? "Adding..." : "Add Entry"}
               </button>

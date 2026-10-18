@@ -59,7 +59,7 @@ export default function EODReport() {
   }, [filters]);
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       <PageHeader title="EOD Report" desc="Track daily work summaries" />
       <div className="flex items-center justify-between">
         <button

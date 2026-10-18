@@ -4,21 +4,21 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/jpeg" href="/logo.jpeg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>IT Dashboard | HRMS</title>
+    <title>IT Dashboard | Ardhnarishwar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
-      // Apply saved theme before React loads to prevent white flash
       (function () {
         try {
-          var t = localStorage.getItem("hrms-theme") || "system";
-          var dark =
-            t === "dark" ||
-            (t === "system" &&
-              window.matchMedia("(prefers-color-scheme: dark)").matches);
-          if (dark) document.documentElement.classList.add("dark");
+          localStorage.removeItem("hrms-theme");
+          document.documentElement.classList.remove("dark");
+          document.documentElement.setAttribute("data-theme", "light");
         } catch (e) {}
       })();
     </script>
-  </head>
+    <link rel="stylesheet" href="/logo-3d-bounce.css?v=1">
+</head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>

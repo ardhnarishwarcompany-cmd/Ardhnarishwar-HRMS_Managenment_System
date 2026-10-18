@@ -1,0 +1,66 @@
+# Binaries & Tunnels
+cloudflared.exe
+*.exe
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Logs & Databases
+*.log
+local_data/
+*.sqlite
+*.db
+
+# Operating System & IDEs
+.DS_Store
+Thumbs.db
+ehthumbs.db
+[Nn]et[Hh]ood
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

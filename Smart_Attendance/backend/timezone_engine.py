@@ -38,18 +38,33 @@ def get_utc_iso_string() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def get_localized_time(tz_name: str = "UTC", utc_dt: datetime = None) -> tuple[str, str, str]:
+def get_localized_time(tz_name: str = "UTC", utc_dt = None) -> tuple[str, str, str]:
     """
     Given a timezone string (e.g. 'Asia/Kolkata', 'America/New_York') and optional UTC datetime,
     returns (date_str 'YYYY-MM-DD', time_str 'HH:MM:SS', formatted_label '01 Sep 2026, 03:30 PM')
+    Accepts (tz_name, utc_dt) or (utc_dt, tz_name).
     """
+    # Check if arguments are reversed, e.g. get_localized_time(dt, "Asia/Kolkata")
+    if isinstance(tz_name, (datetime, str)) and isinstance(utc_dt, str) and not isinstance(tz_name, str):
+        utc_dt, tz_name = tz_name, utc_dt
+    elif isinstance(tz_name, str) and isinstance(utc_dt, str) and ("/" in utc_dt or utc_dt in ("UTC", "GMT")):
+        # If tz_name looks like ISO date and utc_dt looks like tz_name
+        if "T" in tz_name or "-" in tz_name:
+            utc_dt, tz_name = tz_name, utc_dt
+
     if utc_dt is None:
         utc_dt = datetime.now(timezone.utc)
-    elif utc_dt.tzinfo is None:
+    elif isinstance(utc_dt, str):
+        try:
+            utc_dt = datetime.fromisoformat(utc_dt.replace("Z", "+00:00"))
+        except Exception:
+            utc_dt = datetime.now(timezone.utc)
+
+    if utc_dt.tzinfo is None:
         utc_dt = utc_dt.replace(tzinfo=timezone.utc)
 
     try:
-        tz = pytz.timezone(tz_name)
+        tz = pytz.timezone(str(tz_name)) if tz_name else pytz.timezone("UTC")
     except Exception:
         tz = pytz.timezone("UTC")
 
@@ -58,6 +73,7 @@ def get_localized_time(tz_name: str = "UTC", utc_dt: datetime = None) -> tuple[s
     time_str = local_dt.strftime("%H:%M:%S")
     formatted = local_dt.strftime("%d %b %Y, %I:%M %p")
     return date_str, time_str, formatted
+
 
 
 def format_utc_to_tz(utc_iso_str: str, tz_name: str = "UTC") -> dict:
@@ -117,20 +133,31 @@ def evaluate_attendance_status(local_time_str: str, policy: dict, work_type: str
         return "Present"
 
 
-def resolve_entity_timezone(employee: dict = None, branch: dict = None, company: dict = None, default_tz: str = "Asia/Kolkata") -> str:
+def resolve_entity_timezone(employee: dict = None, branch: dict = None, company: dict = None, default_tz: str = "Asia/Kolkata", **kwargs) -> str:
     """
     Hierarchical timezone resolution:
     1. Employee-specific timezone (for remote/distributed staff)
     2. Branch/Location-specific timezone
     3. Company/Tenant default timezone
     4. Default fallback timezone ("Asia/Kolkata" or "UTC")
+    Supports direct company dictionary or company_id keyword argument.
     """
-    if employee and employee.get("timezone"):
+    comp_obj = company
+    if comp_obj is None and "company_id" in kwargs:
+        comp_id = kwargs.get("company_id")
+        if comp_id:
+            try:
+                from database import companies_col
+                comp_obj = companies_col.find_one({"company_id": str(comp_id).upper()})
+            except Exception:
+                pass
+
+    if employee and isinstance(employee, dict) and employee.get("timezone"):
         return employee.get("timezone").strip()
-    if branch and branch.get("timezone"):
+    if branch and isinstance(branch, dict) and branch.get("timezone"):
         return branch.get("timezone").strip()
-    if company and company.get("timezone"):
-        return company.get("timezone").strip()
+    if comp_obj and isinstance(comp_obj, dict) and comp_obj.get("timezone"):
+        return comp_obj.get("timezone").strip()
     return default_tz
 
 

@@ -1,4 +1,10 @@
 import { useMemo, useState } from "react";
+import CityAutocomplete from "./CityAutocomplete";
+import StateAutocomplete from "./StateAutocomplete";
+import BoardAutocomplete from "./BoardAutocomplete";
+import SuggestField from "./SuggestField";
+import DegreeField from "./DegreeField";
+import { UNIVERSITIES, COLLEGES, SPECIALIZATIONS } from "./suggestData";
 import axios from "../../api/axios";
 import toast from "react-hot-toast";
 import {
@@ -17,6 +23,7 @@ import {
   Upload,
   X,
 } from "lucide-react";
+import PageHeader from "../../components/common/PageHeader";
 
 const inputCls =
   "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100";
@@ -116,7 +123,7 @@ const Input = ({
       {label}
       {required && <span className="ml-1 text-red-500">*</span>}
     </label>
-    <input
+    <input autoComplete="off"
       id={`nj-${name}`}
       name={name}
       type={type}
@@ -167,7 +174,7 @@ const Textarea = ({ label, name, value, onChange, placeholder = "" }) => (
     >
       {label}
     </label>
-    <textarea
+    <textarea autoComplete="off"
       id={`nj-${name}`}
       name={name}
       value={value ?? ""}
@@ -267,7 +274,7 @@ const PdfUpload = ({ label, name, value, onChange, required = false }) => (
       </div>
     </label>
 
-    <input
+    <input autoComplete="off"
       id={`nj-${name}`}
       name={name}
       type="file"
@@ -314,7 +321,7 @@ const ImageUpload = ({
           </p>
         </div>
       )}
-      <input
+      <input autoComplete="off"
         type="file"
         accept={accept}
         className="hidden"
@@ -347,6 +354,15 @@ export default function NewJoining() {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleDecimalChange = (e) => {
+    const { name } = e.target;
+    let v = e.target.value.replace(/[^0-9.]/g, "");
+    const i = v.indexOf(".");
+    if (i !== -1) v = v.slice(0, i + 1) + v.slice(i + 1).replace(/\./g, "").slice(0, 2);
+    if (v !== "" && v !== "." && parseFloat(v) > 100) v = v.slice(0, -1);
+    setForm((f) => ({ ...f, [name]: v }));
   };
 
   const handlePhoneChange = (e) => {
@@ -518,46 +534,16 @@ export default function NewJoining() {
   return (
     <div className="min-h-screen bg-slate-100 p-4 md:p-6">
       <div className="mx-auto max-w-7xl">
-        <div className="relative mb-6 overflow-hidden rounded-[2rem] bg-slate-950 px-6 py-8 text-white shadow-xl md:px-8">
-          <div
-            className="pointer-events-none absolute inset-0 opacity-30"
-            style={{
-              backgroundImage:
-                "linear-gradient(rgba(139,92,246,.18) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,.18) 1px, transparent 1px)",
-              backgroundSize: "32px 32px",
-            }}
-          />
+        <PageHeader
+          icon={GraduationCap}
+          title="New Joining Form"
+          subtitle="Complete employee onboarding details including personal, education, employment, bank, emergency and family information."
+        >
+          <span className="hr-chip">Education PDFs: {selectedPdfCount}/4</span>
+          <span className="hr-chip">Secure multipart upload</span>
+        </PageHeader>
 
-          <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-violet-600/30 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-24 left-1/3 h-72 w-72 rounded-full bg-indigo-500/20 blur-3xl" />
-
-          <div className="relative">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-violet-400/20 bg-violet-500/10 px-3 py-1 text-xs font-semibold text-violet-200">
-              <GraduationCap size={14} />
-              HRMS · New Joining
-            </div>
-
-            <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
-              New Joining Form
-            </h1>
-
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">
-              Complete employee onboarding details including personal,
-              education, employment, bank, emergency and family information.
-            </p>
-
-            <div className="mt-5 flex flex-wrap gap-2 text-xs text-slate-300">
-              <span className="rounded-full bg-white/10 px-3 py-1.5">
-                Education PDFs: {selectedPdfCount}/4
-              </span>
-              <span className="rounded-full bg-white/10 px-3 py-1.5">
-                Secure multipart upload
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} autoComplete="off" className="space-y-5">
           <Card
             step="01"
             title="Basic Details"
@@ -683,17 +669,21 @@ export default function NewJoining() {
                 onChange={handleChange}
               />
 
-              <Input
+              <CityAutocomplete
                 label="City"
                 name="presentCity"
                 value={form.presentCity}
-                onChange={handleChange}
+                inputClassName={inputCls}
+                onTextChange={(v) => setForm((f) => ({ ...f, presentCity: v }))}
+                onSelect={(city, state) => setForm((f) => ({ ...f, presentCity: city, presentState: state }))}
               />
-              <Input
+              <StateAutocomplete
                 label="State"
                 name="presentState"
                 value={form.presentState}
-                onChange={handleChange}
+                inputClassName={inputCls}
+                onTextChange={(v) => setForm((f) => ({ ...f, presentState: v }))}
+                onSelect={(st) => setForm((f) => ({ ...f, presentState: st }))}
               />
               <Input
                 label="Pincode"
@@ -734,11 +724,13 @@ export default function NewJoining() {
                     value={form.qualification10}
                     onChange={handleChange}
                   />
-                  <Input
+                  <BoardAutocomplete
                     label="Board"
                     name="board10"
                     value={form.board10}
-                    onChange={handleChange}
+                    inputClassName={inputCls}
+                    onTextChange={(v) => setForm((f) => ({ ...f, board10: v }))}
+                    onSelect={(b) => setForm((f) => ({ ...f, board10: b }))}
                   />
                   <Input
                     label="Passing Year"
@@ -751,7 +743,8 @@ export default function NewJoining() {
                     label="Percentage / CGPA"
                     name="percent10"
                     value={form.percent10}
-                    onChange={handleChange}
+                    onChange={handleDecimalChange}
+                    inputMode="decimal"
                   />
                   <div className="md:col-span-2 lg:col-span-4">
                     <PdfUpload
@@ -788,11 +781,13 @@ export default function NewJoining() {
                     value={form.qualification12}
                     onChange={handleChange}
                   />
-                  <Input
+                  <BoardAutocomplete
                     label="Board"
                     name="board12"
                     value={form.board12}
-                    onChange={handleChange}
+                    inputClassName={inputCls}
+                    onTextChange={(v) => setForm((f) => ({ ...f, board12: v }))}
+                    onSelect={(b) => setForm((f) => ({ ...f, board12: b }))}
                   />
                   <Input
                     label="Passing Year"
@@ -805,7 +800,8 @@ export default function NewJoining() {
                     label="Percentage / CGPA"
                     name="percent12"
                     value={form.percent12}
-                    onChange={handleChange}
+                    onChange={handleDecimalChange}
+                    inputMode="decimal"
                   />
                   <div className="md:col-span-2 lg:col-span-4">
                     <PdfUpload
@@ -836,42 +832,47 @@ export default function NewJoining() {
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-                  <Select
+                  <DegreeField
+                    Select={Select}
                     label="Degree"
                     name="degree_grad"
                     value={form.degree_grad}
-                    onChange={handleChange}
-                  >
-                    <option value="">Select Degree</option>
-                    <option value="B.Tech">B.Tech</option>
-                    <option value="BCA">BCA</option>
-                    <option value="BBA">BBA</option>
-                    <option value="B.Com">B.Com</option>
-                    <option value="BA">BA</option>
-                    <option value="B.Sc">B.Sc</option>
-                    <option value="BE">BE</option>
-                    <option value="Other">Other</option>
-                  </Select>
+                    level="ug"
+                    inputClassName={inputCls}
+                    onSelect={(v) => setForm((f) => ({ ...f, degree_grad: v }))}
+                  />
 
-                  <Input
+                  <SuggestField
                     label="University / Institution Name"
                     name="university_grad"
                     value={form.university_grad}
-                    onChange={handleChange}
+                    baseOptions={UNIVERSITIES}
+                    extraType="university"
+                    placeholder="Type university name"
+                    inputClassName={inputCls}
+                    onChange={(v) => setForm((f) => ({ ...f, university_grad: v }))}
                   />
 
-                  <Input
+                  <SuggestField
                     label="College Name"
                     name="college_grad"
                     value={form.college_grad}
-                    onChange={handleChange}
+                    baseOptions={COLLEGES}
+                    extraType="college"
+                    placeholder="Type college name"
+                    inputClassName={inputCls}
+                    onChange={(v) => setForm((f) => ({ ...f, college_grad: v }))}
                   />
 
-                  <Input
+                  <SuggestField
                     label="Specialization / Branch"
                     name="specialization_grad"
                     value={form.specialization_grad}
-                    onChange={handleChange}
+                    baseOptions={SPECIALIZATIONS}
+                    extraType="specialization"
+                    placeholder="Type specialization"
+                    inputClassName={inputCls}
+                    onChange={(v) => setForm((f) => ({ ...f, specialization_grad: v }))}
                   />
 
                   <Select
@@ -906,7 +907,8 @@ export default function NewJoining() {
                     label="Percentage / CGPA"
                     name="percent_grad"
                     value={form.percent_grad}
-                    onChange={handleChange}
+                    onChange={handleDecimalChange}
+                    inputMode="decimal"
                   />
 
                   <div className="md:col-span-2 lg:col-span-4">
@@ -938,41 +940,47 @@ export default function NewJoining() {
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-                  <Select
+                  <DegreeField
+                    Select={Select}
                     label="Degree"
                     name="degree_pg"
                     value={form.degree_pg}
-                    onChange={handleChange}
-                  >
-                    <option value="">Select Degree</option>
-                    <option value="M.Tech">M.Tech</option>
-                    <option value="MCA">MCA</option>
-                    <option value="MBA">MBA</option>
-                    <option value="M.Com">M.Com</option>
-                    <option value="MA">MA</option>
-                    <option value="M.Sc">M.Sc</option>
-                    <option value="Other">Other</option>
-                  </Select>
+                    level="pg"
+                    inputClassName={inputCls}
+                    onSelect={(v) => setForm((f) => ({ ...f, degree_pg: v }))}
+                  />
 
-                  <Input
+                  <SuggestField
                     label="University / Institution Name"
                     name="university_pg"
                     value={form.university_pg}
-                    onChange={handleChange}
+                    baseOptions={UNIVERSITIES}
+                    extraType="university"
+                    placeholder="Type university name"
+                    inputClassName={inputCls}
+                    onChange={(v) => setForm((f) => ({ ...f, university_pg: v }))}
                   />
 
-                  <Input
+                  <SuggestField
                     label="College Name"
                     name="college_pg"
                     value={form.college_pg}
-                    onChange={handleChange}
+                    baseOptions={COLLEGES}
+                    extraType="college"
+                    placeholder="Type college name"
+                    inputClassName={inputCls}
+                    onChange={(v) => setForm((f) => ({ ...f, college_pg: v }))}
                   />
 
-                  <Input
+                  <SuggestField
                     label="Specialization"
                     name="specialization_pg"
                     value={form.specialization_pg}
-                    onChange={handleChange}
+                    baseOptions={SPECIALIZATIONS}
+                    extraType="specialization"
+                    placeholder="Type specialization"
+                    inputClassName={inputCls}
+                    onChange={(v) => setForm((f) => ({ ...f, specialization_pg: v }))}
                   />
 
                   <Select
@@ -1007,7 +1015,8 @@ export default function NewJoining() {
                     label="Percentage / CGPA"
                     name="percent_pg"
                     value={form.percent_pg}
-                    onChange={handleChange}
+                    onChange={handleDecimalChange}
+                    inputMode="decimal"
                   />
 
                   <div className="md:col-span-2 lg:col-span-4">
@@ -1068,7 +1077,18 @@ export default function NewJoining() {
                 label="Last Salary"
                 name="lastSalary"
                 value={form.lastSalary}
-                onChange={handleChange}
+                inputMode="decimal"
+                placeholder="e.g. 25000"
+                onChange={(e) => {
+                  let v = e.target.value.replace(/[^0-9.]/g, "");
+                  const parts = v.split(".");
+                  let intPart = parts[0].replace(/^0+(?=\d)/, "").slice(0, 7);
+                  let out = intPart;
+                  if (parts.length > 1) {
+                    out += "." + parts.slice(1).join("").slice(0, 2);
+                  }
+                  handleChange({ target: { name: "lastSalary", value: out } });
+                }}
               />
             </div>
           </Card>
@@ -1097,13 +1117,46 @@ export default function NewJoining() {
                 label="Account Number"
                 name="accountNumber"
                 value={form.accountNumber}
-                onChange={handleChange}
+                inputMode="numeric"
+                placeholder="9 to 18 digits"
+                onChange={(e) => {
+                  const v = e.target.value.replace(/[^0-9]/g, "").slice(0, 18);
+                  handleChange({ target: { name: "accountNumber", value: v } });
+                }}
               />
               <Input
                 label="IFSC Code"
                 name="ifsc"
                 value={form.ifsc}
-                onChange={handleChange}
+                placeholder="e.g. SBIN0001234"
+                onChange={async (e) => {
+                  const v = e.target.value
+                    .toUpperCase()
+                    .replace(/[^A-Z0-9]/g, "")
+                    .slice(0, 11);
+                  handleChange({ target: { name: "ifsc", value: v } });
+                  if (v.length === 11) {
+                    if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(v)) {
+                      window.alert("Invalid IFSC format. Example: SBIN0001234");
+                      return;
+                    }
+                    try {
+                      const r = await fetch("https://ifsc.razorpay.com/" + v);
+                      if (!r.ok) {
+                        window.alert("IFSC code not found. Please check it.");
+                        return;
+                      }
+                      const d = await r.json();
+                      setForm((prev) => ({
+                        ...prev,
+                        bankName: d.BANK || prev.bankName,
+                        branch: d.BRANCH || prev.branch,
+                      }));
+                    } catch (err) {
+                      console.error("IFSC lookup failed", err);
+                    }
+                  }
+                }}
               />
               <Input
                 label="Branch"

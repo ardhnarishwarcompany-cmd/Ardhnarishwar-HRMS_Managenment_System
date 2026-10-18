@@ -34,7 +34,7 @@ export default function Dashboard() {
         API.get("/super-admin/employees"),
         API.get("/super-admin/departments"),
         API.get("/super-admin/clients"),
-        API.get("/super-admin/interviews").catch(() => null),
+        API.get("/super-admin/interviews", { params: { limit: 25 } }).catch(() => null),
       ]);
 
       const employees = empRes?.data?.employees || [];
@@ -45,8 +45,10 @@ export default function Dashboard() {
         clientRes?.data?.data ||
         clientRes?.data ||
         [];
-      const interviews =
-        interviewRes?.data?.data || interviewRes?.data?.interviews || [];
+      const interviewPayload = interviewRes?.data?.data;
+      const interviews = Array.isArray(interviewPayload)
+        ? interviewPayload
+        : interviewPayload?.rows || interviewRes?.data?.interviews || [];
 
       // ✅ HR = departmentId === 1
       const hrCount = employees.filter(
@@ -62,7 +64,8 @@ export default function Dashboard() {
 
       // Build real recent activity from latest records
       const events = [];
-      const ts = (r) => new Date(r?.createdAt || r?.updatedAt || 0).getTime();
+      const ts = (r) =>
+        new Date(r?.createdAt || r?.updatedAt || r?.created_at || r?.updated_at || 0).getTime();
 
       [...employees]
         .sort((a, b) => ts(b) - ts(a))
@@ -86,16 +89,33 @@ export default function Dashboard() {
           }),
         );
 
-      (Array.isArray(interviews) ? [...interviews] : [])
+      const interviewList = Array.isArray(interviews) ? [...interviews] : [];
+
+      interviewList
+        .filter((iv) => iv.client_status && iv.client_status !== "pending")
+        .sort((a, b) => ts(b) - ts(a))
+        .slice(0, 3)
+        .forEach((iv) =>
+          events.push({
+            time: new Date(iv.client_decided_at || iv.updated_at || 0).getTime(),
+            type: "interview",
+            text: `Client ${iv.client_status}: ${iv.candidate_name || "candidate"}${
+              iv.company_name ? ` (${iv.company_name})` : ""
+            }`,
+          }),
+        );
+
+      interviewList
+        .filter((iv) => !iv.client_status || iv.client_status === "pending")
         .sort((a, b) => ts(b) - ts(a))
         .slice(0, 2)
         .forEach((iv) =>
           events.push({
-            time: ts(iv),
+            time: new Date(iv.created_at || 0).getTime(),
             type: "interview",
-            text: `Interview scheduled: ${
-              iv.candidateName || iv.candidate?.fullName || "candidate"
-            }${iv.date ? ` on ${iv.date}` : ""}`,
+            text: `Interview scheduled: ${iv.candidate_name || "candidate"}${
+              iv.interview_date ? ` on ${String(iv.interview_date).slice(0, 10)}` : ""
+            }`,
           }),
         );
 
@@ -145,19 +165,19 @@ export default function Dashboard() {
   const activityIcon = (type) => {
     if (type === "client")
       return (
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-violet-100 text-violet-600">
-          <Briefcase size={14} />
+        <span className="adm-act-d" style={{ background: "#ede9fe", color: "#7c3aed" }}>
+          <Briefcase size={18} />
         </span>
       );
     if (type === "interview")
       return (
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-600">
-          <CalendarClock size={14} />
+        <span className="adm-act-d" style={{ background: "#fef3c7", color: "#d97706" }}>
+          <CalendarClock size={18} />
         </span>
       );
     return (
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
-        <UserPlus size={14} />
+      <span className="adm-act-d" style={{ background: "#d9f7e8", color: "#047857" }}>
+        <UserPlus size={18} />
       </span>
     );
   };
@@ -190,143 +210,104 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="space-y-5 sm:space-y-6">
-      {/* Premium hero header */}
+    <div className="flex flex-col gap-6">
       <PageHero
+        size="lg"
         title="Overview"
         subtitle="HRMS Control Center — here's what's happening in your HRMS today."
         chips={[
-          { icon: <Users size={12} />, label: `${stats.employees} Employees` },
-          { icon: <UserCog size={12} />, label: `${stats.hrAccounts} HR Accounts` },
-          {
-            icon: <Building2 size={12} />,
-            label: `${stats.departments} Departments`,
-          },
-          { icon: <Briefcase size={12} />, label: `${stats.clients} Clients` },
+          { icon: <Users size={16} />, label: `${stats.employees} Employees` },
+          { icon: <UserCog size={16} />, label: `${stats.hrAccounts} HR Accounts` },
+          { icon: <Building2 size={16} />, label: `${stats.departments} Departments` },
+          { icon: <Briefcase size={16} />, label: `${stats.clients} Clients` },
         ]}
         actions={
           <button
+            type="button"
             onClick={() => navigate("/dashboard/advanced-search")}
-            className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-indigo-700 shadow-sm transition-all hover:bg-indigo-50"
+            className="adm-wb"
           >
-            <LayoutGrid size={15} />
+            <LayoutGrid size={18} />
             Advanced Search
           </button>
         }
       />
 
-      {/* Premium stat cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
+      {/* KPI cards */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         {statCards.map((card) => (
-          <button
-            key={card.title}
-            onClick={card.onClick}
-            className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-lg hover:shadow-indigo-100"
-          >
-            <div className="flex items-start justify-between">
-              <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-slate-500">
-                {card.title}
-              </p>
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md shadow-indigo-200 transition-transform duration-200 group-hover:scale-105">
-                {card.icon}
-              </span>
+          <button key={card.title} type="button" onClick={card.onClick} className="adm-k">
+            <div className="adm-k-top">
+              <p className="adm-k-label">{card.title}</p>
+              <span className="adm-k-ic">{card.icon}</span>
             </div>
-            <p className="mt-2 text-3xl font-bold tracking-tight text-slate-900">
-              {card.value}
-            </p>
-            <p className="mt-1 text-xs text-slate-500">{card.subText}</p>
-            <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+            <strong className="adm-k-value">{card.value}</strong>
+            <p className="adm-k-sub">{card.subText}</p>
+            <span className="adm-k-more">
               View
-              <ArrowRight size={12} />
+              <ArrowRight size={13} />
             </span>
-            <div className="pointer-events-none absolute -right-8 -bottom-10 h-24 w-24 rounded-full bg-indigo-50 transition-transform duration-300 group-hover:scale-125" />
           </button>
         ))}
       </div>
 
-      {/* Big section */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-5">
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1.7fr_1fr]">
         {/* Recent Activity */}
-        <div className="xl:col-span-2 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
-          <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
-              <Activity size={18} />
+        <section className="adm-card">
+          <div className="adm-card-h">
+            <span className="adm-card-ic">
+              <Activity size={22} />
             </span>
-            <div>
-              <h2 className="text-base font-bold text-slate-900">
-                Recent Activity
-              </h2>
-              <p className="text-xs text-slate-500">
-                Latest admin actions & HR updates.
-              </p>
+            <div className="min-w-0">
+              <b>Recent Activity</b>
+              <small>Latest admin actions &amp; HR updates.</small>
             </div>
           </div>
 
-          <div className="mt-5">
-            {activity.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-10 text-center text-sm text-slate-500">
-                No recent activity yet.
-              </div>
-            ) : (
-              <div className="relative space-y-1">
-                <div
-                  className="absolute left-4 top-4 bottom-4 w-px bg-slate-200"
-                  aria-hidden="true"
-                />
-                {activity.map((item, idx) => (
-                  <div
-                    key={idx}
-                    className="relative flex items-center gap-3 rounded-xl px-2 py-2.5 transition-colors hover:bg-slate-50"
-                  >
-                    {activityIcon(item.type)}
-                    <p className="min-w-0 flex-1 break-words text-sm text-slate-700">
-                      {item.text}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+          {activity.length === 0 ? (
+            <div className="adm-empty">
+              <span className="adm-empty-ic">
+                <Activity size={26} />
+              </span>
+              No recent activity yet.
+            </div>
+          ) : (
+            <div>
+              {activity.map((item, idx) => (
+                <div key={idx} className="adm-act">
+                  {activityIcon(item.type)}
+                  <span>{item.text}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
 
         {/* Quick Actions */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
-          <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
-              <Zap size={18} />
+        <section className="adm-card">
+          <div className="adm-card-h">
+            <span className="adm-card-ic">
+              <Zap size={22} />
             </span>
-            <div>
-              <h2 className="text-base font-bold text-slate-900">
-                Quick Actions
-              </h2>
-              <p className="text-xs text-slate-500">Fast shortcuts for admin.</p>
+            <div className="min-w-0">
+              <b>Quick Actions</b>
+              <small>Fast shortcuts for admin.</small>
             </div>
           </div>
 
-          <div className="mt-5 space-y-2.5">
+          <div className="flex flex-col gap-3">
             {quickActions.map((a) => (
-              <button
-                key={a.label}
-                onClick={() => navigate(a.to)}
-                className="group flex w-full items-center gap-3 rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-left transition-all duration-200 hover:border-indigo-300 hover:bg-indigo-50/60 hover:shadow-sm"
-              >
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-sm transition-transform duration-200 group-hover:scale-105">
-                  {a.icon}
-                </span>
+              <button key={a.label} type="button" onClick={() => navigate(a.to)} className="adm-qa">
+                <span className="adm-qa-ic">{a.icon}</span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-bold text-slate-800">
-                    {a.label}
-                  </span>
-                  <span className="block text-xs text-slate-500">{a.desc}</span>
+                  {a.label}
+                  <small>{a.desc}</small>
                 </span>
-                <ArrowRight
-                  size={15}
-                  className="shrink-0 text-slate-300 transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-indigo-600"
-                />
+                <ArrowRight size={18} className="adm-qa-ar" />
               </button>
             ))}
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );

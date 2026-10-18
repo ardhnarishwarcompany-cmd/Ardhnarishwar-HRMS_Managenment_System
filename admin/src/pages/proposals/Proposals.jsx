@@ -81,22 +81,22 @@ function StatusBadge({ status }) {
 
 function StatCard({ icon: Icon, label, value, accent, iconBg }) {
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-200/60 sm:p-5">
+    <div className="group relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-200/60 sm:p-4">
       <div
         className={`absolute inset-x-0 top-0 h-1 ${accent}`}
         aria-hidden="true"
       />
-      <div className="flex items-center gap-3 sm:gap-4">
+      <div className="flex items-center gap-3">
         <div
-          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl sm:h-11 sm:w-11 ${iconBg}`}
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconBg}`}
         >
-          <Icon size={20} strokeWidth={2} />
+          <Icon size={18} strokeWidth={2} />
         </div>
         <div className="min-w-0">
-          <p className="truncate text-xs font-medium uppercase tracking-wide text-slate-500">
+          <p className="text-[11px] font-medium uppercase leading-tight tracking-wide text-slate-500">
             {label}
           </p>
-          <p className="mt-0.5 text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+          <p className="mt-0.5 text-xl font-bold leading-none tracking-tight text-slate-900">
             {value}
           </p>
         </div>
@@ -264,9 +264,9 @@ export default function Proposals() {
     : [];
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 p-4 sm:p-6">
+    <div className="mx-auto flex h-full max-w-7xl flex-col gap-4 p-4">
       {/* ============ HERO HEADER ============ */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-800 p-6 shadow-xl shadow-indigo-200/50 sm:p-8">
+      <div className="relative shrink-0 overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-800 p-5 shadow-xl shadow-indigo-200/50">
         <div
           className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/10 blur-2xl"
           aria-hidden="true"
@@ -275,32 +275,22 @@ export default function Proposals() {
           className="pointer-events-none absolute -bottom-24 right-24 h-48 w-48 rounded-full bg-violet-400/20 blur-3xl"
           aria-hidden="true"
         />
-        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-start gap-4">
             <div className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15 ring-1 ring-white/25 backdrop-blur sm:flex">
               <Handshake size={24} className="text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+              <h1 className="text-2xl font-bold tracking-tight text-white">
                 Proposals
               </h1>
-              <p className="mt-1 max-w-md text-sm leading-relaxed text-indigo-100/90 text-pretty">
+              <p className="mt-1 max-w-xl text-sm leading-relaxed text-indigo-100/90 text-pretty">
                 Create, send and track business proposals for your clients
                 &mdash; all in one place.
               </p>
             </div>
           </div>
-          <Link
-            to="/proposals/create"
-            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-indigo-700 shadow-lg shadow-indigo-900/20 transition-all hover:bg-indigo-50 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-white/60"
-          >
-            <Plus size={17} strokeWidth={2.5} />
-            New Proposal
-          </Link>
-        </div>
-
-        {stats && (Number(stats.accepted_value) > 0 || pendingCount > 0) && (
-          <div className="relative mt-6 flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3 lg:justify-end">
             {pendingCount > 0 && (
               <button
                 type="button"
@@ -313,8 +303,8 @@ export default function Proposals() {
                   : `${pendingCount} sales proposals need your approval`}
               </button>
             )}
-            {Number(stats.accepted_value) > 0 && (
-              <div className="inline-flex items-center gap-2.5 rounded-xl bg-white/10 px-4 py-2.5 ring-1 ring-white/20 backdrop-blur">
+            {Number(stats?.accepted_value) > 0 && (
+              <div className="inline-flex items-center gap-2.5 rounded-xl bg-white/10 px-4 py-2 ring-1 ring-white/20 backdrop-blur">
                 <TrendingUp size={17} className="text-emerald-300" />
                 <span className="text-sm text-indigo-100">
                   Accepted value:{" "}
@@ -324,13 +314,20 @@ export default function Proposals() {
                 </span>
               </div>
             )}
+            <Link
+              to="/proposals/create"
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-indigo-700 shadow-lg shadow-indigo-900/20 transition-all hover:bg-indigo-50 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-white/60"
+            >
+              <Plus size={17} strokeWidth={2.5} />
+              New Proposal
+            </Link>
           </div>
-        )}
+        </div>
       </div>
 
       {/* ============ STAT CARDS ============ */}
       {stats && (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4 xl:grid-cols-7">
+        <div className="grid shrink-0 grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
           {statCards.map((c) => (
             <StatCard key={c.label} {...c} />
           ))}
@@ -338,7 +335,7 @@ export default function Proposals() {
       )}
 
       {/* ============ TOOLBAR ============ */}
-      <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white p-3 shadow-sm sm:flex-row sm:items-center sm:p-4">
+      <div className="flex shrink-0 flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white p-3 shadow-sm sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <Search
             size={16}
@@ -378,7 +375,7 @@ export default function Proposals() {
           ))}
         </div>
       ) : rows.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
+        <div className="flex flex-1 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-50">
             <FileText size={28} className="text-indigo-400" />
           </div>
@@ -400,9 +397,12 @@ export default function Proposals() {
       ) : (
         <>
           {/* ============ DESKTOP TABLE (lg+) ============ */}
-          <div className="hidden max-h-[60vh] overflow-auto rounded-2xl border border-slate-200/80 bg-white shadow-sm lg:block">
+          {/* Only this box scrolls; the hero, stats and toolbar above stay fixed.
+              contain:paint stops the clipped rows from inflating the page scroller —
+              the `main > *` page-in transform animation otherwise makes Chrome count them. */}
+          <div className="hidden min-h-[220px] flex-1 overflow-auto rounded-2xl border border-slate-200/80 bg-white shadow-sm [contain:paint] lg:block">
             <table className="min-w-full text-sm">
-              <thead className="sticky top-0 z-10 bg-slate-50">
+              <thead className="sticky top-0 z-10 bg-slate-50 shadow-[0_1px_0_0_#e2e8f0]">
                 <tr className="border-b border-slate-200 bg-slate-50 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                   <th className="px-5 py-3.5">Number</th>
                   <th className="px-5 py-3.5">Client</th>
@@ -558,7 +558,7 @@ export default function Proposals() {
           </div>
 
           {/* ============ MOBILE / TABLET CARDS (< lg) ============ */}
-          <div className="grid max-h-[60vh] grid-cols-1 gap-4 overflow-y-auto pr-1 sm:grid-cols-2 lg:hidden">
+          <div className="grid min-h-[220px] flex-1 grid-cols-1 content-start gap-4 overflow-y-auto pr-1 [contain:paint] sm:grid-cols-2 lg:hidden">
             {rows.map((p) => (
               <div
                 key={p.id}

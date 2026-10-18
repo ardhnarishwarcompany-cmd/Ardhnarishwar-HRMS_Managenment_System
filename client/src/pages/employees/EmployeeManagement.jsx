@@ -5,6 +5,7 @@ import { Plus, Search, Users, MoreHorizontal, Eye, Pencil, Trash2 } from "lucide
 import AddEmployeeModal from "../../components/employees/AddEmployeeModal";
 import EditEmployeeModal from "../../components/employees/EditEmployeeModal";
 import Modal from "../../components/ui/Modal";
+import PageHeader from "../../components/common/PageHeader";
 
 import {
   getEmployees,
@@ -331,24 +332,17 @@ export default function EmployeeManagement() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 text-balance">
-            Employee Management
-          </h1>
-          <p className="text-slate-500 mt-1 text-sm">
-            Manage employees with department, designation &amp; status.
-          </p>
-        </div>
-
-        <button
-          onClick={openAddModal}
-          className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-600/25 hover:from-indigo-500 hover:to-violet-500 transition-colors self-start md:self-auto"
-        >
-          <Plus className="w-4 h-4" />
-          Add Employee
-        </button>
-      </div>
+      <PageHeader
+        icon={Users}
+        title="Employee Management"
+        subtitle="Manage employees with department, designation & status."
+        actions={
+          <button onClick={openAddModal} className="btn-primary btn-inline">
+            <Plus className="w-4 h-4" />
+            Add Employee
+          </button>
+        }
+      />
 
       {/* Filters */}
       <div className="card-premium p-5 flex flex-col xl:flex-row gap-4 xl:items-center xl:justify-between">

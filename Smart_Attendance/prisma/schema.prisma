@@ -1,0 +1,108 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum WorkMode {
+  WORK_FROM_OFFICE
+  WORK_FROM_HOME
+  SALES_FIELD
+}
+
+enum AttendanceStatus {
+  PRESENT
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+}
+
+enum VerificationMethod {
+  OFFICE_WIFI_AND_GPS
+  HOME_IP_AND_GPS
+  SALES_GPS
+  OTP_APPROVER
+}
+
+model Organization {
+  id                    String                 @id @default(uuid())
+  name                  String
+  code                  String                 @unique
+  // Office Wi-Fi and Geofence Range Settings
+  officeWifiIp          String?                // Office static IP or CIDR
+  officeLatitude        Float?
+  officeLongitude       Float?
+  officeRangeRadiusM    Int                    @default(100) // Allowed distance in meters
+  // Relations
+  approvers             OrganizationApprover[]
+  employees             Employee[]
+  attendanceLogs        AttendanceLog[]
+  createdAt             DateTime               @default(now())
+}
+
+model OrganizationApprover {
+  id              String       @id @default(uuid())
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade])
+  name            String
+  email           String
+  phone           String?
+  isActive        Boolean      @default(true)
+  createdAt       DateTime     @default(now())
+
+  @@unique([organizationId, email])
+}
+
+model Employee {
+  id                  String          @id @default(uuid())
+  organizationId      String
+  organization        Organization    @relation(fields: [organizationId], references: [id])
+  name                String
+  email               String          @unique
+  assignedIp          String?         // Static/Home IP assigned by admin
+  workMode            WorkMode?
+  isFirstLogin        Boolean         @default(true)
+  // WFH Home Geofence Coordinates
+  homeLatitude        Float?
+  homeLongitude       Float?
+  homeRangeRadiusM    Int             @default(200)
+  // Relations
+  attendanceLogs      AttendanceLog[]
+  fieldVisits         FieldVisit[]
+  createdAt           DateTime        @default(now())
+}
+
+model AttendanceLog {
+  id                 String             @id @default(uuid())
+  employeeId         String
+  employee           Employee           @relation(fields: [employeeId], references: [id])
+  organizationId     String
+  organization       Organization       @relation(fields: [organizationId], references: [id])
+  checkInTime        DateTime           @default(now())
+  clientIp           String
+  latitude           Float?
+  longitude          Float?
+  accuracyMeters     Float?
+  distanceFromBaseM  Float?             // Calculated distance from office or home
+  verificationMethod VerificationMethod
+  status             AttendanceStatus   @default(PRESENT)
+  approvedByEmail    String?
+  rejectionReason    String?
+  fieldVisits        FieldVisit[]
+}
+
+model FieldVisit {
+  id              String        @id @default(uuid())
+  attendanceLogId String
+  attendanceLog   AttendanceLog @relation(fields: [attendanceLogId], references: [id])
+  employeeId      String
+  employee        Employee      @relation(fields: [employeeId], references: [id])
+  clientName      String
+  notes           String?
+  latitude        Float
+  longitude       Float
+  timestamp       DateTime      @default(now())
+}

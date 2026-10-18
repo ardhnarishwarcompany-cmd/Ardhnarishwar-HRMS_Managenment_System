@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Super Admin • Global Attendance Management System</title>
-<link rel="icon" type="image/svg+xml" href="/favicon.ico">
+<title>Ardhnarishwar 3D • Global Super Admin Command Portal</title>
+<link rel="icon" type="image/png" href="/static/images/ardhnarishwar_logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/css/theme.css">
+<link rel="stylesheet" href="/static/css/ardhnarishwar_3d.css">
 <style>
 .dashboard-layout {
   min-height: 100vh;
@@ -207,36 +208,141 @@
   color: var(--text-muted);
   font-size: 14px;
 }
+
+/* ── Permissions Matrix Custom Styles ── */
+.perm-table th, .perm-table td {
+  text-align: center;
+}
+.perm-table th:first-child, .perm-table td:first-child {
+  text-align: left;
+}
+.perm-table th:nth-child(2), .perm-table td:nth-child(2) {
+  text-align: left;
+}
+
+/* ── Super Admin Responsive System ── */
+@media (max-width: 1200px) {
+  .main-content {
+    padding: 24px 20px;
+  }
+}
+
+@media (max-width: 992px) {
+  .main-content {
+    padding: 20px 16px;
+  }
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .world-clocks-bar {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 16px 12px;
+  }
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .page-title h1 {
+    font-size: 20px;
+  }
+  .kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .kpi-card {
+    padding: 16px 18px;
+  }
+  .kpi-value {
+    font-size: 26px;
+  }
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .search-box {
+    min-width: 100%;
+    width: 100%;
+  }
+  .view-tabs {
+    gap: 6px;
+    padding-bottom: 8px;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+  .view-tab {
+    padding: 7px 12px;
+    font-size: 12px;
+  }
+  .table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  table th, table td {
+    padding: 8px 10px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .modal-content {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    margin: 10px auto;
+    padding: 16px !important;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  #view-config .card, #view-controller .card, #view-permissions .card {
+    padding: 16px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .world-clocks-bar {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .clock-pill {
+    padding: 8px 10px;
+  }
+  .clock-digits {
+    font-size: 14px;
+  }
+}
 </style>
+<link rel="stylesheet" href="/static/css/navbar_responsive.css">
+<script src="/static/js/navbar_responsive.js" defer></script>
 </head>
 <body>
 <div class="dashboard-layout">
   <!-- Top Navigation Bar -->
   <header class="navbar">
     <div class="nav-brand">
-      <div class="brand-icon" style="background:transparent; border:none; display:flex; align-items:center; justify-content:center;">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="32" height="32">
-          <defs>
-            <linearGradient id="saBrandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#10B981"/>
-              <stop offset="100%" stop-color="#6366F1"/>
-            </linearGradient>
-          </defs>
-          <circle cx="24" cy="24" r="18" fill="none" stroke="url(#saBrandGrad)" stroke-width="2.5"/>
-          <ellipse cx="24" cy="24" rx="9" ry="18" fill="none" stroke="url(#saBrandGrad)" stroke-width="1.8" stroke-dasharray="2 1"/>
-          <line x1="6" y1="24" x2="42" y2="24" stroke="url(#saBrandGrad)" stroke-width="1.8"/>
-          <circle cx="24" cy="24" r="5.5" fill="#10B981"/>
-          <path d="M24 20v4l3 2" fill="none" stroke="#070B14" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="34" cy="14" r="3.5" fill="#06B6D4"/>
-        </svg>
+      <div class="ardh-medallion-nav" title="Ardhnarishwar 3D Emblem">
+        <img src="/static/images/ardhnarishwar_logo_emblem.png" alt="Ardhnarishwar Logo">
       </div>
       <div>
-        <div class="brand-title">Global Attendance Management System</div>
-        <div class="brand-sub">GLOBAL SUPER ADMIN COMMAND CENTER</div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div class="brand-title">Ardhnarishwar Attendance Engine</div>
+          <span class="badge badge-indigo" style="font-size:11px; font-weight:800; letter-spacing:0.5px; padding:3px 8px;">👑 SUPER ADMIN PORTAL</span>
+        </div>
+        <div class="brand-sub">GLOBAL SAAS COMMAND CENTER • FULL MULTI-TENANT CONTROLS</div>
       </div>
     </div>
 
-    <div style="display:flex; align-items:center; gap:14px;">
+    <button type="button" class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navActions">
+      <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+    </button>
+
+    <div class="nav-actions" id="navActions">
       <!-- Theme Switcher -->
       <div class="theme-selector-wrap">
         <button class="theme-btn-trigger" onclick="toggleThemeMenu(event)" title="Choose Appearance Theme">
@@ -283,6 +389,28 @@
         </div>
       </div>
 
+      <!-- 3D Audio FX Toggle -->
+      <button class="btn-sound-fx" title="Toggle Sound FX">
+        <span>🔊</span> <span>Sound</span>
+      </button>
+
+      <!-- Runtime Live Status Indicator -->
+      <div class="runtime-live-pill" title="Runtime Live Engine Active">
+        <span class="pulse-dot"></span> <span>RUNTIME LIVE</span>
+      </div>
+
+      <div class="runtime-last-sync" id="saLastSyncTime">Synced: Just now</div>
+
+      <!-- Master Runtime Refresh Button -->
+      <button class="btn-runtime-refresh" onclick="ArdhnarishwarRuntime.triggerGlobalSync(true)" title="Synchronize Platform in Runtime">
+        <span class="refresh-icon">🔄</span> <span>Refresh Platform</span>
+      </button>
+
+      <!-- Auto-Refresh Toggle -->
+      <div class="auto-refresh-toggle" onclick="ArdhnarishwarRuntime.toggleAutoRefresh()" title="Toggle Background Live Polling">
+        <span>⚡ Auto-Sync: <b>ON (15s)</b></span>
+      </div>
+
       <a href="/health" target="_blank" class="badge badge-emerald" style="text-decoration:none;">
         <span class="badge-dot"></span> System Live (UTC)
       </a>
@@ -323,8 +451,9 @@
       </div>
 
       <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <button class="btn btn-indigo btn-sm" onclick="switchView('timings'); document.getElementById('view-timings').scrollIntoView({behavior:'smooth', block:'start'});" title="Check-in and check-out time of every employee in every company">🕒 Check-In / Check-Out (All)</button>
         <button class="btn btn-danger btn-sm" onclick="openResetZeroModal()">🧹 Zero-Data Reset</button>
-        <button class="btn btn-secondary btn-sm" onclick="loadDashboard()">🔄 Refresh Data</button>
+        <button class="btn btn-secondary btn-sm btn-runtime-refresh" onclick="ArdhnarishwarRuntime.triggerGlobalSync(true)"><span class="refresh-icon">🔄</span> Refresh Data</button>
         <button class="btn btn-primary btn-sm" onclick="openCreateModal()">+ Provision Client Company</button>
       </div>
     </div>
@@ -372,7 +501,7 @@
     <div class="kpi-card" onclick="switchView('attendance')" title="Click to view Global Attendance Stream" style="background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:20px 26px; margin-bottom:28px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px; backdrop-filter:blur(16px);">
       <div>
         <h3 style="font-size:16px; font-weight:800; margin-bottom:4px;">📊 Global Attendance Method & Status Distribution</h3>
-        <p style="font-size:12.5px; color:var(--text-muted); margin:0;">Real-time worldwide telemetry across Face AI, Dynamic Tokens, Office Wi-Fi, and Field GPS</p>
+        <p style="font-size:12.5px; color:var(--text-muted); margin:0;">Real-time worldwide telemetry across Face AI, Email OTP, Office Wi-Fi, and Field GPS</p>
       </div>
 
       <div style="display:flex; align-items:center; gap:28px; flex-wrap:wrap;">
@@ -396,16 +525,31 @@
     <!-- Navigation Tabs -->
     <div class="view-tabs">
       <button class="view-tab active" id="tab-btn-companies" onclick="switchView('companies')">
-        🏢 Active & Client Workspaces (<span id="tab-count-companies">0</span>)
+        🏢 Companies & Accounts (<span id="tab-count-companies">0</span>)
       </button>
       <button class="view-tab" id="tab-btn-pending" onclick="switchView('pending')">
-        ⏳ Pending Approvals Queue (<span id="tab-count-pending">0</span>)
+        ⏳ Pending Approvals (<span id="tab-count-pending">0</span>)
+      </button>
+      <button class="view-tab" id="tab-btn-reports" onclick="switchView('reports')">
+        📊 Company-Wise Reports
+      </button>
+      <button class="view-tab" id="tab-btn-config" onclick="switchView('config')">
+        ⚙️ System Configurations
+      </button>
+      <button class="view-tab" id="tab-btn-permissions" onclick="switchView('permissions')">
+        🛡️ Permissions Matrix
+      </button>
+      <button class="view-tab" id="tab-btn-controller" onclick="switchView('controller')">
+        🎛️ Attendance Controller
+      </button>
+      <button class="view-tab" id="tab-btn-timings" onclick="switchView('timings')">
+        🕒 Check-In / Check-Out (All Companies)
       </button>
       <button class="view-tab" id="tab-btn-attendance" onclick="switchView('attendance')">
-        ⚡ Global Real-Time Attendance Stream
+        ⚡ Live Attendance Stream
       </button>
       <button class="view-tab" id="tab-btn-audit" onclick="switchView('audit')">
-        📜 Global Security & Audit Trail
+        📜 Security Audit Logs
       </button>
     </div>
 
@@ -428,14 +572,13 @@
               <th>Country & Timezone</th>
               <th>Status</th>
               <th>Employees</th>
-              <th>Plan</th>
               <th>Contact Phone</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody id="company-table-body">
             <tr>
-              <td colspan="8">
+              <td colspan="7">
                 <div class="empty-state">
                   <div class="empty-icon">🏢</div>
                   <div class="empty-title">Loading Company Directory...</div>
@@ -501,6 +644,15 @@
     </div>
 
     <!-- VIEW 3: Global Live Attendance Stream -->
+    <!-- VIEW: Check-In / Check-Out timings of every employee in every company -->
+    <div id="view-timings" style="display:none;">
+      <div style="margin-bottom:14px;">
+        <h3 style="font-size:16px; font-weight:800; margin:0;">🕒 Global Check-In & Check-Out Timings</h3>
+        <p style="font-size:12.5px; color:var(--text-muted); margin:2px 0 0;">Every employee of every company: first check-in, last check-out and hours worked. "Today" uses each company's own timezone. Pick a company to narrow down, or click a counter to filter.</p>
+      </div>
+      <div id="sa-timings-panel"></div>
+    </div>
+
     <div id="view-attendance" style="display:none;">
       <div class="toolbar" style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;">
         <div style="display:flex; gap:10px; flex-wrap:wrap; flex:1;">
@@ -523,9 +675,11 @@
             <option value="Present">Present</option>
             <option value="Late">Late</option>
             <option value="Half Day">Half Day</option>
+            <option value="Absent">Absent</option>
+            <option value="Leave">Leave</option>
           </select>
         </div>
-        <button class="btn btn-secondary btn-sm" onclick="loadGlobalAttendance()">🔄 Refresh Stream</button>
+        <button class="btn btn-secondary btn-sm btn-runtime-refresh" onclick="ArdhnarishwarRuntime.triggerGlobalSync(true)"><span class="refresh-icon">🔄</span> Refresh Stream</button>
       </div>
 
       <div class="table-container">
@@ -538,11 +692,11 @@
               <th>Method</th>
               <th>Status</th>
               <th>Spatial GPS / Telemetry</th>
-              <th>Device & IP</th>
+              <th>Device & IP</th><th style="text-align:center;">Action</th>
             </tr>
           </thead>
           <tbody id="attendance-table-body">
-            <tr><td colspan="7"><div class="empty-state"><div class="empty-icon">⚡</div><div class="empty-title">Loading Global Attendance Stream...</div></div></td></tr>
+            <tr><td colspan="8"><div class="empty-state"><div class="empty-icon">⚡</div><div class="empty-title">Loading Global Attendance Stream...</div></div></td></tr>
           </tbody>
         </table>
       </div>
@@ -550,6 +704,10 @@
 
     <!-- VIEW 4: Audit Logs -->
     <div id="view-audit" style="display:none;">
+      <div class="toolbar" style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:14px;">
+        <div style="font-size:13px; color:var(--text-secondary);">Immutable global security events & audit trail</div>
+        <button class="btn btn-secondary btn-sm btn-runtime-refresh" onclick="ArdhnarishwarRuntime.triggerGlobalSync(true)"><span class="refresh-icon">🔄</span> Refresh Audit Trail</button>
+      </div>
       <div class="table-container">
         <table>
           <thead>
@@ -566,6 +724,369 @@
             <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📜</div><div class="empty-title">Loading Security Audit Trail...</div></div></td></tr>
           </tbody>
         </table>
+      </div>
+    </div>
+
+
+
+    <!-- VIEW 6: Company-Wise Reports & Analytics -->
+    <div id="view-reports" style="display:none;">
+      <div class="toolbar" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+        <div class="search-box" style="max-width:280px;">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="report-search" class="form-input" placeholder="Search company in reports..." oninput="filterCompanyReports()">
+        </div>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <button class="btn btn-secondary btn-sm btn-runtime-refresh" onclick="ArdhnarishwarRuntime.triggerGlobalSync(true)"><span class="refresh-icon">🔄</span> Refresh Reports</button>
+          <button class="btn btn-indigo btn-sm" onclick="exportCompanyReportsCSV()">📥 Export Summary CSV</button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Workspace ID</th>
+              <th>Company Legal Name</th>
+              <th>Country & Timezone</th>
+              <th>Active Headcount</th>
+              <th>Today's Punches</th>
+              <th>Late Incidents</th>
+              <th>Attendance Rate</th>
+              <th>Subscription</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="company-reports-body">
+            <tr><td colspan="9"><div class="empty-state"><div class="empty-icon">📊</div><div class="empty-title">Loading Company Reports...</div></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+
+    <!-- VIEW 8: System Configurations -->
+    <div id="view-config" style="display:none;">
+      <div class="card" style="max-width:800px; margin:0 auto; padding:28px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid var(--border-subtle); padding-bottom:14px;">
+          <div>
+            <h3 style="font-size:18px; font-weight:800; margin-bottom:4px;">⚙️ Global System Platform Configurations</h3>
+            <p style="font-size:13px; color:var(--text-secondary); margin:0;">Configure platform parameters, biometric thresholds, and defaults</p>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="loadSystemConfig()">🔄 Reset to Saved</button>
+        </div>
+
+        <form id="system-config-form" onsubmit="handleSaveSystemConfig(event)" style="display:flex; flex-direction:column; gap:18px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Platform SaaS Name</label>
+              <input type="text" id="cfg-platform-name" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Super Admin Parent Company</label>
+              <input type="text" id="cfg-super-company" class="form-input" required>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Default Global Timezone</label>
+              <select id="cfg-timezone" class="form-select">
+                <option value="Asia/Kolkata">Asia/Kolkata (IST +05:30)</option>
+                <option value="America/New_York">America/New_York (EST/EDT)</option>
+                <option value="America/Chicago">America/Chicago (CST/CDT)</option>
+                <option value="America/Los_Angeles">America/Los_Angeles (PST/PDT)</option>
+                <option value="Europe/London">Europe/London (GMT/BST)</option>
+                <option value="Europe/Paris">Europe/Paris (CET/CEST)</option>
+                <option value="Asia/Dubai">Asia/Dubai (GST +04:00)</option>
+                <option value="Asia/Singapore">Asia/Singapore (SGT +08:00)</option>
+                <option value="Asia/Tokyo">Asia/Tokyo (JST +09:00)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Default Office Subnet</label>
+              <input type="text" id="cfg-subnet" class="form-input" placeholder="192.168.29">
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Face Biometric Match Tolerance (0.3 - 0.7)</label>
+              <input type="number" id="cfg-tolerance" class="form-input" step="0.05" min="0.2" max="0.9" value="0.5">
+              <span style="font-size:11px; color:var(--text-muted);">Lower is stricter, higher is more forgiving</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Liveness PAD Confidence Threshold</label>
+              <input type="number" id="cfg-liveness-threshold" class="form-input" step="0.05" min="0.4" max="0.99" value="0.70">
+              <span style="font-size:11px; color:var(--text-muted);">Minimum confidence required for anti-spoofing challenge pass</span>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Liveness Token TTL (Seconds)</label>
+              <input type="number" id="cfg-liveness-ttl" class="form-input" min="30" max="300" value="60">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Default Geofence Radius (Meters)</label>
+              <input type="number" id="cfg-radius" class="form-input" min="10" max="1000" value="50">
+            </div>
+          </div>
+
+          <div style="background:var(--bg-input); padding:14px 18px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); display:flex; align-items:center; justify-content:space-between;">
+            <div>
+              <strong style="font-size:13.5px; color:var(--text-primary);">Enforce Anti-Spoofing Liveness Challenge</strong>
+              <div style="font-size:12px; color:var(--text-secondary);">Requires blink/turn challenge before allowing camera check-in</div>
+            </div>
+            <input type="checkbox" id="cfg-require-liveness" style="width:20px; height:20px; accent-color:var(--emerald);">
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
+            <button type="submit" class="btn btn-primary" id="btn-save-cfg">Save System Configurations →</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- VIEW: Role Permissions Matrix -->
+    <div id="view-permissions" style="display:none;">
+      <div class="card" style="padding:28px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid var(--border-subtle); padding-bottom:14px; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h3 style="font-size:18px; font-weight:800; margin-bottom:4px; display:flex; align-items:center; gap:8px;">
+              <span>🛡️</span> Role Permissions Matrix
+            </h3>
+            <p style="font-size:13px; color:var(--text-secondary); margin:0;">Configure and dynamically edit operational privileges across all roles</p>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <button class="btn btn-secondary btn-sm" id="btn-toggle-perm-edit" onclick="togglePermissionsEditMode()">
+              <span id="perm-edit-icon">✏️</span> <span id="perm-edit-text">Edit Permissions</span>
+            </button>
+            <button class="btn btn-primary btn-sm" id="btn-save-perm" onclick="savePermissionsMatrix()" style="display:none;">
+              💾 Save Changes
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btn-cancel-perm" onclick="cancelPermissionsEdit()" style="display:none;">
+              ✕ Cancel
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="resetDefaultPermissions()" title="Restore platform defaults">
+              ↺ Reset Defaults
+            </button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table id="permissions-matrix-table" class="perm-table">
+            <thead>
+              <tr>
+                <th>System Role</th>
+                <th>Portal Access</th>
+                <th>Manage Companies</th>
+                <th>Manage Staff</th>
+                <th>Configure Rules</th>
+                <th>Approve Leaves</th>
+                <th>View Reports</th>
+                <th>System Config</th>
+              </tr>
+            </thead>
+            <tbody id="permissions-matrix-body">
+              <tr><td colspan="8" style="text-align:center; padding:24px; color:var(--text-muted);">Loading permissions matrix...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 10: Attendance Controller -->
+    <div id="view-controller" style="display:none;">
+      <div class="card" style="padding:28px; margin-bottom:24px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid var(--border-subtle); padding-bottom:14px; flex-wrap:wrap; gap:12px;">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <h3 style="font-size:18px; font-weight:800; margin:0;">🎛️ Attendance Controller & Role-Based Permissions</h3>
+              <span class="badge badge-indigo">SUPER ADMIN EXCLUSIVE</span>
+            </div>
+            <p style="font-size:13px; color:var(--text-secondary); margin:4px 0 0 0;">
+              Highest authority control: Decide which attendance verification methods and features each Company Admin can access and assign to employees.
+            </p>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn btn-secondary btn-sm" onclick="resetControllerDefaults()">↺ Reset to Recommended</button>
+            <button class="btn btn-primary btn-sm" id="btn-save-controller" onclick="saveCompanyControllerSettings()">💾 Save Controller Permissions</button>
+          </div>
+        </div>
+
+        <!-- Target Company Selector -->
+        <div style="background:var(--bg-input); padding:16px 20px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+          <div style="display:flex; align-items:center; gap:14px; flex:1; min-width:280px;">
+            <label style="font-size:12.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap;">Target Workspace:</label>
+            <select id="ctrl-company-select" class="form-select" style="max-width:400px; font-weight:700;" onchange="loadCompanyControllerSettings()">
+              <option value="">Loading Companies...</option>
+            </select>
+          </div>
+          <div id="ctrl-company-badge-wrap" style="display:flex; align-items:center; gap:8px;">
+            <span class="badge badge-emerald" id="ctrl-company-status-badge">🟢 ACTIVE WORKSPACE</span>
+          </div>
+        </div>
+
+        <!-- Grid of Controller Controls -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;" class="controller-grid">
+          <!-- Col 1: Permitted Attendance Verification Methods -->
+          <div style="background:var(--bg-surface); padding:20px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+              <h4 style="font-size:14.5px; font-weight:800; color:var(--text-primary); margin:0;">
+                1. Permitted Attendance Methods
+              </h4>
+              <span class="badge badge-cyan" style="font-size:10px;">COMPANY ADMIN CAN ASSIGN ONLY THESE</span>
+            </div>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:16px;">
+              Methods enabled here will be available to the Company Admin when provisioning employee attendance. Any disabled method will be completely hidden from their assignment interface and strictly blocked from employee marking.
+            </p>
+
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <!-- Method 1: Face AI -->
+              <label style="display:flex; align-items:flex-start; gap:12px; padding:12px; background:var(--bg-input); border-radius:var(--radius-sm); border:1px solid var(--border-subtle); cursor:pointer;">
+                <input type="checkbox" id="ctrl-method-face" value="Face" checked style="width:18px; height:18px; accent-color:var(--emerald); margin-top:2px;">
+                <div>
+                  <strong style="font-size:13px; color:var(--text-primary);">📷 Neural Face Recognition AI</strong>
+                  <div style="font-size:11.5px; color:var(--text-secondary); margin-top:2px;">Biometric facial landmark matching with cryptographic liveness challenge anti-spoofing.</div>
+                </div>
+              </label>
+
+              <!-- Method 2: OTP -->
+              <label style="display:flex; align-items:flex-start; gap:12px; padding:12px; background:var(--bg-input); border-radius:var(--radius-sm); border:1px solid var(--border-subtle); cursor:pointer;">
+                <input type="checkbox" id="ctrl-method-otp" value="OTP" checked style="width:18px; height:18px; accent-color:var(--indigo); margin-top:2px;">
+                <div>
+                  <strong style="font-size:13px; color:var(--text-primary);">🔢 Dynamic In-App Code & OTP</strong>
+                  <div style="font-size:11.5px; color:var(--text-secondary); margin-top:2px;">6-digit rotating cryptographic tokens and in-app private 2FA codes.</div>
+                </div>
+              </label>
+
+              <!-- Method 3: Wi-Fi -->
+              <label style="display:flex; align-items:flex-start; gap:12px; padding:12px; background:var(--bg-input); border-radius:var(--radius-sm); border:1px solid var(--border-subtle); cursor:pointer;">
+                <input type="checkbox" id="ctrl-method-wifi" value="WiFi" checked style="width:18px; height:18px; accent-color:var(--cyan); margin-top:2px;">
+                <div>
+                  <strong style="font-size:13px; color:var(--text-primary);">📶 Corporate Office Wi-Fi</strong>
+                  <div style="font-size:11.5px; color:var(--text-secondary); margin-top:2px;">Office public IP / Subnet rule match verification for on-premise attendance.</div>
+                </div>
+              </label>
+
+              <!-- Method 4: Field GPS -->
+              <label style="display:flex; align-items:flex-start; gap:12px; padding:12px; background:var(--bg-input); border-radius:var(--radius-sm); border:1px solid var(--border-subtle); cursor:pointer;">
+                <input type="checkbox" id="ctrl-method-gps" value="GPS" checked style="width:18px; height:18px; accent-color:var(--amber); margin-top:2px;">
+                <div>
+                  <strong style="font-size:13px; color:var(--text-primary);">🚗 Field & Remote GPS</strong>
+                  <div style="font-size:11.5px; color:var(--text-secondary); margin-top:2px;">High-accuracy satellite geolocation with client meeting tracking and mock-location detection.</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Col 2: Company Admin Permissions & Operational Controls -->
+          <div style="background:var(--bg-surface); padding:20px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+              <h4 style="font-size:14.5px; font-weight:800; color:var(--text-primary); margin:0;">
+                2. Company Admin Authority & Rules
+              </h4>
+              <span class="badge badge-emerald" style="font-size:10px;">ROLE-BASED GOVERNANCE</span>
+            </div>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:16px;">
+              Determine what attendance settings the Company Admin is permitted to customize for their workforce.
+            </p>
+
+            <div style="margin-bottom:14px; padding:13px; background:rgba(6,182,212,0.06); border:1px solid rgba(6,182,212,0.22); border-radius:var(--radius-sm);">
+              <label class="form-label" for="ctrl-office-wifi-ip">Authorized Corporate Office Wi-Fi IP / CIDR</label>
+              <input id="ctrl-office-wifi-ip" class="form-input" placeholder="e.g. 203.0.113.25 or 192.168.1.0/24">
+              <div style="font-size:11px; color:var(--text-muted); margin-top:5px; line-height:1.4;">Saved rules are hard-checked for Wi-Fi attendance. Use comma-separated IP/CIDR rules for multiple office networks.</div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <label style="display:flex; align-items:flex-start; gap:12px; padding:12px; background:var(--bg-input); border-radius:var(--radius-sm); border:1px solid var(--border-subtle); cursor:pointer;">
+                <input type="checkbox" id="ctrl-allow-override" checked style="width:18px; height:18px; accent-color:var(--emerald); margin-top:2px;">
+                <div>
+                  <strong style="font-size:13px; color:var(--text-primary);">Allow Company Admin to Assign Methods Employee-Wise</strong>
+                  <div style="font-size:11.5px; color:var(--text-secondary); margin-top:2px;">When enabled, Company Admin can choose specific allowed methods per employee.</div>
+                </div>
+              </label>
+
+              <label style="display:flex; align-items:flex-start; gap:12px; padding:12px; background:var(--bg-input); border-radius:var(--radius-sm); border:1px solid var(--border-subtle); cursor:pointer;">
+                <input type="checkbox" id="ctrl-req-gps-field" checked style="width:18px; height:18px; accent-color:var(--emerald); margin-top:2px;">
+                <div>
+                  <strong style="font-size:13px; color:var(--text-primary);">Enforce Verified Satellite GPS for Field Employees</strong>
+                  <div style="font-size:11.5px; color:var(--text-secondary); margin-top:2px;">Requires active GPS coordinate telemetry whenever field employees clock in or out.</div>
+                </div>
+              </label>
+
+              <label style="display:flex; align-items:flex-start; gap:12px; padding:12px; background:var(--bg-input); border-radius:var(--radius-sm); border:1px solid var(--border-subtle); cursor:pointer;">
+                <input type="checkbox" id="ctrl-req-wifi-office" style="width:18px; height:18px; accent-color:var(--emerald); margin-top:2px;">
+                <div>
+                  <strong style="font-size:13px; color:var(--text-primary);">Require Authorized Corporate Wi-Fi for Office Staff</strong>
+                  <div style="font-size:11.5px; color:var(--text-secondary); margin-top:2px;">Office workers must connect to verified office Wi-Fi subnet before clocking in.</div>
+                </div>
+              </label>
+
+              <label style="display:flex; align-items:flex-start; gap:12px; padding:12px; background:var(--bg-input); border-radius:var(--radius-sm); border:1px solid var(--border-subtle); cursor:pointer;">
+                <input type="checkbox" id="ctrl-allow-wfh-gps" checked style="width:18px; height:18px; accent-color:var(--emerald); margin-top:2px;">
+                <div>
+                  <strong style="font-size:13px; color:var(--text-primary);">Permit Home Base Geofence Radius for WFH Staff</strong>
+                  <div style="font-size:11.5px; color:var(--text-secondary); margin-top:2px;">Validates WFH staff are within their registered home base radius.</div>
+                </div>
+              </label>
+
+              <label style="display:flex; align-items:flex-start; gap:12px; padding:12px; background:var(--bg-input); border-radius:var(--radius-sm); border:1px solid var(--border-subtle); cursor:pointer;">
+                <input type="checkbox" id="ctrl-allow-offline" checked style="width:18px; height:18px; accent-color:var(--emerald); margin-top:2px;">
+                <div>
+                  <strong style="font-size:13px; color:var(--text-primary);">Enable Offline Punches & Mobile App Sync</strong>
+                  <div style="font-size:11.5px; color:var(--text-secondary); margin-top:2px;">Allow mobile app employees to queue punches offline and synchronize when connected.</div>
+                </div>
+              </label>
+
+              <div style="padding:12px; background:var(--bg-input); border-radius:var(--radius-sm); border:1px solid var(--border-subtle); display:flex; align-items:center; justify-content:space-between;">
+                <div>
+                  <strong style="font-size:13px; color:var(--text-primary);">Daily Clock-Out Policy</strong>
+                  <div style="font-size:11.5px; color:var(--text-secondary);">Maximum number of clock-outs permitted per employee per working day.</div>
+                </div>
+                <select id="ctrl-max-clockouts" class="form-select" style="width:140px; font-weight:700;">
+                  <option value="1">1 (Single Shift)</option>
+                  <option value="2">2 (Split Shift)</option>
+                  <option value="10">Flexible / Unlimited</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Permissions Summary Table Across All Companies -->
+      <div class="card" style="padding:28px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--border-subtle); padding-bottom:12px; flex-wrap:wrap; gap:10px;">
+          <div>
+            <h4 style="font-size:16px; font-weight:800; margin:0;">🌐 Global Attendance Controller Matrix</h4>
+            <p style="font-size:12.5px; color:var(--text-secondary); margin:2px 0 0 0;">Overview of active attendance methods and permissions configured across all company workspaces.</p>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="loadControllerView()">🔄 Refresh Matrix</button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Company Name</th>
+                <th>Workspace ID</th>
+                <th>Status</th>
+                <th>Permitted Methods</th>
+                <th>Admin Override</th>
+                <th>Field GPS</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="controller-summary-table-body">
+              <tr>
+                <td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">Loading controller matrix...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </main>
@@ -653,6 +1174,110 @@
   </div>
 </div>
 
+<!-- Modal: Create Company Administrator -->
+<div class="modal-overlay" id="create-admin-modal">
+  <div class="modal-content" style="max-width:480px;">
+    <div class="modal-header">
+      <h3 class="modal-title">👤 Create Company Administrator</h3>
+      <button class="btn-close" onclick="closeCreateAdminModal()">✕</button>
+    </div>
+    <form id="create-admin-form" onsubmit="handleCreateCompanyAdmin(event)" style="display:flex; flex-direction:column; gap:14px; padding-top:8px;">
+      <div class="form-group">
+        <label class="form-label">Target Company Workspace</label>
+        <select id="admin-target-company" class="form-select" required></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Administrator Full Name</label>
+        <input type="text" id="admin-fullname" class="form-input" placeholder="e.g. John Doe" required>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="form-group">
+          <label class="form-label">Corporate Email</label>
+          <input type="email" id="admin-email" class="form-input" placeholder="admin@company.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mobile Number</label>
+          <input type="text" id="admin-mobile" class="form-input" placeholder="9876543210" required>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="form-group">
+          <label class="form-label">Administrative Role</label>
+          <select id="admin-role" class="form-select">
+            <option value="company_admin">Company Admin (Full Access)</option>
+            <option value="hr">HR Manager</option>
+            <option value="manager">Team Manager</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Initial Password</label>
+          <input type="text" id="admin-password" class="form-input" value="admin123" required>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:8px;">
+        <button type="button" class="btn btn-secondary" onclick="closeCreateAdminModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="btn-submit-create-admin">Create Admin Account →</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Edit Company Account -->
+<div class="modal-overlay" id="edit-company-modal">
+  <div class="modal-content" style="max-width:520px;">
+    <div class="modal-header">
+      <h3 class="modal-title">✏️ Manage Company Account</h3>
+      <button class="btn-close" onclick="closeEditCompanyModal()">✕</button>
+    </div>
+    <form id="edit-company-form" onsubmit="handleEditCompany(event)" style="display:flex; flex-direction:column; gap:14px; padding-top:8px;">
+      <input type="hidden" id="edit-comp-id">
+      <div class="form-group">
+        <label class="form-label">Workspace ID</label>
+        <input type="text" id="edit-comp-id-disp" class="form-input" disabled style="opacity:0.7;">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Company Legal Name</label>
+        <input type="text" id="edit-comp-name" class="form-input" required>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="form-group">
+          <label class="form-label">Country</label>
+          <input type="text" id="edit-comp-country" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Timezone</label>
+          <select id="edit-comp-tz" class="form-select">
+            <option value="Asia/Kolkata">Asia/Kolkata (IST +05:30)</option>
+            <option value="America/New_York">America/New_York (EST/EDT)</option>
+            <option value="America/Chicago">America/Chicago (CST/CDT)</option>
+            <option value="America/Los_Angeles">America/Los_Angeles (PST/PDT)</option>
+            <option value="Europe/London">Europe/London (GMT/BST)</option>
+            <option value="Europe/Paris">Europe/Paris (CET/CEST)</option>
+            <option value="Asia/Dubai">Asia/Dubai (GST +04:00)</option>
+            <option value="Asia/Singapore">Asia/Singapore (SGT +08:00)</option>
+            <option value="Asia/Tokyo">Asia/Tokyo (JST +09:00)</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="form-group">
+          <label class="form-label">Contact Phone</label>
+          <input type="text" id="edit-comp-phone" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contact Email</label>
+          <input type="email" id="edit-comp-email" class="form-input">
+        </div>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:8px;">
+        <button type="button" class="btn btn-secondary" onclick="closeEditCompanyModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="btn-submit-edit-comp">Save Changes →</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
 <!-- Toast Container -->
 <div class="toast-container" id="toast-container"></div>
 
@@ -703,9 +1328,12 @@ async function loadCompanies() {
       // Populate company dropdown in attendance filter
       const compSelect = document.getElementById('att-filter-comp');
       if (compSelect) {
-        compSelect.innerHTML = '<option value="">All Companies / Tenants</option>' + 
+        const selectedComp = compSelect.value;
+        compSelect.innerHTML = '<option value="">All Companies / Tenants</option>' +
           activeList.map(c => `<option value="${c.company_id}">${c.name} (${c.company_id})</option>`).join('');
+        compSelect.value = selectedComp;
       }
+      if (saTimingsPanel) saTimingsPanel.setCompanies(activeList);
     }
   } catch (err) {
     console.error('Companies load error:', err);
@@ -806,13 +1434,13 @@ function renderGlobalAttendanceTable(list) {
   renderSuperAdminDonut(allAttendanceRecords);
 
   if (list.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">⚡</div><div class="empty-title">No Attendance Records Found</div></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">⚡</div><div class="empty-title">No Attendance Records Found</div></div></td></tr>`;
     return;
   }
 
   tbody.innerHTML = list.map(r => {
     const status = (r.status || 'Present').toUpperCase();
-    const badgeClass = status === 'PRESENT' ? 'badge-emerald' : status === 'LATE' ? 'badge-amber' : 'badge-rose';
+    const badgeClass = status === 'PRESENT' ? 'badge-emerald' : (status === 'LATE' || status === 'HALF DAY') ? 'badge-amber' : status === 'LEAVE' ? 'badge-indigo' : 'badge-rose';
     const gpsTxt = (r.location && r.location.lat !== undefined) 
       ? `📍 ${r.location.lat.toFixed(4)}, ${r.location.lng.toFixed(4)} (±${r.location.accuracy || 0}m)`
       : (r.location_tag || 'Standard');
@@ -840,6 +1468,7 @@ function renderGlobalAttendanceTable(list) {
           <span class="badge ${badgeClass}">
             <span class="badge-dot"></span> ${status}
           </span>
+          ${r.edited_by ? `<div style="font-size:10px; color:var(--text-muted); margin-top:3px;">✎ edited (was ${r.original_status || '-'})</div>` : ''}
         </td>
         <td style="font-family:var(--font-mono); font-size:11px; color:var(--text-secondary); max-width:180px; overflow:hidden; text-overflow:ellipsis;">
           ${gpsTxt}
@@ -848,9 +1477,121 @@ function renderGlobalAttendanceTable(list) {
           <div>${r.ip || '127.0.0.1'}</div>
           <div style="color:var(--text-muted); font-size:10px;">${(r.device_info || 'Browser').slice(0, 16)}</div>
         </td>
+        <td style="text-align:center;">
+          <button type="button" title="Edit status (Present / Absent / Leave ...)" onclick="editAttendanceRecord('${r._id}')"
+            style="background:rgba(99,102,241,.14); border:1px solid rgba(99,102,241,.5); color:#A5B4FC; border-radius:8px; padding:5px 10px; cursor:pointer; font-size:12px; font-weight:700; white-space:nowrap; margin-right:6px;">✏️ Edit</button>
+          <button type="button" title="Delete this attendance entry everywhere" onclick="deleteAttendanceRecord('${r._id}')"
+            style="background:rgba(244,63,94,.12); border:1px solid rgba(244,63,94,.45); color:#FB7185; border-radius:8px; padding:5px 10px; cursor:pointer; font-size:12px; font-weight:700; white-space:nowrap;">🗑️ Delete</button>
+        </td>
       </tr>
     `;
   }).join('');
+}
+
+async function deleteAttendanceRecord(id) {
+  const rec = (allAttendanceRecords || []).find(r => String(r._id) === String(id));
+  const who = rec ? `${rec.name || 'Employee'} (${rec.emp_id}) • ${rec.date || ''} ${rec.time || ''} • ${rec.method || ''}` : 'this record';
+  if (!confirm(`Delete this attendance entry permanently?\n\n${who}\n\nIt will be removed everywhere (reports, timings, employee history). This cannot be undone.`)) return;
+  try {
+    const res = await fetch(`/api/superadmin/attendance/${encodeURIComponent(id)}`, {
+      method: 'DELETE', credentials: 'same-origin', headers: { 'Accept': 'application/json' }
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.ok) { alert(data.error || ('Delete failed (HTTP ' + res.status + ')')); return; }
+    allAttendanceRecords = allAttendanceRecords.filter(r => String(r._id) !== String(id));
+    filterGlobalAttendance();
+    if (typeof ArdhnarishwarRuntime !== 'undefined' && ArdhnarishwarRuntime.triggerGlobalSync) ArdhnarishwarRuntime.triggerGlobalSync(true);
+  } catch (e) {
+    alert('Delete failed: ' + e.message);
+  }
+}
+
+function editAttendanceRecord(id) {
+  const rec = (allAttendanceRecords || []).find(r => String(r._id) === String(id));
+  if (!rec) { alert('Record not found. Please refresh the stream.'); return; }
+  const prev = document.getElementById('att-edit-modal'); if (prev) prev.remove();
+  const cur = String(rec.status || 'Present');
+  const opts = ['Present', 'Absent', 'Late', 'Half Day', 'Leave']
+    .map(s => `<option value="${s}" ${s.toLowerCase() === cur.toLowerCase() ? 'selected' : ''}>${s}</option>`).join('');
+  const lbl = 'display:block;font-size:12px;font-weight:700;margin-bottom:5px;color:var(--text-secondary,#cbd5e1);';
+  const ov = document.createElement('div');
+  ov.id = 'att-edit-modal';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(2,6,23,.72);display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);';
+  ov.innerHTML = `
+    <div style="width:100%;max-width:440px;max-height:92vh;overflow:auto;background:var(--bg-card,#0f172a);border:1px solid var(--border-subtle,#334155);border-radius:16px;padding:22px;color:var(--text-primary,#e2e8f0);box-shadow:0 20px 60px rgba(0,0,0,.6);">
+      <h3 style="margin:0 0 4px;font-size:17px;font-weight:800;">✏️ Edit Attendance</h3>
+      <div id="att-edit-who" style="font-size:12.5px;color:var(--text-muted,#94a3b8);margin-bottom:16px;"></div>
+      <label style="${lbl}">New Status</label>
+      <select id="att-edit-status" class="form-select" style="width:100%;margin-bottom:12px;">${opts}</select>
+      <div id="att-edit-leave-wrap" style="display:none;margin-bottom:12px;">
+        <label style="${lbl}">Leave Type</label>
+        <select id="att-edit-leave-type" class="form-select" style="width:100%;">
+          <option>Casual</option><option>Sick</option><option>Earned</option><option>Unpaid</option>
+        </select>
+      </div>
+      <label style="${lbl}">Reason</label>
+      <textarea id="att-edit-reason" class="form-input" rows="3" style="width:100%;margin-bottom:12px;resize:vertical;" placeholder="e.g. Employee did not work / approved leave"></textarea>
+      <label style="display:flex;gap:8px;align-items:flex-start;font-size:12.5px;margin-bottom:16px;cursor:pointer;">
+        <input type="checkbox" id="att-edit-all" checked style="margin-top:2px;">
+        <span>Is employee ki us din ki saari entries pe lagao (recommended)</span>
+      </label>
+      <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
+        <button type="button" id="att-edit-cancel" style="background:transparent;border:1px solid var(--border-subtle,#334155);color:var(--text-secondary,#cbd5e1);border-radius:10px;padding:9px 16px;cursor:pointer;font-weight:700;">Cancel</button>
+        <button type="button" id="att-edit-save" style="background:linear-gradient(135deg,#6366F1,#8B5CF6);border:none;color:#fff;border-radius:10px;padding:9px 18px;cursor:pointer;font-weight:800;">Save Changes</button>
+      </div>
+    </div>`;
+  document.body.appendChild(ov);
+  document.getElementById('att-edit-who').textContent =
+    `${rec.name || 'Employee'} (${rec.emp_id}) • ${rec.date || ''} ${rec.time || ''} • current: ${cur}`;
+
+  const stSel = document.getElementById('att-edit-status');
+  const lvWrap = document.getElementById('att-edit-leave-wrap');
+  const syncLv = () => { lvWrap.style.display = stSel.value === 'Leave' ? 'block' : 'none'; };
+  stSel.addEventListener('change', syncLv); syncLv();
+  const close = () => ov.remove();
+  document.getElementById('att-edit-cancel').onclick = close;
+  ov.addEventListener('click', e => { if (e.target === ov) close(); });
+
+  document.getElementById('att-edit-save').onclick = async () => {
+    const newStatus = stSel.value;
+    if (newStatus.toLowerCase() === cur.toLowerCase()) { alert('Status same hai. Naya status chuno.'); return; }
+    const applyAll = document.getElementById('att-edit-all').checked;
+    const btn = document.getElementById('att-edit-save');
+    btn.disabled = true; btn.textContent = 'Saving...';
+    try {
+      const res = await fetch(`/api/superadmin/attendance/${encodeURIComponent(id)}`, {
+        method: 'PATCH', credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          status: newStatus,
+          reason: document.getElementById('att-edit-reason').value.trim(),
+          leave_type: document.getElementById('att-edit-leave-type').value,
+          apply_all_day: applyAll
+        })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.ok) {
+        alert(data.error || ('Edit failed (HTTP ' + res.status + ')'));
+        btn.disabled = false; btn.textContent = 'Save Changes';
+        return;
+      }
+      allAttendanceRecords.forEach(r => {
+        const same = String(r._id) === String(id) ||
+          (applyAll && r.company_id === rec.company_id && r.emp_id === rec.emp_id && r.date === rec.date);
+        if (same) {
+          r.original_status = r.original_status || r.status || 'Present';
+          r.status = data.status || newStatus;
+          r.edited_by = data.edited_by || 'Super Admin';
+        }
+      });
+      close();
+      filterGlobalAttendance();
+      if (typeof ArdhnarishwarRuntime !== 'undefined' && ArdhnarishwarRuntime.triggerGlobalSync) ArdhnarishwarRuntime.triggerGlobalSync(true);
+    } catch (e) {
+      alert('Edit failed: ' + e.message);
+      btn.disabled = false; btn.textContent = 'Save Changes';
+    }
+  };
 }
 
 function renderCompanyTable(list) {
@@ -861,7 +1602,7 @@ function renderCompanyTable(list) {
   if (list.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="8">
+        <td colspan="7">
           <div class="empty-state">
             <div class="empty-icon">🏢</div>
             <div class="empty-title">No Active Client Workspaces</div>
@@ -892,17 +1633,19 @@ function renderCompanyTable(list) {
           </span>
         </td>
         <td style="font-family:var(--font-mono); font-weight:700;">${c.employee_count || 0}</td>
-        <td><span class="badge badge-indigo">${c.plan || 'Enterprise'}</span></td>
         <td style="font-size:12.5px; font-family:var(--font-mono);">${c.contact_phone || 'N/A'}</td>
         <td>
-          <div style="display:flex; gap:6px; align-items:center;">
+          <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
             <a href="/admin?company_id=${encodeURIComponent(c.company_id)}" class="btn btn-secondary btn-sm" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px;" title="Open full enterprise management portal for this workspace">
-              <span>🏢</span> Manage
+              <span>🏢</span> Portal
             </a>
+            <button class="btn btn-secondary btn-sm" onclick="openEditCompanyModal('${c.company_id}')" title="Edit company account">
+              <span>✏️</span> Edit
+            </button>
             <button class="btn btn-sm ${isSuspended ? 'btn-primary' : 'btn-secondary'}" onclick="toggleStatus('${c.company_id}', '${isSuspended ? 'active' : 'suspended'}')">
               ${isSuspended ? 'Activate' : 'Suspend'}
             </button>
-            <button class="btn btn-danger btn-sm" onclick="deleteCompany('${c.company_id}', '${c.name.replace(/'/g, "\'")}')">✕</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteCompany('${c.company_id}', '${c.name.replace(/'/g, "\\'")}')">✕</button>
           </div>
         </td>
       </tr>
@@ -911,18 +1654,29 @@ function renderCompanyTable(list) {
 }
 
 function switchView(view) {
-  if (!['companies', 'pending', 'attendance', 'audit'].includes(view)) {
+  const validViews = ['companies', 'pending', 'reports', 'config', 'permissions', 'controller', 'timings', 'attendance', 'audit'];
+  if (!validViews.includes(view)) {
     view = 'companies';
   }
   const viewMap = {
     'companies': 'view-companies',
     'pending': 'view-pending',
+    'reports': 'view-reports',
+    'config': 'view-config',
+    'permissions': 'view-permissions',
+    'controller': 'view-controller',
+    'timings': 'view-timings',
     'attendance': 'view-attendance',
     'audit': 'view-audit'
   };
   const tabMap = {
     'companies': 'tab-btn-companies',
     'pending': 'tab-btn-pending',
+    'reports': 'tab-btn-reports',
+    'config': 'tab-btn-config',
+    'permissions': 'tab-btn-permissions',
+    'controller': 'tab-btn-controller',
+    'timings': 'tab-btn-timings',
     'attendance': 'tab-btn-attendance',
     'audit': 'tab-btn-audit'
   };
@@ -933,6 +1687,12 @@ function switchView(view) {
     const tab = document.getElementById(tabMap[key]);
     if (tab) tab.classList.toggle('active', key === view);
   });
+
+  if (view === 'reports') loadCompanyReports();
+  else if (view === 'config') loadSystemConfig();
+  else if (view === 'permissions') loadPermissionsMatrix();
+  else if (view === 'controller') loadControllerView();
+  else if (view === 'timings' && saTimingsPanel) saTimingsPanel.reload();
 
   if (window.history && window.history.replaceState) {
     window.history.replaceState(null, '', `?tab=${view}`);
@@ -1189,6 +1949,7 @@ async function doLogout() {
 }
 
 function renderSuperAdminDonut(records) {
+  records = (records || []).filter(r => !['ABSENT', 'LEAVE'].includes(String(r.status || '').toUpperCase()));
   const faceCnt = records.filter(r => (r.method || '').includes('Face')).length;
   const codeCnt = records.filter(r => (r.method || '').includes('Code') || (r.method || '').includes('OTP') || (r.method || '').includes('QR')).length;
   const wifiCnt = records.filter(r => (r.method || '').includes('WiFi')).length;
@@ -1248,6 +2009,504 @@ function renderSuperAdminDonut(records) {
   });
 }
 
+
+// ── Company-Wise Reports ──────────────────────────────────────────────────
+let allCompanyReports = [];
+async function loadCompanyReports() {
+  try {
+    const res = await fetch('/api/superadmin/company-reports');
+    const data = await res.json();
+    if (data.ok && data.reports) {
+      allCompanyReports = data.reports;
+      renderCompanyReports(allCompanyReports);
+    }
+  } catch (err) {
+    console.error('Company reports error:', err);
+  }
+}
+
+function renderCompanyReports(reports) {
+  const tbody = document.getElementById('company-reports-body');
+  if (!tbody) return;
+  if (reports.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">📊</div><div class="empty-title">No Company Data Available</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = reports.map(r => {
+    return `
+      <tr>
+        <td><strong style="font-family:var(--font-mono); color:var(--cyan);">${r.company_id}</strong></td>
+        <td><strong>${r.name}</strong></td>
+        <td style="font-size:12px;">${r.country} <span style="font-family:var(--font-mono); color:var(--text-muted); font-size:11px;">(${r.timezone})</span></td>
+        <td style="font-family:var(--font-mono); font-weight:700;">${r.active_employees}</td>
+        <td style="font-family:var(--font-mono); font-weight:700; color:var(--emerald);">${r.today_attendance}</td>
+        <td style="font-family:var(--font-mono); color:var(--amber);">${r.today_late}</td>
+        <td>
+          <span class="badge ${r.attendance_rate >= 80 ? 'badge-emerald' : r.attendance_rate >= 50 ? 'badge-amber' : 'badge-rose'}">
+            ${r.attendance_rate}%
+          </span>
+        </td>
+        <td><span class="badge badge-indigo">${r.plan}</span></td>
+        <td>
+          <a href="/admin?company_id=${encodeURIComponent(r.company_id)}" class="btn btn-secondary btn-sm" style="text-decoration:none;">
+            View Workspace
+          </a>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function filterCompanyReports() {
+  const q = (document.getElementById('report-search').value || '').trim().toLowerCase();
+  if (!q) { renderCompanyReports(allCompanyReports); return; }
+  const filtered = allCompanyReports.filter(r => 
+    (r.company_id && r.company_id.toLowerCase().includes(q)) ||
+    (r.name && r.name.toLowerCase().includes(q)) ||
+    (r.country && r.country.toLowerCase().includes(q))
+  );
+  renderCompanyReports(filtered);
+}
+
+function exportCompanyReportsCSV() {
+  if (allCompanyReports.length === 0) {
+    showToast('No company reports to export', 'error');
+    return;
+  }
+  const headers = ['Workspace ID', 'Company Name', 'Country', 'Timezone', 'Status', 'Plan', 'Active Headcount', 'Today Attendance', 'Today Late', 'Monthly Attendance', 'Attendance Rate %'];
+  const rows = allCompanyReports.map(r => [
+    r.company_id,
+    `"${(r.name || '').replace(/"/g, '""')}"`,
+    `"${(r.country || '').replace(/"/g, '""')}"`,
+    r.timezone,
+    r.status,
+    `"${(r.plan || '').replace(/"/g, '""')}"`,
+    r.active_employees,
+    r.today_attendance,
+    r.today_late,
+    r.monthly_attendance,
+    `${r.attendance_rate}%`
+  ]);
+  const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', `company_reports_${new Date().toISOString().slice(0, 10)}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  showToast('Company reports CSV exported successfully', 'success');
+}
+
+
+// ── System Configurations ─────────────────────────────────────────────────
+async function loadSystemConfig() {
+  try {
+    const res = await fetch('/api/superadmin/system-config');
+    const data = await res.json();
+    if (data.ok && data.config) {
+      const c = data.config;
+      if (document.getElementById('cfg-platform-name')) document.getElementById('cfg-platform-name').value = c.platform_name || '';
+      if (document.getElementById('cfg-super-company')) document.getElementById('cfg-super-company').value = c.super_admin_company || '';
+      if (document.getElementById('cfg-timezone')) document.getElementById('cfg-timezone').value = c.default_timezone || 'Asia/Kolkata';
+      if (document.getElementById('cfg-subnet')) document.getElementById('cfg-subnet').value = c.office_subnet || '';
+      if (document.getElementById('cfg-tolerance')) document.getElementById('cfg-tolerance').value = c.face_match_tolerance || 0.5;
+      if (document.getElementById('cfg-liveness-threshold')) document.getElementById('cfg-liveness-threshold').value = c.liveness_confidence_threshold || 0.70;
+      if (document.getElementById('cfg-liveness-ttl')) document.getElementById('cfg-liveness-ttl').value = c.liveness_session_ttl_seconds || 60;
+      if (document.getElementById('cfg-radius')) document.getElementById('cfg-radius').value = c.office_radius_m || 50;
+      if (document.getElementById('cfg-require-liveness')) document.getElementById('cfg-require-liveness').checked = c.require_liveness !== false;
+    }
+  } catch (err) {
+    console.error('System config load error:', err);
+  }
+}
+
+async function handleSaveSystemConfig(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btn-save-cfg');
+  btn.disabled = true;
+  const payload = {
+    platform_name: document.getElementById('cfg-platform-name').value,
+    super_admin_company: document.getElementById('cfg-super-company').value,
+    default_timezone: document.getElementById('cfg-timezone').value,
+    office_subnet: document.getElementById('cfg-subnet').value,
+    face_match_tolerance: parseFloat(document.getElementById('cfg-tolerance').value),
+    liveness_confidence_threshold: parseFloat(document.getElementById('cfg-liveness-threshold').value),
+    liveness_session_ttl_seconds: parseInt(document.getElementById('cfg-liveness-ttl').value),
+    office_radius_m: parseFloat(document.getElementById('cfg-radius').value),
+    require_liveness: document.getElementById('cfg-require-liveness').checked
+  };
+  try {
+    const res = await fetch('/api/superadmin/system-config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.ok) {
+      showToast(data.message || 'System platform configuration updated successfully', 'success');
+    } else {
+      showToast(data.error || 'Failed to save configuration', 'error');
+    }
+  } catch (err) {
+    showToast('Network error saving configuration', 'error');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ── Role Permissions Matrix ───────────────────────────────────────────────
+const PERMISSION_ROLES = [
+  { key: 'super_admin', name: 'Super Administrator', badge: 'badge-purple', icon: '👑', desc: 'Platform Owner' },
+  { key: 'company_admin', name: 'Company Administrator', badge: 'badge-indigo', icon: '🏢', desc: 'Workspace Owner' },
+  { key: 'hr', name: 'HR Manager', badge: 'badge-cyan', icon: '👥', desc: 'People Ops' },
+  { key: 'manager', name: 'Team Manager', badge: 'badge-amber', icon: '📋', desc: 'Team Lead' },
+  { key: 'employee', name: 'Staff / Employee', badge: 'badge-emerald', icon: '👤', desc: 'Base User' }
+];
+
+const PERMISSION_COLUMNS = [
+  { key: 'manage_companies', label: 'Manage Companies' },
+  { key: 'manage_staff', label: 'Manage Staff' },
+  { key: 'configure_rules', label: 'Configure Rules' },
+  { key: 'approve_leaves', label: 'Approve Leaves' },
+  { key: 'view_reports', label: 'View Reports' },
+  { key: 'system_config', label: 'System Config' }
+];
+
+const DEFAULT_PERMISSIONS = {
+  super_admin: {
+    portal: '/admin/dashboard',
+    manage_companies: true,
+    manage_staff: true,
+    configure_rules: true,
+    approve_leaves: true,
+    view_reports: true,
+    system_config: true
+  },
+  company_admin: {
+    portal: '/workspace/dashboard',
+    manage_companies: false,
+    manage_staff: true,
+    configure_rules: true,
+    approve_leaves: true,
+    view_reports: true,
+    system_config: false
+  },
+  hr: {
+    portal: '/workspace/dashboard',
+    manage_companies: false,
+    manage_staff: true,
+    configure_rules: false,
+    approve_leaves: true,
+    view_reports: true,
+    system_config: false
+  },
+  manager: {
+    portal: '/workspace/dashboard',
+    manage_companies: false,
+    manage_staff: false,
+    configure_rules: false,
+    approve_leaves: true,
+    view_reports: true,
+    system_config: false
+  },
+  employee: {
+    portal: '/employee/portal',
+    manage_companies: false,
+    manage_staff: false,
+    configure_rules: false,
+    approve_leaves: false,
+    view_reports: false,
+    system_config: false
+  }
+};
+
+let permissionsMatrixState = null;
+let permissionsEditMode = false;
+let editingPermissions = null;
+
+async function loadPermissionsMatrix() {
+  const tbody = document.getElementById('permissions-matrix-body');
+  if (tbody && !permissionsMatrixState) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:24px; color:var(--text-muted);">Loading permissions matrix...</td></tr>';
+  }
+  try {
+    const res = await fetch('/api/superadmin/permissions');
+    const data = await res.json();
+    if (data.ok && data.permissions) {
+      permissionsMatrixState = data.permissions;
+    } else {
+      permissionsMatrixState = JSON.parse(JSON.stringify(DEFAULT_PERMISSIONS));
+    }
+  } catch (err) {
+    console.error('Permissions load error:', err);
+    permissionsMatrixState = JSON.parse(JSON.stringify(DEFAULT_PERMISSIONS));
+  }
+  renderPermissionsMatrix();
+}
+
+function renderPermissionsMatrix() {
+  const tbody = document.getElementById('permissions-matrix-body');
+  if (!tbody) return;
+
+  const currentData = permissionsEditMode ? (editingPermissions || permissionsMatrixState || DEFAULT_PERMISSIONS) : (permissionsMatrixState || DEFAULT_PERMISSIONS);
+
+  // Sync action buttons
+  const btnEdit = document.getElementById('btn-edit-perm');
+  const btnSave = document.getElementById('btn-save-perm');
+  const btnCancel = document.getElementById('btn-cancel-perm');
+
+  if (btnEdit) btnEdit.style.display = permissionsEditMode ? 'none' : 'inline-flex';
+  if (btnSave) btnSave.style.display = permissionsEditMode ? 'inline-flex' : 'none';
+  if (btnCancel) btnCancel.style.display = permissionsEditMode ? 'inline-flex' : 'none';
+
+  tbody.innerHTML = PERMISSION_ROLES.map(role => {
+    const roleKey = role.key;
+    const perms = currentData[roleKey] || (DEFAULT_PERMISSIONS[roleKey] || {});
+    const portalVal = perms.portal || (roleKey === 'super_admin' ? '/admin/dashboard' : roleKey === 'employee' ? '/employee/portal' : '/workspace/dashboard');
+
+    let portalCell = '';
+    if (permissionsEditMode) {
+      portalCell = `
+        <input type="text" class="form-input" style="font-size:11.5px; font-family:var(--font-mono); padding:5px 8px; width:160px; background:var(--bg-card);" 
+               value="${portalVal}" onchange="handlePortalChange('${roleKey}', this.value)">
+      `;
+    } else {
+      portalCell = `
+        <span class="badge badge-indigo" style="font-family:var(--font-mono); font-size:11.5px;">${portalVal}</span>
+      `;
+    }
+
+    const permCols = PERMISSION_COLUMNS.map(col => {
+      const isAllowed = Boolean(perms[col.key]);
+      if (permissionsEditMode) {
+        return `
+          <td style="text-align:center;">
+            <label style="display:inline-flex; align-items:center; gap:6px; cursor:pointer; padding:4px 8px; border-radius:6px; background:var(--bg-input); border:1px solid ${isAllowed ? 'var(--emerald)' : 'var(--border-subtle)'}; transition:all 0.2s ease;">
+              <input type="checkbox" ${isAllowed ? 'checked' : ''} 
+                     style="width:16px; height:16px; accent-color:var(--emerald); cursor:pointer;"
+                     onchange="handlePermissionToggle('${roleKey}', '${col.key}', this.checked)">
+              <span style="font-size:11px; font-weight:700; color:${isAllowed ? 'var(--emerald)' : 'var(--text-muted)'};">
+                ${isAllowed ? 'YES' : 'NO'}
+              </span>
+            </label>
+          </td>
+        `;
+      } else {
+        return `
+          <td style="text-align:center;">
+            ${isAllowed 
+              ? '<span class="badge badge-emerald" style="font-size:11px; font-weight:700;">✓ ALLOWED</span>' 
+              : '<span class="badge badge-rose" style="font-size:11px; opacity:0.65;">✕ DENIED</span>'}
+          </td>
+        `;
+      }
+    }).join('');
+
+    return `
+      <tr>
+        <td>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:16px;">${role.icon}</span>
+            <div>
+              <strong style="color:var(--text-primary); font-size:13.5px;">${role.name}</strong>
+              <div style="font-size:11px; color:var(--text-muted);">${role.desc}</div>
+            </div>
+          </div>
+        </td>
+        <td>${portalCell}</td>
+        ${permCols}
+      </tr>
+    `;
+  }).join('');
+}
+
+function togglePermissionsEditMode() {
+  permissionsEditMode = true;
+  editingPermissions = JSON.parse(JSON.stringify(permissionsMatrixState || DEFAULT_PERMISSIONS));
+  renderPermissionsMatrix();
+  showToast('Permissions Matrix is now in Edit Mode. Toggle checkboxes and click Save Changes.', 'info');
+}
+
+function cancelPermissionsEdit() {
+  permissionsEditMode = false;
+  editingPermissions = null;
+  renderPermissionsMatrix();
+}
+
+function handlePermissionToggle(roleKey, permKey, isChecked) {
+  if (!editingPermissions) {
+    editingPermissions = JSON.parse(JSON.stringify(permissionsMatrixState || DEFAULT_PERMISSIONS));
+  }
+  if (!editingPermissions[roleKey]) {
+    editingPermissions[roleKey] = JSON.parse(JSON.stringify(DEFAULT_PERMISSIONS[roleKey] || {}));
+  }
+  editingPermissions[roleKey][permKey] = isChecked;
+  renderPermissionsMatrix();
+}
+
+function handlePortalChange(roleKey, newPortal) {
+  if (!editingPermissions) {
+    editingPermissions = JSON.parse(JSON.stringify(permissionsMatrixState || DEFAULT_PERMISSIONS));
+  }
+  if (!editingPermissions[roleKey]) {
+    editingPermissions[roleKey] = JSON.parse(JSON.stringify(DEFAULT_PERMISSIONS[roleKey] || {}));
+  }
+  editingPermissions[roleKey].portal = newPortal.trim();
+}
+
+async function savePermissionsMatrix() {
+  const btn = document.getElementById('btn-save-perm');
+  if (btn) btn.disabled = true;
+
+  const payload = editingPermissions || permissionsMatrixState || DEFAULT_PERMISSIONS;
+
+  try {
+    const res = await fetch('/api/superadmin/permissions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ permissions: payload })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      permissionsMatrixState = JSON.parse(JSON.stringify(payload));
+      permissionsEditMode = false;
+      editingPermissions = null;
+      renderPermissionsMatrix();
+      showToast(data.message || 'Role permissions matrix saved and synced across all tenants!', 'success');
+    } else {
+      showToast(data.error || 'Failed to update permissions matrix', 'error');
+    }
+  } catch (err) {
+    showToast('Network error saving permissions matrix', 'error');
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+async function resetDefaultPermissions() {
+  if (!confirm('Are you sure you want to restore default platform permissions for all system roles?')) {
+    return;
+  }
+  try {
+    const res = await fetch('/api/superadmin/permissions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ permissions: DEFAULT_PERMISSIONS })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      permissionsMatrixState = JSON.parse(JSON.stringify(DEFAULT_PERMISSIONS));
+      permissionsEditMode = false;
+      editingPermissions = null;
+      renderPermissionsMatrix();
+      showToast('Permissions Matrix restored to platform defaults!', 'success');
+    } else {
+      showToast(data.error || 'Failed to reset permissions', 'error');
+    }
+  } catch (err) {
+    showToast('Network error resetting permissions', 'error');
+  }
+}
+
+
+// ── Create Company Admin Modal ────────────────────────────────────────────
+function openCreateAdminModal(preselected_company_id = '') {
+  const select = document.getElementById('admin-target-company');
+  if (select) {
+    select.innerHTML = allCompanies.map(c => 
+      `<option value="${c.company_id}" ${c.company_id === preselected_company_id ? 'selected' : ''}>${c.name} (${c.company_id})</option>`
+    ).join('');
+  }
+  document.getElementById('create-admin-modal').classList.add('active');
+}
+
+function closeCreateAdminModal() {
+  document.getElementById('create-admin-modal').classList.remove('active');
+}
+
+async function handleCreateCompanyAdmin(e) {
+  e.preventDefault();
+  const company_id = document.getElementById('admin-target-company').value;
+  const name = document.getElementById('admin-fullname').value.trim();
+  const email = document.getElementById('admin-email').value.trim();
+  const mobile = document.getElementById('admin-mobile').value.trim();
+  const role = document.getElementById('admin-role').value;
+  const password = document.getElementById('admin-password').value.trim();
+  const btn = document.getElementById('btn-submit-create-admin');
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(`/api/superadmin/companies/${encodeURIComponent(company_id)}/create-admin`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, mobile, role, password })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      showToast(data.message || 'Administrator account created successfully', 'success');
+      closeCreateAdminModal();
+    } else {
+      showToast(data.error || 'Failed to create administrator', 'error');
+    }
+  } catch (err) {
+    showToast('Network error creating administrator', 'error');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ── Edit Company Account Modal ────────────────────────────────────────────
+function openEditCompanyModal(company_id) {
+  const comp = allCompanies.find(c => c.company_id === company_id);
+  if (!comp) return;
+  document.getElementById('edit-comp-id').value = comp.company_id;
+  document.getElementById('edit-comp-id-disp').value = comp.company_id;
+  document.getElementById('edit-comp-name').value = comp.name || '';
+  document.getElementById('edit-comp-country').value = comp.country || 'India';
+  document.getElementById('edit-comp-tz').value = comp.timezone || 'Asia/Kolkata';
+  document.getElementById('edit-comp-phone').value = comp.contact_phone || '';
+  document.getElementById('edit-comp-email').value = comp.contact_email || '';
+  document.getElementById('edit-company-modal').classList.add('active');
+}
+
+function closeEditCompanyModal() {
+  document.getElementById('edit-company-modal').classList.remove('active');
+}
+
+async function handleEditCompany(e) {
+  e.preventDefault();
+  const company_id = document.getElementById('edit-comp-id').value;
+  const name = document.getElementById('edit-comp-name').value.trim();
+  const country = document.getElementById('edit-comp-country').value.trim();
+  const timezone = document.getElementById('edit-comp-tz').value;
+  const contact_phone = document.getElementById('edit-comp-phone').value.trim();
+  const contact_email = document.getElementById('edit-comp-email').value.trim();
+  const btn = document.getElementById('btn-submit-edit-comp');
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(`/api/superadmin/companies/${encodeURIComponent(company_id)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, country, timezone, contact_phone, contact_email })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      showToast(data.message || 'Company account updated successfully', 'success');
+      closeEditCompanyModal();
+      loadCompanies();
+    } else {
+      showToast(data.error || 'Failed to update company account', 'error');
+    }
+  } catch (err) {
+    showToast('Network error updating company account', 'error');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
 function showToast(msg, type = 'info') {
   const container = document.getElementById('toast-container');
   if (!container) return;
@@ -1261,9 +2520,247 @@ function showToast(msg, type = 'info') {
   }, 4000);
 }
 
-window.onload = loadDashboard;
+// ══════════════════════════════════════════════════════════════════════════════
+// ATTENDANCE CONTROLLER LOGIC (SUPER ADMIN EXCLUSIVE)
+// ══════════════════════════════════════════════════════════════════════════════
+
+let controllerCompanies = [];
+let currentControllerConfig = null;
+
+async function loadControllerView() {
+  try {
+    const res = await fetch('/api/superadmin/controller');
+    const data = await res.json();
+    if (!data.ok) {
+      showToast(data.error || 'Failed to load controller matrix', 'error');
+      return;
+    }
+
+    controllerCompanies = data.companies || [];
+    const select = document.getElementById('ctrl-company-select');
+    if (select) {
+      select.innerHTML = controllerCompanies.map(c => `
+        <option value="${c.company_id}">${c.name} (${c.company_id})</option>
+      `).join('');
+    }
+
+    renderControllerMatrixTable(controllerCompanies);
+
+    if (controllerCompanies.length > 0) {
+      const selected = select && select.value ? select.value : controllerCompanies[0].company_id;
+      await loadCompanyControllerSettings(selected);
+    }
+  } catch (err) {
+    console.error('Controller view load error:', err);
+    showToast('Failed to load Attendance Controller', 'error');
+  }
+}
+
+function renderControllerMatrixTable(companies) {
+  const tbody = document.getElementById('controller-summary-table-body');
+  if (!tbody) return;
+
+  if (companies.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px;">No companies registered yet.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = companies.map(c => {
+    const ctrl = c.controller || {};
+    const methods = ctrl.allowed_methods || ['Face', 'OTP', 'WiFi', 'GPS'];
+    const methodBadges = methods.map(m => {
+      if (m === 'Face') return `<span class="badge badge-emerald" style="font-size:11px;">📷 Face</span>`;
+      if (m === 'OTP') return `<span class="badge badge-indigo" style="font-size:11px;">🔢 OTP</span>`;
+      if (m === 'WiFi') return `<span class="badge badge-cyan" style="font-size:11px;">📶 Wi-Fi</span>`;
+      if (m === 'GPS') return `<span class="badge badge-amber" style="font-size:11px;">🚗 GPS</span>`;
+      return `<span class="badge badge-neutral" style="font-size:11px;">${m}</span>`;
+    }).join(' ');
+
+    const statusBadge = c.status === 'active' 
+      ? '<span class="badge badge-emerald"><span class="badge-dot"></span> ACTIVE</span>'
+      : `<span class="badge badge-amber">${(c.status || 'inactive').toUpperCase()}</span>`;
+
+    const overrideBadge = ctrl.allow_company_admin_override !== false
+      ? '<span style="color:var(--emerald); font-weight:700;">✓ Permitted</span>'
+      : '<span style="color:var(--text-muted);">✕ Fixed Defaults</span>';
+
+    const gpsFieldBadge = ctrl.require_gps_for_field !== false
+      ? '<span style="color:var(--emerald); font-weight:700;">✓ Enforced</span>'
+      : '<span style="color:var(--text-muted);">Optional</span>';
+
+    return `
+      <tr>
+        <td><strong style="color:var(--text-primary);">${c.name}</strong></td>
+        <td><strong style="font-family:var(--font-mono); color:var(--cyan);">${c.company_id}</strong></td>
+        <td>${statusBadge}</td>
+        <td><div style="display:flex; gap:4px; flex-wrap:wrap;">${methodBadges}</div></td>
+        <td style="font-size:12.5px;">${overrideBadge}</td>
+        <td style="font-size:12.5px;">${gpsFieldBadge}</td>
+        <td>
+          <button class="btn btn-secondary btn-sm" onclick="selectCompanyForController('${c.company_id}')" title="Configure controller for this workspace">
+            ⚙️ Configure
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function selectCompanyForController(companyId) {
+  const select = document.getElementById('ctrl-company-select');
+  if (select) {
+    select.value = companyId;
+    loadCompanyControllerSettings(companyId);
+    window.scrollTo({ top: 300, behavior: 'smooth' });
+  }
+}
+
+async function loadCompanyControllerSettings(compId) {
+  const companyId = compId || (document.getElementById('ctrl-company-select') ? document.getElementById('ctrl-company-select').value : '');
+  if (!companyId) return;
+
+  try {
+    const res = await fetch(`/api/superadmin/controller?company_id=${encodeURIComponent(companyId)}`);
+    const data = await res.json();
+    if (!data.ok) {
+      showToast(data.error || 'Failed to fetch company controller', 'error');
+      return;
+    }
+
+    currentControllerConfig = data.controller || {};
+    const ctrl = currentControllerConfig;
+    const methods = ctrl.allowed_methods || ['Face', 'OTP', 'WiFi', 'GPS'];
+
+    document.getElementById('ctrl-method-face').checked = methods.includes('Face');
+    document.getElementById('ctrl-method-otp').checked = methods.includes('OTP');
+    document.getElementById('ctrl-method-wifi').checked = methods.includes('WiFi');
+    document.getElementById('ctrl-method-gps').checked = methods.includes('GPS');
+
+    document.getElementById('ctrl-allow-override').checked = ctrl.allow_company_admin_override !== false;
+    document.getElementById('ctrl-req-gps-field').checked = ctrl.require_gps_for_field !== false;
+    document.getElementById('ctrl-req-wifi-office').checked = !!ctrl.require_wifi_for_office;
+    document.getElementById('ctrl-office-wifi-ip').value = ctrl.office_wifi_ip || ctrl.officeWifiIp || '';
+    document.getElementById('ctrl-allow-wfh-gps').checked = ctrl.allow_wfh_gps !== false;
+    document.getElementById('ctrl-allow-offline').checked = ctrl.allow_offline_sync !== false;
+    document.getElementById('ctrl-max-clockouts').value = String(ctrl.max_clock_outs_per_day || 1);
+
+    const comp = controllerCompanies.find(c => c.company_id === companyId);
+    if (comp) {
+      const badge = document.getElementById('ctrl-company-status-badge');
+      if (badge) {
+        badge.className = comp.status === 'active' ? 'badge badge-emerald' : 'badge badge-amber';
+        badge.textContent = comp.status === 'active' ? '🟢 ACTIVE WORKSPACE' : `⚠️ ${(comp.status || '').toUpperCase()}`;
+      }
+    }
+  } catch (err) {
+    console.error('Error loading company controller:', err);
+  }
+}
+
+async function saveCompanyControllerSettings() {
+  const select = document.getElementById('ctrl-company-select');
+  const companyId = select ? select.value : '';
+  if (!companyId) {
+    showToast('Please select a company workspace first', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('btn-save-controller');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  const allowedMethods = [];
+  if (document.getElementById('ctrl-method-face').checked) allowedMethods.push('Face');
+  if (document.getElementById('ctrl-method-otp').checked) allowedMethods.push('OTP');
+  if (document.getElementById('ctrl-method-wifi').checked) allowedMethods.push('WiFi');
+  if (document.getElementById('ctrl-method-gps').checked) allowedMethods.push('GPS');
+
+  if (allowedMethods.length === 0) {
+    showToast('At least one attendance method must be permitted for the company', 'error');
+    btn.disabled = false;
+    btn.textContent = '💾 Save Controller Permissions';
+    return;
+  }
+
+  const payload = {
+    company_id: companyId,
+    allowed_methods: allowedMethods,
+    allow_company_admin_override: document.getElementById('ctrl-allow-override').checked,
+    require_gps_for_field: document.getElementById('ctrl-req-gps-field').checked,
+    require_wifi_for_office: document.getElementById('ctrl-req-wifi-office').checked,
+    office_wifi_ip: document.getElementById('ctrl-office-wifi-ip').value.trim(),
+    allow_wfh_gps: document.getElementById('ctrl-allow-wfh-gps').checked,
+    allow_offline_sync: document.getElementById('ctrl-allow-offline').checked,
+    max_clock_outs_per_day: parseInt(document.getElementById('ctrl-max-clockouts').value, 10) || 1
+  };
+
+  try {
+    const res = await fetch('/api/superadmin/controller', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.ok) {
+      showToast(data.message || 'Controller permissions updated successfully!', 'success');
+      await loadControllerView();
+    } else {
+      showToast(data.error || 'Failed to save controller permissions', 'error');
+    }
+  } catch (err) {
+    showToast('Network error saving controller permissions', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '💾 Save Controller Permissions';
+  }
+}
+
+function resetControllerDefaults() {
+  document.getElementById('ctrl-method-face').checked = true;
+  document.getElementById('ctrl-method-otp').checked = true;
+  document.getElementById('ctrl-method-wifi').checked = true;
+  document.getElementById('ctrl-method-gps').checked = true;
+  document.getElementById('ctrl-allow-override').checked = true;
+  document.getElementById('ctrl-req-gps-field').checked = true;
+  document.getElementById('ctrl-req-wifi-office').checked = false;
+  document.getElementById('ctrl-office-wifi-ip').value = '';
+  document.getElementById('ctrl-allow-wfh-gps').checked = true;
+  document.getElementById('ctrl-allow-offline').checked = true;
+  document.getElementById('ctrl-max-clockouts').value = '1';
+  showToast('Reset to recommended platform defaults (unsaved). Click "Save" to apply.', 'info');
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  CHECK-IN / CHECK-OUT TIMINGS — every employee across every company
+// ══════════════════════════════════════════════════════════════════════════════
+let saTimingsPanel = null;
+
+function initSuperAdminTimingsPanel() {
+  if (saTimingsPanel || !window.CheckinCheckoutPanel) return;
+  saTimingsPanel = CheckinCheckoutPanel.mount(document.getElementById('sa-timings-panel'), {
+    endpoint: '/api/superadmin/checkin-checkout',
+    showCompany: true,
+    companies: (allCompanies || []).filter(c => c.status !== 'pending'),
+    emptyText: 'No employees found across companies for this day.'
+  });
+}
+
+window.onload = () => {
+  // The tab view refreshes through switchView() on every runtime sync (via loadDashboard).
+  initSuperAdminTimingsPanel();
+  loadDashboard();
+  if (window.ArdhnarishwarRuntime) {
+    ArdhnarishwarRuntime.registerTask("dashboard", loadDashboard);
+    ArdhnarishwarRuntime.registerTask("companies", loadCompanies);
+    ArdhnarishwarRuntime.registerTask("attendance", loadGlobalAttendance);
+    ArdhnarishwarRuntime.registerTask("audit_logs", loadAuditLogs);
+    ArdhnarishwarRuntime.registerTask("reports", loadCompanyReports);
+  }
+};
 </script>
+<script src="/static/js/checkin_checkout.js"></script>
 <script src="/static/js/theme.js"></script>
 <script src="/static/js/telemetry.js"></script>
+<script src="/static/js/ardhnarishwar_runtime.js"></script>
 </body>
 </html>

@@ -1,14 +1,22 @@
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import StatCard from "../../components/common/StatCard";
-import HRNavbar from "../../components/hr/HRNavbar";
+import ITShell from "../it/ITShell";
 import AttendanceTable from "../../components/attendance/AttendanceTable";
 import AttendanceFilters from "../../components/attendance/AttendanceFilters";
 import LocationCapture from "../../components/attendance/LocationCapture";
 import OfficeLocation from "../../components/attendance/OfficeLocation";
 import ShiftTimings from "../../components/attendance/ShiftTimings";
-import { MapPin, Users, Settings, Clock, UserCheck, UserX, AlarmClock, Plane } from "lucide-react";
+import { MapPin, Users, Settings, Clock, UserCheck, UserX, AlarmClock, Plane, Fingerprint } from "lucide-react";
+
+const localToday = () => {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+};
 
 export default function AutomatedAttendance() {
   const [stats, setStats] = useState({
@@ -18,11 +26,17 @@ export default function AutomatedAttendance() {
     onLeave: 0,
   });
 
+  const me = useMemo(() => {
+    try { return JSON.parse(localStorage.getItem("hrms_it_User") || "{}"); } catch { return {}; }
+  }, []);
+  const role = String(me?.role || "").toUpperCase();
+  const isAdmin = ["SUPER_ADMIN", "ADMIN", "HR"].includes(role);
+
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({
-    date: new Date().toISOString().split("T")[0],
-    department: "",
+    date: localToday(),
+    scope: isAdmin ? "department" : "me",
     status: "",
   });
 
@@ -34,39 +48,65 @@ export default function AutomatedAttendance() {
   const token = localStorage.getItem("hrms_it_Token");
   const BASE = import.meta.env.VITE_API_BASE_URL;
 
-const fetchAttendance = async () => {
-  try {
-    setLoading(true);
+  const fetchAttendance = async () => {
+    try {
+      setLoading(true);
 
-    const params = new URLSearchParams();
+      const params = new URLSearchParams();
 
-    if (filters.date) params.append("date", filters.date);
-    if (filters.status) params.append("status", filters.status);
+      if (filters.date) params.append("date", filters.date);
+      if (filters.status) params.append("status", filters.status);
+      params.append("scope", isAdmin ? (filters.scope || "department") : "me");
 
-    // 🔥 ADD THIS (MISSING)
-    if (filters.department) params.append("department", filters.department);
+      const res = await axios.get(`${BASE}/hr/attendance?${params}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    const res = await axios.get(`${BASE}/hr/attendance?${params}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+      const data = res?.data?.data || [];
 
-    const data = res?.data?.data || [];
-    setRows(data);
+      // Filter rows:
+      // 1. If not admin (e.g. Rohan candidate): only show this candidate's own attendance records!
+      // 2. If admin: show IT department candidates according to registered name
+      const myName = (me?.name || me?.fullName || me?.employee_name || "").toLowerCase().trim();
+      const myId = me?.id || me?.employee_id;
 
-    const present = data.filter((r) => r.status === "present").length;
-    const absent = data.filter((r) => r.status === "absent").length;
-    const late = data.filter((r) => r.status === "late").length;
-    const onLeave = data.filter((r) => r.status === "on_leave").length;
+      const filtered = data.filter((r) => {
+        if (!isAdmin || filters.scope === "me") {
+          const rId = r.employeeId || r.employee_id || r.id;
+          const rName = String(r.employee || r.name || r.employee_name || "").toLowerCase().trim();
+          if (myId && rId && String(rId) === String(myId)) return true;
+          if (myName && rName && (rName === myName || rName.includes(myName) || myName.includes(rName))) return true;
+          if (!isAdmin && data.length === 1 && !rName) return true;
+          return false;
+        }
 
-    setStats({ present, absent, late, onLeave });
+        // Admin view: show IT department candidates
+        const dept = String(r.department || "").toLowerCase().trim();
+        if (!dept) return true;
+        return (
+          dept.includes("it") ||
+          dept.includes("tech") ||
+          dept.includes("dev") ||
+          dept.includes("software") ||
+          dept.includes("engineer")
+        );
+      });
 
-  } catch (err) {
-    toast.error(err?.response?.data?.message || "Fetch failed");
-    setRows([]);
-  } finally {
-    setLoading(false);
-  }
-};
+      setRows(filtered);
+
+      const present = filtered.filter((r) => r.status === "present").length;
+      const absent = filtered.filter((r) => r.status === "absent").length;
+      const late = filtered.filter((r) => r.status === "late").length;
+      const onLeave = filtered.filter((r) => r.status === "on_leave").length;
+
+      setStats({ present, absent, late, onLeave });
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Fetch failed");
+      setRows([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const saveOfficeLocations = async (locations) => {
     try {
@@ -120,33 +160,33 @@ const fetchAttendance = async () => {
   ];
 
   return (
-    <div className="p-6 space-y-6">
-      <HRNavbar />
+    <ITShell
+      title="Automated Attendance"
+      subtitle="Shift timings and automated attendance tracking"
+      icon={Fingerprint}
+      action={<div className="text-xs font-bold text-[var(--mute)]">Last updated: {new Date().toLocaleTimeString()}</div>}
+    >
+      <div className="flex flex-col gap-6">
 
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-800">
-          Automated Attendance
-        </h2>
-        <div className="text-sm text-gray-500">
-          Last updated: {new Date().toLocaleString()}
-        </div>
-      </div>
-
-      <div className="flex gap-2 border-b border-gray-200">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-3 font-medium transition ${
-              activeTab === tab.id
-                ? "text-indigo-600 border-b-2 border-indigo-600"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            <tab.icon className="w-4 h-4" />
-            {tab.label}
-          </button>
-        ))}
+      <div className="flex items-center gap-2 p-1.5 bg-white border border-[var(--line)] rounded-2xl w-fit shadow-sm">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition ${
+                isActive
+                  ? "bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white shadow-md shadow-purple-500/25"
+                  : "text-[var(--mute)] hover:text-[var(--ink)] hover:bg-[var(--soft)]"
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
       </div>
 
       {activeTab === "attendance" && (
@@ -185,7 +225,7 @@ const fetchAttendance = async () => {
             />
           </div>
 
-          <AttendanceFilters filters={filters} onFilterChange={setFilters} />
+          <AttendanceFilters filters={filters} onFilterChange={setFilters} isAdmin={isAdmin} />
           <AttendanceTable
             rows={rows}
             loading={loading}
@@ -268,6 +308,7 @@ const fetchAttendance = async () => {
           />
         </div>
       )}
-    </div>
+      </div>
+    </ITShell>
   );
 }

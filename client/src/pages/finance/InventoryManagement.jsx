@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Boxes as PageIcon } from "lucide-react";
 import {
   Plus,
   Edit2,
@@ -141,13 +142,14 @@ export default function InventoryManagement() {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 text-balance">
-            Inventory Management
-          </h1>
-          <p className="text-slate-500 mt-1 text-sm">
-            Manage stock and inventory items
-          </p>
+        <div className="page-header-main">
+          <span className="page-header-icon">
+            <PageIcon size={26} strokeWidth={1.8} />
+          </span>
+          <div>
+            <h1 className="page-header-title text-balance">Inventory Management</h1>
+            <p className="page-header-subtitle">Manage stock and inventory items</p>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <button

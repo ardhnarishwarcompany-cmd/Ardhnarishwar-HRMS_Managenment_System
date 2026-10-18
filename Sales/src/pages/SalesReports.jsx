@@ -101,75 +101,77 @@ const SalesReports = () => {
 
   // ================= UI =================
   return (
-    <div className="m-5 space-y-6">
+    <div className="space-y-6">
       {/* HEADER */}
       <PageHeader
         title="Sales Reports"
         desc="View sales analytics and subscription revenue."
-      />
-
-      {/* FILTER + ACTION BAR */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-          <SalesFilters
-            filters={filters}
-            setFilters={setFilters}
-            onReset={() =>
-              setFilters({
-                search: "",
-                payment_status: "",
-                from_date: "",
-                to_date: "",
-              })
-            }
-          />
-
-          <div className="flex flex-wrap items-center gap-2.5">
+        actions={
+          <>
             <button
+              type="button"
               onClick={() => navigate("/invoices")}
-              className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-emerald-200 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-300"
+              className="btn-on-brand-ghost"
             >
               <FileText size={15} aria-hidden="true" />
               Generate Invoice
             </button>
 
             <button
+              type="button"
               onClick={() => navigate("/chat")}
-              className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-200 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-300"
+              className="btn-on-brand-ghost"
             >
               <MessageSquare size={15} aria-hidden="true" />
               AI Chat
             </button>
 
             <button
+              type="button"
               onClick={() => {
                 setEditingSale(null);
                 setOpenModal(true);
               }}
-              className="flex items-center gap-1.5 whitespace-nowrap rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-300"
+              className="btn-on-brand"
             >
               <Plus size={15} aria-hidden="true" />
               Add Sale
             </button>
-          </div>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       {/* STATS */}
       <SalesStats sales={sales} />
 
+      {/* FILTER BAR */}
+      <div className="sp-card p-4 sm:p-5">
+        <SalesFilters
+          filters={filters}
+          setFilters={setFilters}
+          onReset={() =>
+            setFilters({
+              search: "",
+              payment_status: "",
+              from_date: "",
+              to_date: "",
+            })
+          }
+        />
+      </div>
+
       {/* TABLE */}
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="sp-card overflow-hidden">
         <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
               <Table2 size={15} aria-hidden="true" />
             </div>
             <h3 className="text-sm font-bold tracking-tight text-slate-900">
               Sales Records
             </h3>
           </div>
-          <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+          <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700">
             {filteredSales.length}{" "}
             {filteredSales.length === 1 ? "record" : "records"}
           </span>
@@ -177,8 +179,8 @@ const SalesReports = () => {
 
         <div className="max-h-[60vh] overflow-auto">
           <table className="w-full text-sm">
-            <thead className="sticky top-0 z-10 bg-slate-50">
-              <tr className="border-b border-slate-200 text-left">
+            <thead className="sticky top-0 z-10 bg-white">
+              <tr className="border-b border-slate-100 text-left">
                 <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
                   Client Code
                 </th>

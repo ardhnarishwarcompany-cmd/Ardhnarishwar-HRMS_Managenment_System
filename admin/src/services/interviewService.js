@@ -35,6 +35,25 @@ export const getAllInterviews = ({
   });
 };
 
+// CLIENT DECISIONS (interviews the client accepted / rejected in the client portal)
+export const getClientDecisions = ({
+  page = 1,
+  limit = 50,
+  search = "",
+  decision = "",
+  hr = "",
+  client = "",
+  joined = "",
+} = {}) => {
+  return API.get("/super-admin/interviews/client-decisions", {
+    params: { page, limit, search, decision, hr, client, joined },
+  });
+};
+
+export const getClientDecisionSummary = () => {
+  return API.get("/super-admin/interviews/client-decisions/summary");
+};
+
 // UPDATE JOINED STATUS
 export const updateJoinedStatus = (
   id,

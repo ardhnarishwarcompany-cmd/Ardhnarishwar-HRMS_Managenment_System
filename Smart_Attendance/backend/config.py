@@ -14,6 +14,14 @@ SUPER_ADMIN_MOBILE = os.environ.get("SUPER_ADMIN_MOBILE", "9999999999")
 SUPER_ADMIN_PASS = os.environ.get("SUPER_ADMIN_PASS", "superadmin123")
 
 # Database configuration
+DB_TYPE = os.environ.get("DB_TYPE", "mysql")  # "mysql" (primary) or "mongodb"
+MYSQL_HOST = os.environ.get("MYSQL_HOST", "localhost")
+MYSQL_PORT = int(os.environ.get("MYSQL_PORT", "3306"))
+MYSQL_USER = os.environ.get("MYSQL_USER", "root")
+MYSQL_PASSWORD = os.environ.get("MYSQL_PASSWORD", "")
+MYSQL_DATABASE = os.environ.get("MYSQL_DATABASE", "smart_attendance")
+MYSQL_FALLBACK = os.environ.get("MYSQL_FALLBACK", "True").lower() in ("true", "1")
+
 MONGO_URI = os.environ.get("MONGO_URI", "mongodb://localhost:27017/")
 DATABASE_NAME = os.environ.get("DATABASE_NAME", "smart_attendance")
 
@@ -37,6 +45,15 @@ FACE_MATCH_TOLERANCE = float(os.environ.get("FACE_MATCH_TOLERANCE", "0.5"))
 LIVENESS_CONFIDENCE_THRESHOLD = float(os.environ.get("LIVENESS_CONFIDENCE_THRESHOLD", "0.70"))
 LIVENESS_SESSION_TTL_SECONDS = int(os.environ.get("LIVENESS_SESSION_TTL_SECONDS", "60"))
 REQUIRE_LIVENESS = os.environ.get("REQUIRE_LIVENESS", "True").lower() in ("true", "1")
+
+# SMTP / Gmail OTP Delivery
+SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.gmail.com")
+SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
+GMAIL_USER = os.environ.get("GMAIL_USER", "")
+GMAIL_PASS = os.environ.get("GMAIL_PASS", "")
+FROM_EMAIL = os.environ.get("FROM_EMAIL", GMAIL_USER)
+FROM_NAME = os.environ.get("FROM_NAME", PLATFORM_NAME)
+SMTP_TLS_REJECT_UNAUTHORIZED = os.environ.get("SMTP_TLS_REJECT_UNAUTHORIZED", "true").lower() in ("true", "1", "yes", "on")
 
 # Server Run Settings
 HOST = os.environ.get("HOST", "127.0.0.1")

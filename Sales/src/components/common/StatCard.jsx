@@ -1,30 +1,39 @@
-export default function StatCard({ title, value, subText, icon, gradient }) {
+/**
+ * Solid gradient stat tile.
+ * `gradient` is a Tailwind background class string, e.g.
+ * "bg-gradient-to-br from-blue-500 to-blue-700".
+ */
+export default function StatCard({
+  title,
+  value,
+  subText,
+  icon,
+  gradient = "bg-gradient-to-br from-brand-600 to-magenta-600",
+}) {
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-      {/* gradient accent bar */}
-      <div
-        className={`pointer-events-none absolute inset-x-0 top-0 h-1 ${gradient}`}
-      />
-
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-            {title}
-          </p>
-          <h2 className="mt-2 truncate text-2xl font-extrabold tracking-tight text-slate-900">
-            {value}
-          </h2>
-          <p className="mt-1.5 text-xs leading-relaxed text-slate-400">
-            {subText}
-          </p>
-        </div>
-
-        <div
-          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-white shadow-md ${gradient} transition-transform duration-300 group-hover:scale-110 [&_svg]:h-5 [&_svg]:w-5`}
-        >
-          {icon}
-        </div>
+    <div
+      className={`sp-tile group p-5 transition-transform duration-300 hover:-translate-y-1 ${gradient}`}
+    >
+      <div className="relative z-10 flex items-start justify-between gap-3">
+        <p className="text-[11px] font-bold uppercase leading-snug tracking-[0.14em] text-white/95">
+          {title}
+        </p>
+        {icon && (
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-transform duration-300 group-hover:scale-110 [&_svg]:h-[18px] [&_svg]:w-[18px]">
+            {icon}
+          </div>
+        )}
       </div>
+
+      <h2 className="relative z-10 mt-3 truncate text-4xl font-extrabold leading-none tracking-tight">
+        {value}
+      </h2>
+
+      {subText && (
+        <p className="relative z-10 mt-3 text-xs font-medium leading-relaxed text-white/85">
+          {subText}
+        </p>
+      )}
     </div>
   );
 }

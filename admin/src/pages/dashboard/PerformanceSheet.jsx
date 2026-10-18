@@ -53,12 +53,17 @@ const DEPARTMENTS = [
   { id: 5, name: "Finance" },
 ];
 
+// barColor must be a literal class name: Tailwind only generates classes it
+// can see in source, so building "bg-red-700" at runtime from textColor
+// produced a class that did not exist and the filled bar segments rendered
+// transparent.
 const STATUS_CONFIG = {
   excellent: {
     label: "Excellent",
     color: "bg-green-100 text-green-700",
     borderColor: "border-green-500",
     bgGlow: "bg-green-50",
+    barColor: "bg-green-500",
     icon: CheckCircle,
     textColor: "text-green-700",
   },
@@ -67,6 +72,7 @@ const STATUS_CONFIG = {
     color: "bg-yellow-100 text-yellow-700",
     borderColor: "border-yellow-500",
     bgGlow: "bg-yellow-50",
+    barColor: "bg-yellow-500",
     icon: AlertCircle,
     textColor: "text-yellow-700",
   },
@@ -75,6 +81,7 @@ const STATUS_CONFIG = {
     color: "bg-red-100 text-red-700",
     borderColor: "border-red-500",
     bgGlow: "bg-red-50",
+    barColor: "bg-red-500",
     icon: XCircle,
     textColor: "text-red-700",
   },
@@ -134,7 +141,6 @@ export default function PerformanceSheet() {
   const fetchEmployees = async () => {
     try {
       const res = await performanceService.getEmployees();
-      console.log(res.data.data);
       setEmployees(res.data.data);
     } catch (err) {
       toast.error("Failed to load employees");
@@ -160,10 +166,15 @@ export default function PerformanceSheet() {
     const needsImprovement = records.filter(
       (r) => r.status === "needs_improvement",
     ).length;
+    // avgScore arrives as a DECIMAL string from MySQL; coerce before summing
+    // or the reduce concatenates strings and the stat shows NaN.
     const avgAll =
       total > 0
-        ? (records.reduce((sum, r) => sum + r.avgScore, 0) / total).toFixed(1)
-        : 0;
+        ? (
+            records.reduce((sum, r) => sum + (Number(r.avgScore) || 0), 0) /
+            total
+          ).toFixed(1)
+        : "0.0";
 
     return { total, excellent, good, needsImprovement, avgAll };
   }, [records]);
@@ -352,6 +363,49 @@ export default function PerformanceSheet() {
     );
   };
 
+  const handleExport = () => {
+    if (filteredRecords.length === 0) {
+      toast.error("No records to export");
+      return;
+    }
+    const escapeCsv = (value) => `"${String(value ?? "").replace(/"/g, '""')}"`;
+    const header = [
+      "Employee ID",
+      "Employee",
+      "Department",
+      "Period",
+      "Overall Score",
+      "Status",
+      ...PERFORMANCE_CRITERIA.map((c) => c.name),
+      "Remarks",
+      "Reviewed By",
+      "Reviewed At",
+    ];
+    const rows = filteredRecords.map((r) => [
+      r.employeeId,
+      r.employeeName,
+      r.department,
+      r.period,
+      r.avgScore,
+      STATUS_CONFIG[r.status]?.label || r.status,
+      ...PERFORMANCE_CRITERIA.map((c) => r.scores?.[c.id] ?? ""),
+      r.remarks,
+      r.reviewedBy,
+      r.reviewedAt,
+    ]);
+    const csv = [header, ...rows]
+      .map((row) => row.map(escapeCsv).join(","))
+      .join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `performance-reviews-${dayjs().format("YYYY-MM-DD")}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success(`Exported ${filteredRecords.length} record(s)`);
+  };
+
   const tabs = [
     { id: "overview", label: "Overview", icon: Target },
     { id: "records", label: "All Records", icon: FileText },
@@ -365,7 +419,7 @@ export default function PerformanceSheet() {
       />
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 mb-6">
         <StatCard
           title="Total Reviews"
           value={stats.total}
@@ -418,18 +472,20 @@ export default function PerformanceSheet() {
 
       {/* Filters & Actions */}
       <div className="bg-white rounded-2xl shadow border border-gray-100 p-5 mb-6">
-        <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex flex-col gap-4 md:flex-row md:flex-wrap md:items-center">
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by employee name or ID..."
-            className="w-full md:w-80 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-black"
+            aria-label="Search by employee name or ID"
+            className="w-full md:flex-1 md:min-w-[220px] border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-black"
           />
 
           <select
             value={departmentFilter}
             onChange={(e) => setDepartmentFilter(Number(e.target.value))}
-            className="w-full md:w-48 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-black bg-white"
+            aria-label="Filter by department"
+            className="w-full md:w-44 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-black bg-white"
           >
             {DEPARTMENTS.map((d) => (
               <option key={d.id} value={d.id}>
@@ -441,18 +497,20 @@ export default function PerformanceSheet() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full md:w-48 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-black bg-white"
+            aria-label="Filter by status"
+            className="w-full md:w-44 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-black bg-white"
           >
             <option value="all">All Status</option>
-            <option value="excellent">Excellent (Green)</option>
-            <option value="good">Good (Yellow)</option>
-            <option value="needs_improvement">Needs Improvement (Red)</option>
+            <option value="excellent">Excellent</option>
+            <option value="good">Good</option>
+            <option value="needs_improvement">Needs Improvement</option>
           </select>
 
           <select
             value={periodFilter}
             onChange={(e) => setPeriodFilter(e.target.value)}
-            className="w-full md:w-40 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-black bg-white"
+            aria-label="Filter by review period"
+            className="w-full md:w-36 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-black bg-white"
           >
             {periods.map((p) => (
               <option key={p.value} value={p.value}>
@@ -461,14 +519,19 @@ export default function PerformanceSheet() {
             ))}
           </select>
 
-          <div className="flex gap-2 ml-auto">
-            <button className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-xl font-semibold transition">
+          <div className="flex gap-2 md:ml-auto">
+            <button
+              type="button"
+              onClick={handleExport}
+              className="flex flex-1 md:flex-none items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-xl font-semibold transition"
+            >
               <Download size={18} />
               Export
             </button>
             <button
+              type="button"
               onClick={() => setOpenAddModal(true)}
-              className="flex items-center gap-2 px-5 py-2.5 bg-black hover:bg-gray-900 text-white rounded-xl font-semibold transition"
+              className="flex flex-1 md:flex-none items-center justify-center gap-2 px-5 py-2.5 bg-black hover:bg-gray-900 text-white rounded-xl font-semibold transition whitespace-nowrap"
             >
               <Plus size={18} />
               Add Review
@@ -478,36 +541,68 @@ export default function PerformanceSheet() {
       </div>
 
       {/* Overview Tab - Performance Cards */}
-      {activeTab === "overview" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {activeTab === "overview" && loading && records.length === 0 && (
+        <div className="bg-white rounded-2xl shadow border border-gray-100 py-16 flex items-center justify-center gap-3 text-gray-500">
+          <Loader2 size={20} className="animate-spin" />
+          <span className="text-sm font-medium">Loading performance data...</span>
+        </div>
+      )}
+
+      {activeTab === "overview" && !loading && filteredRecords.length === 0 && (
+        <div className="bg-white rounded-2xl shadow border border-gray-100 py-16 px-6 flex flex-col items-center text-center gap-3">
+          <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-500">
+            <Target size={26} />
+          </div>
+          <p className="font-bold text-gray-900">No performance reviews found</p>
+          <p className="text-sm text-gray-500 max-w-sm text-pretty">
+            {records.length === 0
+              ? "Start by adding a review for an employee."
+              : "No records match the current search or filters."}
+          </p>
+          {records.length === 0 && (
+            <button
+              type="button"
+              onClick={() => setOpenAddModal(true)}
+              className="mt-2 flex items-center gap-2 px-5 py-2.5 bg-black hover:bg-gray-900 text-white rounded-xl font-semibold transition"
+            >
+              <Plus size={18} />
+              Add Review
+            </button>
+          )}
+        </div>
+      )}
+
+      {activeTab === "overview" && filteredRecords.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {filteredRecords.map((record) => {
             const statusConfig = STATUS_CONFIG[record.status];
             const StatusIcon = statusConfig.icon;
+            const filledSegments = Math.round(record.avgScore);
 
             return (
-              <div
+              <article
                 key={record.id}
-                className={`bg-white rounded-2xl shadow border-l-4 ${statusConfig.borderColor} overflow-hidden`}
+                className={`bg-white rounded-2xl shadow border-l-4 ${statusConfig.borderColor} overflow-hidden min-w-0 flex flex-col`}
               >
-                <div className="p-5">
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="font-bold text-gray-900">
+                <div className="p-5 flex flex-col flex-1 gap-4">
+                  <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
+                    <div className="min-w-0 flex-1 basis-40">
+                      <h3 className="font-bold text-gray-900 text-pretty">
                         {record.employeeName}
                       </h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 truncate">
                         {record.employeeId} • {record.department}
                       </p>
                     </div>
-                    {getStatusBadge(record.status)}
+                    <div className="shrink-0">{getStatusBadge(record.status)}</div>
                   </div>
 
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-xs text-gray-500">Overall Score</p>
-                      <p className="text-3xl font-extrabold">
+                      <p className="text-3xl font-extrabold leading-tight">
                         <span className={statusConfig.textColor}>
-                          {record.avgScore}
+                          {Number(record.avgScore).toFixed(2)}
                         </span>
                         <span className="text-sm font-normal text-gray-400">
                           /10
@@ -515,7 +610,7 @@ export default function PerformanceSheet() {
                       </p>
                     </div>
                     <div
-                      className={`w-14 h-14 rounded-xl ${statusConfig.bgGlow} flex items-center justify-center`}
+                      className={`w-14 h-14 shrink-0 rounded-xl ${statusConfig.bgGlow} flex items-center justify-center`}
                     >
                       <StatusIcon
                         size={28}
@@ -524,32 +619,43 @@ export default function PerformanceSheet() {
                     </div>
                   </div>
 
-                  <div className="mb-4">
-                    <p className="text-xs text-gray-500 mb-2">
-                      Period: {dayjs(record.period).format("MMM YYYY")}
-                    </p>
-                    <div className="flex gap-1">
+                  <div>
+                    <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+                      <span>Period: {dayjs(record.period).format("MMM YYYY")}</span>
+                      <span>{filledSegments}/10</span>
+                    </div>
+                    <div
+                      className="flex gap-1"
+                      role="img"
+                      aria-label={`Score ${record.avgScore} out of 10`}
+                    >
                       {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((score) => (
                         <div
                           key={score}
                           className={`flex-1 h-2 rounded-full ${
-                            score <= Math.round(record.avgScore)
-                              ? statusConfig.textColor.replace("text-", "bg-")
-                              : "bg-gray-100"
+                            score <= filledSegments
+                              ? statusConfig.barColor
+                              : "bg-gray-200"
                           }`}
                         />
                       ))}
                     </div>
                   </div>
 
-                  {record.remarks && (
-                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                      "{record.remarks}"
-                    </p>
-                  )}
+                  <div className="min-h-[2.5rem]">
+                    {record.remarks ? (
+                      <p className="text-sm text-gray-600 line-clamp-2 text-pretty">
+                        <span className="font-semibold text-gray-700">Remarks: </span>
+                        {record.remarks}
+                      </p>
+                    ) : (
+                      <p className="text-sm text-gray-400 italic">No remarks added</p>
+                    )}
+                  </div>
 
-                  <div className="flex gap-2 pt-3 border-t border-gray-100">
+                  <div className="mt-auto flex gap-2 pt-3 border-t border-gray-100">
                     <button
+                      type="button"
                       onClick={() => handleOpenView(record)}
                       className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition"
                     >
@@ -557,6 +663,7 @@ export default function PerformanceSheet() {
                       View
                     </button>
                     <button
+                      type="button"
                       onClick={() => handleOpenEdit(record)}
                       className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-sm font-medium transition"
                     >
@@ -564,6 +671,7 @@ export default function PerformanceSheet() {
                       Edit
                     </button>
                     <button
+                      type="button"
                       onClick={() => {
                         setDeleteId(record.id);
                         setOpenDeleteModal(true);
@@ -575,7 +683,7 @@ export default function PerformanceSheet() {
                     </button>
                   </div>
                 </div>
-              </div>
+              </article>
             );
           })}
         </div>
@@ -781,15 +889,17 @@ export default function PerformanceSheet() {
               {PERFORMANCE_CRITERIA.map((criteria) => (
                 <div
                   key={criteria.id}
-                  className="flex items-center gap-4 p-3 bg-gray-50 rounded-xl"
+                  className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 p-3 bg-gray-50 rounded-xl"
                 >
-                  <span className="w-44 text-sm font-medium text-gray-700">
+                  <span className="sm:w-44 shrink-0 text-sm font-medium text-gray-700">
                     {criteria.name}
                   </span>
-                  {renderScoreInput(
-                    criteria,
-                    formData.scores?.[criteria.id] || 5,
-                  )}
+                  <div className="flex-1">
+                    {renderScoreInput(
+                      criteria,
+                      formData.scores?.[criteria.id] || 5,
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -845,29 +955,34 @@ export default function PerformanceSheet() {
       >
         {selectedRecord && (
           <div className="space-y-5">
-            <div className="flex items-start justify-between">
-              <div>
-                <h3 className="text-xl font-bold text-gray-900">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h3 className="text-xl font-bold text-gray-900 truncate">
                   {selectedRecord.employeeName}
                 </h3>
-                <p className="text-gray-500">
+                <p className="text-gray-500 truncate">
                   {selectedRecord.employeeId} • {selectedRecord.department}
                 </p>
               </div>
-              {getStatusBadge(selectedRecord.status)}
+              <div className="shrink-0">{getStatusBadge(selectedRecord.status)}</div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="p-4 bg-gray-50 rounded-xl">
                 <p className="text-sm text-gray-500">Review Period</p>
                 <p className="font-semibold text-gray-900">
                   {dayjs(selectedRecord.period).format("MMMM YYYY")}
                 </p>
               </div>
-              <div className="p-4 bg-gray-50 rounded-xl">
+              <div
+                className={`p-4 rounded-xl ${STATUS_CONFIG[selectedRecord.status].bgGlow}`}
+              >
                 <p className="text-sm text-gray-500">Overall Score</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {selectedRecord.avgScore}/10
+                <p className="text-2xl font-bold">
+                  <span className={STATUS_CONFIG[selectedRecord.status].textColor}>
+                    {Number(selectedRecord.avgScore).toFixed(2)}
+                  </span>
+                  <span className="text-sm font-normal text-gray-400">/10</span>
                 </p>
               </div>
             </div>
@@ -876,45 +991,62 @@ export default function PerformanceSheet() {
               <h4 className="font-semibold text-gray-900 mb-3">
                 Criteria Breakdown
               </h4>
-              <div className="space-y-2">
-                {Object.entries(selectedRecord.scores).map(([key, value]) => {
-                  const criteria = PERFORMANCE_CRITERIA.find(
-                    (c) => c.id === key,
-                  );
+              <div className="space-y-2.5">
+                {PERFORMANCE_CRITERIA.filter(
+                  (c) => selectedRecord.scores?.[c.id] !== undefined,
+                ).map((criteria) => {
+                  const value = Number(selectedRecord.scores[criteria.id]) || 0;
                   return (
-                    <div key={key} className="flex items-center gap-3">
-                      <span className="w-44 text-sm text-gray-600">
-                        {criteria?.name || key}
+                    <div
+                      key={criteria.id}
+                      className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3"
+                    >
+                      <span className="sm:w-44 shrink-0 text-sm text-gray-600">
+                        {criteria.name}
                       </span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3">
+                      <div className="flex flex-1 items-center gap-3">
                         <div
-                          className={`h-3 rounded-full transition-all ${
-                            value >= 8
-                              ? "bg-green-500"
-                              : value >= 6
-                                ? "bg-yellow-500"
-                                : "bg-red-500"
-                          }`}
-                          style={{ width: `${value * 10}%` }}
-                        />
+                          className="flex-1 bg-gray-100 rounded-full h-2.5 overflow-hidden"
+                          role="progressbar"
+                          aria-valuemin={0}
+                          aria-valuemax={10}
+                          aria-valuenow={value}
+                          aria-label={criteria.name}
+                        >
+                          <div
+                            className={`h-full rounded-full transition-all ${
+                              value >= 8
+                                ? "bg-green-500"
+                                : value >= 6
+                                  ? "bg-yellow-500"
+                                  : "bg-red-500"
+                            }`}
+                            style={{ width: `${value * 10}%` }}
+                          />
+                        </div>
+                        <span className="w-12 text-sm font-semibold text-right text-gray-900">
+                          {value}
+                          <span className="text-xs font-normal text-gray-400">/10</span>
+                        </span>
                       </div>
-                      <span className="w-10 text-sm font-semibold text-right">
-                        {value}
-                      </span>
                     </div>
                   );
                 })}
               </div>
             </div>
 
-            {selectedRecord.remarks && (
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Remarks</h4>
-                <p className="text-gray-600 bg-gray-50 p-4 rounded-xl">
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-2">Remarks</h4>
+              {selectedRecord.remarks ? (
+                <p className="text-gray-600 bg-gray-50 p-4 rounded-xl whitespace-pre-line text-pretty">
                   {selectedRecord.remarks}
                 </p>
-              </div>
-            )}
+              ) : (
+                <p className="text-gray-400 italic bg-gray-50 p-4 rounded-xl">
+                  No remarks were added for this review.
+                </p>
+              )}
+            </div>
 
             <div className="flex justify-between text-sm text-gray-500 pt-4 border-t border-gray-100">
               <span>Reviewed by: {selectedRecord.reviewedBy}</span>

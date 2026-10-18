@@ -1,0 +1,46 @@
+.ar-logo-3d{
+  display:block;object-fit:contain;border-radius:50%;
+  transform-style:preserve-3d;will-change:transform,filter;
+  animation:arBounce3d 2.6s ease-in-out infinite, arGlow 2.6s ease-in-out infinite;
+  cursor:pointer;transition:transform .3s ease;
+}
+.ar-logo-3d:hover{animation-duration:1.2s}
+@keyframes arBounce3d{
+  0%,100%{transform:perspective(600px) translateY(0) rotateY(-14deg) rotateX(4deg) scale(1)}
+  50%{transform:perspective(600px) translateY(-8px) rotateY(14deg) rotateX(-4deg) scale(1.07)}
+}
+@keyframes arGlow{
+  0%,100%{filter:drop-shadow(0 0 6px rgba(167,139,250,.6)) drop-shadow(0 0 14px rgba(45,212,191,.35))}
+  50%{filter:drop-shadow(0 0 14px rgba(196,181,253,.95)) drop-shadow(0 0 30px rgba(45,212,191,.75))}
+}
+@media (prefers-reduced-motion:reduce){.ar-logo-3d{animation:none}}
+.brand-icon,.hero-logo-box{overflow:visible !important}
+
+/* blue/cyan box hatao, logo thoda bada */
+*:has(> img.ar-logo-3d){
+  background:none !important;border:none !important;box-shadow:none !important;
+  overflow:visible !important;
+}
+.hero-logo-box{width:auto !important;height:auto !important;padding:0 !important}
+.hero-logo-box img.ar-logo-3d{width:62px !important;height:62px !important}
+img.ar-logo-lg{width:68px !important;height:68px !important}
+.nav-brand img.ar-logo-3d,.brand-section img.ar-logo-3d{width:46px !important;height:46px !important}
+
+/* login card ka logo: bada, bina box */
+img.ar-logo-lg{
+  width:84px !important;height:84px !important;margin:0 auto !important;
+}
+*:has(> img.ar-logo-lg){
+  width:auto !important;height:auto !important;min-width:0 !important;
+  padding:0 !important;background:none !important;border:none !important;
+  box-shadow:none !important;overflow:visible !important;
+}
+
+/* register / landing / baaki pages ke wrapper se box hatao */
+.brand-icon,.brand-logo,.logo-box,.logo-icon{
+  background:none !important;border:none !important;box-shadow:none !important;
+  overflow:visible !important;width:auto !important;height:auto !important;padding:0 !important;
+}
+.brand-icon img.ar-logo-3d,.brand-logo img.ar-logo-3d,.logo-box img.ar-logo-3d,.logo-icon img.ar-logo-3d{
+  width:64px !important;height:64px !important;
+}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { BookOpen as PageIcon } from "lucide-react";
 import {
   Plus,
   Edit2,
@@ -97,9 +98,14 @@ export default function GeneralLedger() {
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">General Ledger</h1>
-          <p className="text-gray-600 mt-1">Track all financial transactions</p>
+        <div className="page-header-main">
+          <span className="page-header-icon">
+            <PageIcon size={26} strokeWidth={1.8} />
+          </span>
+          <div>
+            <h1 className="page-header-title">General Ledger</h1>
+            <p className="page-header-subtitle">Track all financial transactions</p>
+          </div>
         </div>
         <button
           onClick={() => setShowModal(true)}

@@ -133,7 +133,7 @@ export default function TaskAssignment() {
       action={
         <button
           onClick={() => setShowModal(true)}
-          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition hover:shadow-indigo-500/40 hover:-translate-y-0.5"
+          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-purple-500/25 transition hover:shadow-purple-500/40 hover:-translate-y-0.5"
         >
           <Plus size={16} /> New Task
         </button>
@@ -343,7 +343,7 @@ export default function TaskAssignment() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/25 disabled:opacity-50"
+                  className="px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white shadow-md shadow-purple-500/25 disabled:opacity-50 hover:shadow-purple-500/40"
                 >
                   {saving ? "Creating..." : "Create Task"}
                 </button>

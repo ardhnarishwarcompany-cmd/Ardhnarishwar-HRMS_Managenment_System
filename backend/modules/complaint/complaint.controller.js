@@ -113,3 +113,23 @@ export const updateStatus = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+export const updateComplaint = async (req, res) => {
+  try {
+    const user = { id: getUserId(req), role: mapRole(getRole(req)) };
+    const data = await service.updateComplaint(req.params.id, user, req.body || {});
+    res.json({ success: true, data });
+  } catch (err) {
+    res.status(err.status || 500).json({ success: false, message: err.message });
+  }
+};
+
+export const deleteComplaint = async (req, res) => {
+  try {
+    const user = { id: getUserId(req), role: mapRole(getRole(req)) };
+    const data = await service.deleteComplaint(req.params.id, user);
+    res.json({ success: true, data });
+  } catch (err) {
+    res.status(err.status || 500).json({ success: false, message: err.message });
+  }
+};

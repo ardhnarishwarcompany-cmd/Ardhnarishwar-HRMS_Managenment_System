@@ -6,11 +6,12 @@ function RenderIcon({ icon, size }) {
   if (!icon) return null;
   if (isValidElement(icon)) return icon;
   const Icon = icon;
-  return <Icon size={size} />;
+  return <Icon size={size} strokeWidth={1.8} />;
 }
 
-// Shared premium stat card with gradient top accent + tinted icon chip.
-// accent: indigo | emerald | amber | rose | sky | violet | slate
+// Shared KPI card: coloured top accent bar + solid gradient icon tile on the left,
+// uppercase label, large value, muted hint.
+// accent: indigo | violet | emerald | amber | rose | sky | slate
 // Accepts label/hint or title/subText prop aliases; optional onClick + active.
 export default function StatCard({
   label,
@@ -31,26 +32,18 @@ export default function StatCard({
       onClick={onClick}
       type={onClick ? "button" : undefined}
       className={`stat-card stat-accent-${accent} text-left w-full ${
-        onClick ? "cursor-pointer transition-shadow hover:shadow-md" : ""
-      } ${active ? "ring-2 ring-indigo-400 ring-offset-1" : ""}`}
+        onClick ? "cursor-pointer" : ""
+      } ${active ? "is-active" : ""}`}
     >
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <p className="text-[0.68rem] font-semibold uppercase tracking-wider text-slate-500 truncate">
-            {heading}
-          </p>
-          <p className="mt-1 text-2xl font-extrabold text-slate-900 leading-tight">
-            {value}
-          </p>
-          {sub ? (
-            <p className="mt-0.5 text-xs text-slate-400 truncate">{sub}</p>
-          ) : null}
-        </div>
-        {icon ? (
-          <span className="icon-chip">
-            <RenderIcon icon={icon} size={18} />
-          </span>
-        ) : null}
+      {icon ? (
+        <span className="stat-card-icon">
+          <RenderIcon icon={icon} size={22} />
+        </span>
+      ) : null}
+      <div className="min-w-0 flex-1">
+        <small className="stat-card-label">{heading}</small>
+        <strong className="stat-card-value">{value}</strong>
+        {sub ? <em className="stat-card-sub">{sub}</em> : null}
       </div>
     </Tag>
   );

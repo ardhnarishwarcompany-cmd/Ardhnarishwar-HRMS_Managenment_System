@@ -51,9 +51,14 @@ export default function FinancialReports() {
 
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Financial Reports</h1>
-        <p className="text-gray-600 mt-1">Comprehensive financial analytics and insights</p>
+      <div className="page-header-main">
+        <span className="page-header-icon">
+          <BarChart3 size={26} strokeWidth={1.8} />
+        </span>
+        <div>
+          <h1 className="page-header-title">Financial Reports</h1>
+          <p className="page-header-subtitle">Comprehensive financial analytics and insights</p>
+        </div>
       </div>
 
       <div className="flex gap-4 border-b">

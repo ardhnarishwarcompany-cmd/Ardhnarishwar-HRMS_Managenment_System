@@ -3,11 +3,9 @@ import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, UserPlus, Users, Bot, MessageSquare, ClipboardCheck, BriefcaseBusiness,
   BarChart3, BookOpen, Search, Globe, Target, Laptop, FileEdit,
-  MessageCircleWarning, Menu, Bell, LogOut, Sun, Moon, Monitor,
-  Check
+  MessageCircleWarning, PanelLeft, Bell, LogOut
 } from "lucide-react";
 import { useHrAuth } from "../../context/HrAuthContext";
-import { useTheme } from "../../context/ThemeContext";
 
 const navGroups = [
   {
@@ -51,6 +49,7 @@ const titles = {
   "/web-forms": ["Website Forms", "Website submissions"],
   "/advanced-search": ["Advanced Search", "Search HR records"],
   "/complaint": ["Complaint Box", "HR complaints and concerns"],
+  "/complaints": ["Complaint Box", "HR complaints and concerns"],
   "/work-assignment": ["Work Assignment", "Assigned work"],
   "/work-target": ["Work Target", "Targets and milestones"],
   "/my-targets": ["My Targets", "Your targets"],
@@ -60,20 +59,23 @@ const titles = {
   "/leads": ["Leads", "Lead management"],
 };
 
+const DESKTOP_BREAKPOINT = 1024;
+
 export default function HRLayout() {
   const { employee, logout } = useHrAuth();
-  const { theme, resolved, setTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [themeOpen, setThemeOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
 
   useEffect(() => {
     setMobileOpen(false);
-    setThemeOpen(false);
     setNotifOpen(false);
   }, [location.pathname]);
+
+  // detail routes that live under a different prefix than their nav item
+  const navAliases = { "/complaint": "/complaints/" };
 
   const [title, subtitle] = useMemo(() => {
     const exact = titles[location.pathname];
@@ -89,24 +91,24 @@ export default function HRLayout() {
     navigate("/");
   };
 
-  const pickTheme = (value) => {
-    document.documentElement.classList.add("theme-transition");
-    setTheme(value);
-    setThemeOpen(false);
-    window.setTimeout(
-      () => document.documentElement.classList.remove("theme-transition"),
-      300
-    );
+  const toggleSidebar = () => {
+    if (window.innerWidth < DESKTOP_BREAKPOINT) {
+      setMobileOpen((v) => !v);
+    } else {
+      setCollapsed((v) => !v);
+    }
   };
 
   const displayName = employee?.name || "HR User";
   const displayEmail = employee?.email || "hr@hrms.com";
 
   return (
-    <div className="hr-layout">
+    <div className={`hr-layout ${collapsed ? "is-collapsed" : ""}`}>
       <aside className={`hr-sidebar ${mobileOpen ? "is-open" : ""}`}>
         <div className="hr-sidebar-brand">
-          <img src="/logo.jpeg" alt="ARDHNARISHWAR" />
+          <div className="hr-brand-logo" aria-hidden="true">
+            <img src="/logo.jpeg" alt="Ardhnarishwar" className="w-full h-full object-cover" />
+          </div>
           <div>
             <h1>ARDHNARISHWAR</h1>
             <p>HRMS HR Panel</p>
@@ -123,12 +125,15 @@ export default function HRLayout() {
                     key={to}
                     to={to}
                     end={to === "/dashboard"}
-                    className={({ isActive }) =>
-                      `hr-nav-link ${isActive ? "active" : ""}`
-                    }
+                    className={({ isActive }) => {
+                      const aliasActive =
+                        navAliases[to] &&
+                        location.pathname.startsWith(navAliases[to]);
+                      return `hr-nav-link ${isActive || aliasActive ? "active" : ""}`;
+                    }}
                     onClick={() => setMobileOpen(false)}
                   >
-                    <Icon size={18} strokeWidth={1.8} />
+                    <Icon size={19} strokeWidth={1.8} />
                     <span>{label}</span>
                   </NavLink>
                 ))}
@@ -153,88 +158,54 @@ export default function HRLayout() {
 
       <div className="hr-shell">
         <header className="hr-topbar">
-          <div className="hr-topbar-left">
+          <button
+            className="hr-icon-button"
+            onClick={toggleSidebar}
+            aria-label="Toggle navigation"
+            aria-expanded={!collapsed}
+          >
+            <PanelLeft size={20} strokeWidth={1.8} />
+          </button>
+
+          <div className="hr-topbar-title">
+            <h2>{title}</h2>
+            <p>{subtitle}</p>
+          </div>
+
+          <div className="hr-topbar-spacer" />
+
+          <div className="hr-dropdown-wrap">
             <button
-              className="hr-mobile-menu"
-              onClick={() => setMobileOpen(true)}
-              aria-label="Open navigation"
+              className="hr-icon-button"
+              onClick={() => {
+                setNotifOpen((v) => !v);
+              }}
+              aria-label="Notifications"
             >
-              <Menu size={21} />
+              <Bell size={20} />
             </button>
-            <div>
-              <h2>{title}</h2>
-              <p>{subtitle}</p>
+            {notifOpen && (
+              <div className="hr-popover hr-notif-popover">
+                <strong>Notifications</strong>
+                <span>No new notifications</span>
+              </div>
+            )}
+          </div>
+
+          <div className="hr-user">
+            <div className="hr-user-avatar">
+              {displayName.charAt(0).toUpperCase()}
+            </div>
+            <div className="hr-user-text">
+              <strong>{displayName}</strong>
+              <span>{displayEmail}</span>
             </div>
           </div>
 
-          <div className="hr-topbar-right">
-            <div className="hr-dropdown-wrap">
-              <button
-                className="hr-icon-button"
-                onClick={() => {
-                  setThemeOpen((v) => !v);
-                  setNotifOpen(false);
-                }}
-                aria-label="Change theme"
-              >
-                {resolved === "dark" ? <Moon size={20} /> : <Sun size={20} />}
-              </button>
-
-              {themeOpen && (
-                <div className="hr-popover hr-theme-popover">
-                  {[
-                    ["light", "Light", Sun],
-                    ["dark", "Dark", Moon],
-                    ["system", "System", Monitor],
-                  ].map(([value, label, Icon]) => (
-                    <button
-                      key={value}
-                      onClick={() => pickTheme(value)}
-                      className={theme === value ? "selected" : ""}
-                    >
-                      <Icon size={15} />
-                      <span>{label}</span>
-                      {theme === value && <Check size={14} />}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="hr-dropdown-wrap">
-              <button
-                className="hr-icon-button"
-                onClick={() => {
-                  setNotifOpen((v) => !v);
-                  setThemeOpen(false);
-                }}
-                aria-label="Notifications"
-              >
-                <Bell size={20} />
-              </button>
-              {notifOpen && (
-                <div className="hr-popover hr-notif-popover">
-                  <strong>Notifications</strong>
-                  <span>No new notifications</span>
-                </div>
-              )}
-            </div>
-
-            <div className="hr-user">
-              <div className="hr-user-avatar">
-                {displayName.charAt(0).toUpperCase()}
-              </div>
-              <div className="hr-user-text">
-                <strong>{displayName}</strong>
-                <span>{displayEmail}</span>
-              </div>
-            </div>
-
-            <button className="hr-logout" onClick={handleLogout}>
-              <LogOut size={16} />
-              <span>Logout</span>
-            </button>
-          </div>
+          <button className="hr-logout" onClick={handleLogout}>
+            <LogOut size={17} />
+            <span>Logout</span>
+          </button>
         </header>
 
         <main className="hr-main">

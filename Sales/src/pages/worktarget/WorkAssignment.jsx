@@ -6,7 +6,8 @@ import PageHeader from "../../components/common/PageHeader";
 import StatCard from "../../components/common/StatCard";
 import WorkAssignmentFilters from "../../components/workassignment/WorkAssignmentFilters";
 import WorkAssignmentTable from "../../components/workassignment/WorkAssignmentTable";
-import {  ClipboardList,
+import {
+  Target,
   Loader,
   CheckCircle2,
   AlarmClockOff,
@@ -48,7 +49,7 @@ export default function WorkAssignment() {
       setLastUpdated(new Date());
     } catch (err) {
       console.error("FETCH ERROR:", err);
-      toast.error(err.response?.data?.message || "Failed to load work assignments");
+      toast.error(err.response?.data?.message || "Failed to load targets");
     } finally {
       setLoading(false);
     }
@@ -68,25 +69,25 @@ export default function WorkAssignment() {
   }, [filters]);
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6">
       <PageHeader
-        title="Automated Work Assignment"
-        desc="Auto-assign & track employee tasks"
+        title="Targets"
+        desc="Sales targets assigned to you by the Super Admin - track progress and deadlines"
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Assigned"
           value={stats.assigned}
-          subText="New tasks assigned"
+          subText="New targets assigned"
           gradient="bg-gradient-to-tr from-blue-500 to-cyan-500"
-          icon={<ClipboardList aria-hidden="true" />}
+          icon={<Target aria-hidden="true" />}
         />
 
         <StatCard
           title="In Progress"
           value={stats.inProgress}
-          subText="Tasks being worked on"
+          subText="Targets being worked on"
           gradient="bg-gradient-to-tr from-amber-500 to-orange-500"
           icon={<Loader aria-hidden="true" />}
         />
@@ -94,7 +95,7 @@ export default function WorkAssignment() {
         <StatCard
           title="Completed"
           value={stats.completed}
-          subText="Tasks finished"
+          subText="Targets achieved"
           gradient="bg-gradient-to-tr from-emerald-500 to-teal-500"
           icon={<CheckCircle2 aria-hidden="true" />}
         />
@@ -109,16 +110,16 @@ export default function WorkAssignment() {
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-xs text-gray-500" aria-live="polite">
+        <p className="text-xs text-slate-500" aria-live="polite">
           {lastUpdated
             ? `Last updated ${lastUpdated.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
-            : "Loading assignments..."}
+            : "Loading targets..."}
         </p>
         <button
           type="button"
           onClick={fetchAssignments}
           disabled={loading}
-          className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:opacity-60"
+          className="btn-secondary px-3.5 py-2"
         >
           <RefreshCw size={14} className={loading ? "animate-spin" : ""} aria-hidden="true" />
           {loading ? "Refreshing..." : "Refresh"}

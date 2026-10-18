@@ -4,7 +4,9 @@ import API from "../../api/axios";
 import toast from "react-hot-toast";
 import { Users, CalendarPlus, Save } from "lucide-react";
 import AddInterviewModal from "../../components/hr/AddInterviewModal";
+import PageHeader from "../../components/common/PageHeader";
 
+import { Inbox as HrPageIcon } from "lucide-react";
 export default function LeadDetails() {
   const { id } = useParams();
   const [leads, setLeads] = useState([]);
@@ -75,38 +77,11 @@ export default function LeadDetails() {
   return (
     <div className="min-h-screen bg-slate-100 p-3 sm:p-4 lg:p-6 dark:bg-[#0b0817]">
 <div className="mx-auto mt-6 max-w-[1600px] space-y-6">
-        {/* HERO BAND */}
-        <div className="relative overflow-hidden rounded-3xl bg-slate-900 px-8 py-9 md:px-12">
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 opacity-[0.06]"
-            style={{
-              backgroundImage:
-                "linear-gradient(to right, #818cf8 1px, transparent 1px), linear-gradient(to bottom, #818cf8 1px, transparent 1px)",
-              backgroundSize: "44px 44px",
-            }}
-          />
-          <div
-            aria-hidden="true"
-            className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-violet-600/25 blur-3xl"
-          />
-          <div
-            aria-hidden="true"
-            className="absolute -bottom-24 -left-12 h-56 w-56 rounded-full bg-indigo-600/20 blur-3xl"
-          />
-
-          <div className="relative">
-            <p className="text-xs font-semibold uppercase tracking-widest text-indigo-300">
-              Recruitment
-            </p>
-            <h2 className="mt-2 text-2xl font-bold text-white md:text-3xl text-balance">
-              Lead Management
-            </h2>
-            <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-400">
-              Review batch leads, update statuses, and schedule interviews.
-            </p>
-          </div>
-        </div>
+        <PageHeader
+          icon={HrPageIcon}
+          title="Lead Management"
+          subtitle="Review batch leads, update statuses, and schedule interviews."
+        />
 
         {/* LEADS TABLE */}
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_18px_40px_-24px_rgba(109,40,217,0.25)] dark:border-white/10 dark:bg-white/[0.04] dark:shadow-[0_24px_50px_-24px_rgba(0,0,0,0.7)] dark:backdrop-blur-xl">

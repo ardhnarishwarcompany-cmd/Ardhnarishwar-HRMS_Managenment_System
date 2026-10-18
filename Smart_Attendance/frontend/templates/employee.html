@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Employee Portal • Global Attendance Management System</title>
-<link rel="icon" type="image/svg+xml" href="/favicon.ico">
+<title>Ardhnarishwar 3D • Employee Personal Workforce Suite</title>
+<link rel="icon" type="image/png" href="/static/images/ardhnarishwar_logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/css/theme.css">
+<link rel="stylesheet" href="/static/css/ardhnarishwar_3d.css">
 <style>
 .employee-layout {
   min-height: 100vh;
@@ -309,6 +310,64 @@
 .method-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
 .method-card p { font-size: 12.5px; color: var(--text-secondary); line-height: 1.45; margin-bottom: 16px; }
 .method-action-link { font-size: 12.5px; font-weight: 700; color: var(--cyan); display: flex; align-items: center; gap: 6px; }
+.attendance-method-modal{position:fixed;inset:0;background:rgba(3,7,18,.76);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;z-index:200;}
+.attendance-method-modal.active{display:flex;}
+.attendance-method-dialog{width:min(760px,100%);background:var(--bg-card);border:1px solid var(--border-medium);border-radius:22px;padding:20px;box-shadow:var(--shadow-lg);}
+.attendance-method-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:14px;}
+.attendance-method-option{text-decoration:none;color:var(--text-primary);background:var(--bg-input);border:1px solid var(--border-subtle);border-radius:14px;padding:14px;transition:.2s ease;}
+.attendance-method-option:hover{transform:translateY(-2px);border-color:var(--border-medium);}
+.attendance-method-option .option-icon{width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:rgba(99,102,241,.12);margin-bottom:10px;font-size:20px;}
+.attendance-method-option strong{display:block;font-size:13px;margin-bottom:4px;}
+.attendance-method-option span{display:block;color:var(--text-muted);font-size:11.5px;line-height:1.35;}
+</style>
+<link rel="stylesheet" href="/static/css/ardh_logo.css?v=1">
+<style id="flicker-fix-v1">
+/* har second badalne wale text ki chaudai fix, taaki header na hile */
+html { scrollbar-gutter: stable; }
+#clock-time { display:inline-block; min-width:9ch; font-variant-numeric: tabular-nums; white-space:nowrap; }
+.runtime-last-sync, #empLastSyncTime { display:inline-block; min-width:15ch; font-variant-numeric: tabular-nums; white-space:nowrap; }
+</style>
+<style id="emp-navbar-v2">
+/* Employee header: 2 clean rows (brand / controls), no overlap, no broken pills */
+html body header.navbar {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 10px 16px; padding: 12px 24px;
+}
+html body header.navbar > .nav-brand {
+  flex: 1 1 100%; min-width: 0; display: flex; align-items: center; gap: 14px;
+}
+html body header.navbar > .nav-brand > div:last-child { min-width: 0; flex: 1 1 auto; }
+html body header.navbar > .nav-brand > div:last-child > div:first-child { flex-wrap: wrap; row-gap: 4px; }
+html body header.navbar .brand-title,
+html body header.navbar .brand-sub {
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+}
+html body header.navbar .nav-brand .badge { white-space: nowrap; flex-shrink: 0; }
+
+/* controls row */
+html body header.navbar > .nav-brand + div {
+  flex: 1 1 100%;
+  display: flex !important; flex-wrap: wrap; align-items: center; justify-content: flex-start;
+  gap: 8px 10px !important;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-subtle, rgba(148,163,184,.15));
+}
+html body header.navbar > .nav-brand + div > * { flex: 0 0 auto; }
+html body header.navbar > .nav-brand + div,
+html body header.navbar > .nav-brand + div * { white-space: nowrap; }
+html body header.navbar > .nav-brand + div > :last-child { margin-left: auto; }
+
+@media (max-width: 640px) {
+  html body header.navbar { padding: 10px 14px; gap: 8px 10px; }
+  html body header.navbar .brand-sub,
+  html body header.navbar .runtime-last-sync { display: none !important; }
+  html body header.navbar .nav-brand .badge { display: none; }
+  html body header.navbar > .nav-brand + div { gap: 6px 8px !important; }
+}
+@media (max-width: 480px) {
+  html body header.navbar .btn-sound-fx > span:last-child,
+  html body header.navbar .btn-runtime-refresh > span:last-child { display: none; }
+}
 </style>
 </head>
 <body>
@@ -316,25 +375,15 @@
   <!-- Top Navigation Bar -->
   <header class="navbar">
     <div class="nav-brand">
-      <div class="brand-icon" style="background:transparent; border:none; display:flex; align-items:center; justify-content:center;">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="32" height="32">
-          <defs>
-            <linearGradient id="empBrandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#10B981"/>
-              <stop offset="100%" stop-color="#6366F1"/>
-            </linearGradient>
-          </defs>
-          <circle cx="24" cy="24" r="18" fill="none" stroke="url(#empBrandGrad)" stroke-width="2.5"/>
-          <ellipse cx="24" cy="24" rx="9" ry="18" fill="none" stroke="url(#empBrandGrad)" stroke-width="1.8" stroke-dasharray="2 1"/>
-          <line x1="6" y1="24" x2="42" y2="24" stroke="url(#empBrandGrad)" stroke-width="1.8"/>
-          <circle cx="24" cy="24" r="5.5" fill="#10B981"/>
-          <path d="M24 20v4l3 2" fill="none" stroke="#070B14" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="34" cy="14" r="3.5" fill="#06B6D4"/>
-        </svg>
+      <div class="ardh-medallion-nav" title="Ardhnarishwar 3D Emblem">
+        <img src="/static/images/ardhnarishwar_logo_emblem.png" alt="Ardhnarishwar Logo">
       </div>
       <div>
-        <div class="brand-title" id="nav-emp-name">Global Attendance Management System</div>
-        <div class="brand-sub">EMPLOYEE PORTAL • <span id="nav-company-id">...</span></div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div class="brand-title" id="nav-emp-name">Global Attendance Management System</div>
+          <span class="badge badge-emerald" style="font-size:10px; font-weight:800; padding:2px 7px; letter-spacing:0.5px;">👤 EMPLOYEE SELF-SERVICE PORTAL</span>
+        </div>
+        <div class="brand-sub">WORKSPACE ID: <span id="nav-company-id" style="color:var(--cyan); font-weight:700;">...</span> • PERSONAL WORKFORCE SUITE</div>
       </div>
     </div>
 
@@ -385,6 +434,28 @@
         </div>
       </div>
 
+      <!-- 3D Audio FX Toggle -->
+      <button class="btn-sound-fx" title="Toggle Sound FX">
+        <span>🔊</span> <span>Sound</span>
+      </button>
+
+      <!-- Runtime Live Status Indicator -->
+      <div class="runtime-live-pill" title="Runtime Live Engine Active">
+        <span class="pulse-dot"></span> <span>RUNTIME LIVE</span>
+      </div>
+
+      <div class="runtime-last-sync" id="empLastSyncTime">Synced: Just now</div>
+
+      <!-- Master Runtime Refresh Button -->
+      <button class="btn-runtime-refresh" onclick="ArdhnarishwarRuntime.triggerGlobalSync(true)" title="Synchronize Personal Suite in Runtime">
+        <span class="refresh-icon">🔄</span> <span>Refresh Suite</span>
+      </button>
+
+      <!-- Auto-Refresh Toggle -->
+      <div class="auto-refresh-toggle" onclick="ArdhnarishwarRuntime.toggleAutoRefresh()" title="Toggle Background Live Polling">
+        <span>⚡ Auto-Sync: <b>ON (15s)</b></span>
+      </div>
+
       <div class="tz-clock-badge" style="background:var(--bg-surface); border:1px solid var(--border-medium); padding:6px 14px; border-radius:var(--radius-full); font-size:12.5px; font-family:var(--font-mono); color:var(--emerald); display:flex; align-items:center; gap:8px;">
         <span>🕒</span> <span id="clock-time">--:--:--</span> (<span id="clock-tz">UTC</span>)
       </div>
@@ -414,7 +485,9 @@
         </div>
       </div>
 
-      <div style="display:flex; gap:10px; align-items:center;">
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <a href="/portal/employee" id="btn-open-employee-self-portal" class="btn btn-indigo btn-sm" target="_blank" rel="noopener" title="Open the Employee Self-Service Portal in a new tab (work mode check-in, OTP approvals, client visits)">🧑‍💼 Employee Self Portal ↗</a>
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('daily-records-card').scrollIntoView({behavior:'smooth', block:'start'})" title="See your check-in and check-out timings">🕒 My Check-In / Check-Out</button>
         <button class="btn btn-secondary btn-sm" onclick="openCorrectionModal()">✏️ Request Correction</button>
         <button class="btn btn-primary btn-sm" onclick="openLeaveModal()">📅 Apply for Leave</button>
       </div>
@@ -425,18 +498,22 @@
       <div class="status-indicator-box">
         <div class="status-large-icon" id="today-status-icon" style="background:rgba(245,158,11,0.15); color:var(--amber);">⏳</div>
         <div>
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-            <span style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Today's Attendance Status</span>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
+            <span style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Attendance Status</span>
             <span class="badge badge-amber" id="today-status-badge">NOT MARKED YET</span>
+            <span id="live-timer-badge" class="badge badge-neutral" style="display:none; font-family:var(--font-mono); font-size:11.5px; border-color:var(--emerald); color:var(--emerald);">⏱️ Active Duty: <span id="live-elapsed-time">00:00:00</span></span>
           </div>
           <h3 style="font-size:17px; font-weight:800; margin:0;" id="today-status-headline">You haven't checked in for today</h3>
-          <p style="font-size:12.5px; color:var(--text-secondary); margin:4px 0 0;" id="today-status-detail">Use Face AI or Dynamic Code to record your arrival time.</p>
+          <p style="font-size:12.5px; color:var(--text-secondary); margin:4px 0 0;" id="today-status-detail">Click Clock IN and choose one of your approved attendance verification methods.</p>
         </div>
       </div>
-      <div id="today-status-action">
-        <a href="/employee/face" class="btn btn-primary btn-md">
-          <span>Clock In Now ⚡</span>
-        </a>
+      <div id="today-status-action" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <button class="btn btn-primary btn-md" onclick="openAttendanceMethodChooser('IN')">
+          <span>Clock IN ⚡</span>
+        </button>
+        <button class="btn btn-secondary btn-md" onclick="openAttendanceMethodChooser('IN')">
+          <span>Choose Attendance Method</span>
+        </button>
       </div>
     </div>
 
@@ -488,16 +565,26 @@
       </div>
 
       <!-- 2. KPI Metrics Tiles -->
-      <div class="kpi-tiles-grid">
+      <div class="kpi-tiles-grid" style="grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));">
         <div class="kpi-tile">
-          <span class="kpi-tile-label">Total Punches</span>
-          <div class="kpi-tile-num" id="kpi-total-punches">0</div>
-          <span style="font-size:11px; color:var(--text-muted); margin-top:4px;">Recorded this period</span>
+          <span class="kpi-tile-label">Today's Hours</span>
+          <div class="kpi-tile-num" id="kpi-today-hours" style="color:var(--cyan);">0.0 hrs</div>
+          <span style="font-size:11px; color:var(--text-muted); margin-top:4px;">Active duty elapsed</span>
+        </div>
+        <div class="kpi-tile">
+          <span class="kpi-tile-label">Monthly Hours</span>
+          <div class="kpi-tile-num" id="kpi-monthly-hours" style="color:var(--indigo);">0.0 hrs</div>
+          <span style="font-size:11px; color:var(--text-muted); margin-top:4px;">Cumulative this month</span>
         </div>
         <div class="kpi-tile">
           <span class="kpi-tile-label">On-Time Score</span>
           <div class="kpi-tile-num" style="color:var(--emerald);" id="kpi-punctuality">100%</div>
           <span style="font-size:11px; color:var(--text-muted); margin-top:4px;">Punctuality rate</span>
+        </div>
+        <div class="kpi-tile">
+          <span class="kpi-tile-label">Total Punches</span>
+          <div class="kpi-tile-num" id="kpi-total-punches">0</div>
+          <span style="font-size:11px; color:var(--text-muted); margin-top:4px;">Recorded this period</span>
         </div>
         <div class="kpi-tile">
           <span class="kpi-tile-label">Late Incidents</span>
@@ -506,65 +593,61 @@
         </div>
         <div class="kpi-tile">
           <span class="kpi-tile-label">Approved Leaves</span>
-          <div class="kpi-tile-num" style="color:var(--indigo);" id="kpi-leaves-count">0</div>
+          <div class="kpi-tile-num" style="color:var(--purple);" id="kpi-leaves-count">0</div>
           <span style="font-size:11px; color:var(--text-muted); margin-top:4px;">Approved leave days</span>
         </div>
       </div>
     </div>
 
-    <!-- Attendance Methods Selection -->
+    <!-- Attendance Methods Selection (Dynamic Role & Admin Controlled) -->
     <div class="section-title">
-      <span>🚀 Authorize Attendance Check-IN</span>
-      <span style="font-size:12.5px; font-weight:500; color:var(--text-muted);">Choose your authorized clock-in method</span>
+      <span id="methods-section-heading">🚀 Authorize Attendance Check-IN</span>
+      <span id="methods-section-subheading" style="font-size:12.5px; font-weight:500; color:var(--text-muted);">Choose your authorized clock-in method</span>
     </div>
 
-    <div class="methods-grid">
-      <!-- Method 1: Face AI -->
-      <a href="/employee/face" class="method-card">
-        <div>
-          <div class="method-icon-box icon-face">📷</div>
-          <h3>Neural Biometric Face AI</h3>
-          <p>Local OpenCV facial landmark recognition with instant enrollment and reticle targeting HUD.</p>
-        </div>
-        <div class="method-action-link">Launch Camera Scan →</div>
-      </a>
+    <div class="methods-grid" id="methods-grid">
+      <!-- Method cards will be dynamically rendered based on user.allowed_methods -->
+    </div>
 
-      <!-- Method 2: OTP In-App -->
-      <a href="/employee/otp" class="method-card">
+    <!-- 📅 PAIRED CHECK-IN & CHECK-OUT DAILY DOSSIER -->
+    <div class="card card-3d" id="daily-records-card" style="margin-bottom:24px; scroll-margin-top:16px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
         <div>
-          <div class="method-icon-box icon-otp">🔢</div>
-          <h3>In-App Dynamic Code</h3>
-          <p>Rotating 6-digit cryptographic security tokens and in-app private 2FA codes.</p>
+          <h3 style="font-size:16px; font-weight:700; display:flex; align-items:center; gap:8px;">
+            <span>⏱️</span> Daily Check-In & Check-Out Working Hours Records
+          </h3>
+          <p style="font-size:12.5px; color:var(--text-secondary); margin:2px 0 0;">Paired daily timestamps with verified working duration and shift status</p>
         </div>
-        <div class="method-action-link">Verify In-App Code →</div>
-      </a>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button class="btn btn-secondary btn-sm btn-runtime-refresh" onclick="ArdhnarishwarRuntime ? ArdhnarishwarRuntime.triggerGlobalSync(true) : loadDailyRecords()">🔄 Refresh Records</button>
+        </div>
+      </div>
 
-      <!-- Method 3: Wi-Fi -->
-      <a href="/employee/wifi" class="method-card">
-        <div>
-          <div class="method-icon-box icon-wifi">📶</div>
-          <h3>Corporate Office Wi-Fi</h3>
-          <p>Verified check-in when connected to your authorized corporate office network.</p>
-        </div>
-        <div class="method-action-link">Check Network Status →</div>
-      </a>
-
-      <!-- Method 4: Field GPS -->
-      <a href="/employee/field" class="method-card">
-        <div>
-          <div class="method-icon-box icon-field">🚗</div>
-          <h3>Field & Remote GPS</h3>
-          <p>Real-time satellite GPS coordinates for on-site meetings and client visits.</p>
-        </div>
-        <div class="method-action-link">Log Field Check-IN →</div>
-      </a>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Clock IN</th>
+              <th>Clock OUT</th>
+              <th>Total Hours</th>
+              <th>Methods</th>
+              <th>Status</th>
+              <th>Verification Notes</th>
+            </tr>
+          </thead>
+          <tbody id="daily-records-body">
+            <tr><td colspan="7"><div class="empty-state"><div class="empty-icon">⏱️</div><div class="empty-title">Loading Daily Check-In / Check-Out Records...</div></div></td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Personal Attendance History & My Leaves -->
-    <div class="card" style="margin-bottom:24px;">
+    <div class="card card-3d" style="margin-bottom:24px;">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
         <h3 style="font-size:16px; font-weight:700;">📜 My Recent Attendance Logs</h3>
-        <button class="btn btn-secondary btn-sm" onclick="loadMyHistory()">🔄 Refresh Logs</button>
+        <button class="btn btn-secondary btn-sm btn-runtime-refresh" onclick="ArdhnarishwarRuntime ? ArdhnarishwarRuntime.triggerGlobalSync(true) : loadMyHistory()">🔄 Refresh Logs</button>
       </div>
 
       <div class="table-container">
@@ -586,10 +669,10 @@
     </div>
 
     <!-- My Leave Applications -->
-    <div class="card">
+    <div class="card card-3d">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
         <h3 style="font-size:16px; font-weight:700;">📅 My Leave Applications</h3>
-        <button class="btn btn-secondary btn-sm" onclick="loadMyLeaves()">🔄 Refresh Leaves</button>
+        <button class="btn btn-secondary btn-sm btn-runtime-refresh" onclick="ArdhnarishwarRuntime ? ArdhnarishwarRuntime.triggerGlobalSync(true) : loadMyLeaves()">🔄 Refresh Leaves</button>
       </div>
 
       <div class="table-container">
@@ -705,19 +788,140 @@
   </div>
 </div>
 
+<!-- Attendance method chooser for Clock-IN / Clock-OUT -->
+<div class="attendance-method-modal" id="attendance-method-modal" role="dialog" aria-modal="true">
+  <div class="attendance-method-dialog">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;">
+      <div><div style="font-size:11px;color:var(--cyan);font-weight:800;text-transform:uppercase;letter-spacing:.7px;">Attendance Verification</div><h3 id="attendance-method-modal-title" style="margin:3px 0 4px;font-size:19px;">Choose a Clock-IN method</h3><p id="attendance-method-modal-subtitle" style="margin:0;color:var(--text-muted);font-size:12.5px;">Only assigned methods are shown.</p></div>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="closeAttendanceMethodChooser()">✕ Close</button>
+    </div>
+    <div id="attendance-method-choices" class="attendance-method-options"></div>
+  </div>
+</div>
+
 <!-- Toast Container -->
 <div class="toast-container" id="toast-container"></div>
 
+<script src="/static/js/checkin_checkout.js"></script>
 <script src="/static/js/theme.js"></script>
 <script src="/static/js/telemetry.js"></script>
+<script src="/static/js/ardhnarishwar_runtime.js"></script>
 <script>
 let currentCompanyTimezone = "UTC";
+let liveTimerInterval = null;
+let currentUserData = null;
+let currentLiveStatus = "NOT_MARKED";
+
+function renderMethodsGrid() {
+  const grid = document.getElementById('methods-grid');
+  if (!grid) return;
+  const heading = document.getElementById('methods-section-heading');
+  const subheading = document.getElementById('methods-section-subheading');
+
+  const isClockedIn = (currentLiveStatus === 'CHECKED_IN');
+  const modeParam = isClockedIn ? 'OUT' : 'IN';
+
+  if (heading) {
+    heading.textContent = isClockedIn ? '🛑 Authorize Attendance Check-OUT' : '🚀 Authorize Attendance Check-IN';
+  }
+  if (subheading) {
+    subheading.textContent = isClockedIn 
+      ? 'Choose your assigned verification method to complete your shift and clock out' 
+      : 'Choose your assigned verification method to clock in for duty';
+  }
+
+  // Work out allowed methods from user profile or work type default
+  let allowed = [];
+  if (currentUserData && Array.isArray(currentUserData.allowed_methods) && currentUserData.allowed_methods.length > 0) {
+    allowed = currentUserData.allowed_methods;
+  } else {
+    const wt = (currentUserData && currentUserData.work_type) || 'Office';
+    const defaults = {
+      'Office': ['OTP', 'WiFi', 'Face'],
+      'WFH': ['Face', 'OTP', 'GPS'],
+      'Field': ['GPS', 'Face', 'OTP']
+    };
+    allowed = defaults[wt] || ['Face', 'OTP'];
+  }
+
+  const methodCatalog = {
+    'Face': {
+      icon: '📷',
+      iconClass: 'icon-face',
+      title: 'Neural Biometric Face AI',
+      desc: 'Local OpenCV facial landmark recognition with instant enrollment and reticle targeting HUD.',
+      action: isClockedIn ? 'Launch Face Scan for Clock-OUT →' : 'Launch Camera Scan →',
+      href: `/employee/face?mode=${modeParam}`
+    },
+    'OTP': {
+      icon: '🔢',
+      iconClass: 'icon-otp',
+      title: 'Email OTP Verification',
+      desc: '6-digit OTP sent to the company authorized person.',
+      action: isClockedIn ? 'Verify Code for Clock-OUT →' : 'Verify In-App Code →',
+      href: `/employee/otp?mode=${modeParam}`
+    },
+    'WiFi': {
+      icon: '📶',
+      iconClass: 'icon-wifi',
+      title: 'Corporate Office Wi-Fi',
+      desc: 'Verified check-in when connected to your authorized corporate office network.',
+      action: isClockedIn ? 'Verify Wi-Fi for Clock-OUT →' : 'Check Network Status →',
+      href: `/employee/wifi?mode=${modeParam}`
+    },
+    'GPS': {
+      icon: '🚗',
+      iconClass: 'icon-field',
+      title: 'Field & Remote GPS',
+      desc: 'Real-time satellite GPS coordinates for on-site meetings and client visits.',
+      action: isClockedIn ? 'Log Field Clock-OUT →' : 'Log Field Check-IN →',
+      href: `/employee/field?mode=${modeParam}`
+    }
+  };
+
+  const cardsHtml = allowed.map(methodKey => {
+    const item = methodCatalog[methodKey];
+    if (!item) return '';
+    return `
+      <a href="${item.href}" class="method-card">
+        <div>
+          <div class="method-icon-box ${item.iconClass}">${item.icon}</div>
+          <h3>${item.title}</h3>
+          <p>${item.desc}</p>
+        </div>
+        <div class="method-action-link">${item.action}</div>
+      </a>
+    `;
+  }).join('');
+
+  if (cardsHtml.trim()) {
+    grid.innerHTML = cardsHtml;
+  } else {
+    grid.innerHTML = `
+      <div style="grid-column: 1 / -1; padding: 24px; text-align: center; background: var(--bg-surface); border-radius: var(--radius-md); border: 1px dashed var(--border-subtle);">
+        <p style="color: var(--text-secondary); margin: 0;">No attendance verification methods are currently assigned to your account. Please contact your Company Admin.</p>
+      </div>
+    `;
+  }
+}
 
 async function initEmployeePortal() {
+  if (window.ArdhnarishwarRuntime) {
+    ArdhnarishwarRuntime.registerTask('Shift Status', loadStatusSummary);
+    ArdhnarishwarRuntime.registerTask('Daily Check-Ins', loadDailyRecords);
+    ArdhnarishwarRuntime.registerTask('Attendance Logs', loadMyHistory);
+    ArdhnarishwarRuntime.registerTask('Leave Applications', loadMyLeaves);
+    ArdhnarishwarRuntime.registerTask('Private Alerts', loadNotifications);
+    // Auto-sync starts on its own in ardhnarishwar_runtime.js; initAutoSync() does not exist there and
+    // calling it threw an error that stopped this portal from loading its data.
+    if (typeof ArdhnarishwarRuntime.initAutoSync === 'function') ArdhnarishwarRuntime.initAutoSync(15000);
+  }
+
   try {
     const res = await fetch('/api/me');
     const data = await res.json();
     if (data.ok && data.user) {
+      currentUserData = data.user;
       const u = data.user;
       document.getElementById('nav-emp-name').textContent = u.name;
       document.getElementById('nav-company-id').textContent = u.company_id || 'COMPANY';
@@ -730,11 +934,16 @@ async function initEmployeePortal() {
         currentCompanyTimezone = data.company.timezone || 'Asia/Kolkata';
         document.getElementById('clock-tz').textContent = currentCompanyTimezone;
       }
+      renderMethodsGrid();
     }
   } catch (err) {}
 
   startLiveClock();
-  await Promise.all([loadMyHistory(), loadMyLeaves(), loadNotifications()]);
+  if (window.ArdhnarishwarRuntime) {
+    await ArdhnarishwarRuntime.triggerGlobalSync(false);
+  } else {
+    await Promise.all([loadStatusSummary(), loadDailyRecords(), loadMyHistory(), loadMyLeaves(), loadNotifications()]);
+  }
 }
 
 function startLiveClock() {
@@ -746,6 +955,206 @@ function startLiveClock() {
   }, 1000);
 }
 
+async function loadStatusSummary() {
+  try {
+    const res = await fetch('/api/employee/status-summary');
+    const data = await res.json();
+    if (data.ok) {
+      const todayHoursEl = document.getElementById('kpi-today-hours');
+      const monthlyHoursEl = document.getElementById('kpi-monthly-hours');
+      if (todayHoursEl) todayHoursEl.textContent = `${data.elapsed_hours || 0.0} hrs`;
+      if (monthlyHoursEl) monthlyHoursEl.textContent = `${data.total_monthly_hours || 0.0} hrs`;
+
+      renderLiveStatus(data);
+    }
+  } catch (e) {
+    console.error('Status summary error:', e);
+  }
+}
+
+function renderLiveStatus(data) {
+  const card = document.getElementById('today-status-card');
+  const icon = document.getElementById('today-status-icon');
+  const badge = document.getElementById('today-status-badge');
+  const timerBadge = document.getElementById('live-timer-badge');
+  const headline = document.getElementById('today-status-headline');
+  const detail = document.getElementById('today-status-detail');
+  const actionWrap = document.getElementById('today-status-action');
+
+  if (liveTimerInterval) {
+    clearInterval(liveTimerInterval);
+    liveTimerInterval = null;
+  }
+
+  const st = data.status || 'NOT_MARKED';
+  currentLiveStatus = st;
+  renderMethodsGrid();
+
+  if (st === 'CHECKED_IN') {
+    card.className = 'today-status-card marked-present';
+    icon.textContent = '🟢';
+    icon.style.background = 'rgba(16,185,129,0.15)';
+    icon.style.color = 'var(--emerald)';
+
+    badge.className = 'badge badge-emerald';
+    badge.innerHTML = '<span class="badge-dot"></span> CHECKED IN (ON DUTY)';
+    if (timerBadge) timerBadge.style.display = 'inline-flex';
+
+    headline.textContent = `Clocked IN at ${data.first_in} • Active Shift`;
+    detail.innerHTML = `Today's Date: <strong>${data.today_date}</strong> • Working Hours: <strong>${data.elapsed_hours} hrs</strong> elapsed`;
+
+    startElapsedTimer(data.first_in);
+
+    actionWrap.innerHTML = `
+      <button class="btn btn-danger btn-md" onclick="openAttendanceMethodChooser('OUT')">
+        <span>Clock OUT ⚡</span>
+      </button>
+      <button class="btn btn-secondary btn-md btn-runtime-refresh" onclick="ArdhnarishwarRuntime ? ArdhnarishwarRuntime.triggerGlobalSync(true) : loadStatusSummary()">
+        <span>🔄 Refresh Status</span>
+      </button>
+    `;
+  } else if (st === 'CHECKED_OUT') {
+    card.className = 'today-status-card marked-present';
+    icon.textContent = '🏁';
+    icon.style.background = 'rgba(99,102,241,0.15)';
+    icon.style.color = 'var(--indigo)';
+
+    badge.className = 'badge badge-indigo';
+    badge.innerHTML = '<span class="badge-dot"></span> CHECKED OUT (DAY COMPLETE)';
+    if (timerBadge) timerBadge.style.display = 'none';
+
+    headline.textContent = `Shift Complete • In: ${data.first_in} → Out: ${data.last_out}`;
+    detail.innerHTML = `Total Time Worked Today: <strong>${data.elapsed_hours} hours</strong> (${data.today_punches?.length || 2} punches logged)`;
+
+    actionWrap.innerHTML = `
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span class="badge badge-emerald" style="padding:6px 12px; font-weight:700;">✓ Shift Completed</span>
+        <button class="btn btn-secondary btn-sm btn-runtime-refresh" onclick="ArdhnarishwarRuntime ? ArdhnarishwarRuntime.triggerGlobalSync(true) : loadStatusSummary()">🔄 Refresh</button>
+      </div>
+    `;
+  } else {
+    // NOT_MARKED
+    card.className = 'today-status-card not-marked';
+    icon.textContent = '⏳';
+    icon.style.background = 'rgba(245,158,11,0.15)';
+    icon.style.color = 'var(--amber)';
+
+    badge.className = 'badge badge-amber';
+    badge.textContent = 'NOT MARKED YET';
+    if (timerBadge) timerBadge.style.display = 'none';
+
+    headline.textContent = `You haven't checked in for today (${data.today_date || 'Today'})`;
+    detail.textContent = 'Mark attendance using one-click Clock-IN or select any approved verification method below.';
+
+    actionWrap.innerHTML = `
+      <button class="btn btn-primary btn-md" onclick="openAttendanceMethodChooser('IN')">
+        <span>Clock IN ⚡</span>
+      </button>
+      <button class="btn btn-secondary btn-md" onclick="openAttendanceMethodChooser('IN')"><span>Choose Attendance Method</span></button>
+    `;
+  }
+}
+
+function startElapsedTimer(inTimeStr) {
+  if (!inTimeStr) return;
+  const parts = inTimeStr.split(':');
+  const inHours = parseInt(parts[0], 10);
+  const inMins = parseInt(parts[1], 10);
+  const inSecs = parts[2] ? parseInt(parts[2], 10) : 0;
+
+  function tick() {
+    const now = new Date();
+    const curHours = now.getHours();
+    const curMins = now.getMinutes();
+    const curSecs = now.getSeconds();
+
+    let diffSecs = (curHours * 3600 + curMins * 60 + curSecs) - (inHours * 3600 + inMins * 60 + inSecs);
+    if (diffSecs < 0) diffSecs = 0;
+
+    const h = String(Math.floor(diffSecs / 3600)).padStart(2, '0');
+    const m = String(Math.floor((diffSecs % 3600) / 60)).padStart(2, '0');
+    const s = String(diffSecs % 60).padStart(2, '0');
+
+    const el = document.getElementById('live-elapsed-time');
+    if (el) el.textContent = `${h}:${m}:${s}`;
+  }
+
+  tick();
+  liveTimerInterval = setInterval(tick, 1000);
+}
+
+function getAttendanceMethodOptions(){let allowed=Array.isArray(currentUserData?.allowed_methods)?currentUserData.allowed_methods.slice():[];if(!allowed.length){const wt=currentUserData?.work_type||'Office';allowed=({Office:['OTP','WiFi','Face'],WFH:['Face','OTP','GPS'],Field:['GPS','Face','OTP']})[wt]||['Face','OTP'];}return allowed.filter(m=>['Face','OTP','WiFi','GPS'].includes(m));}
+function openAttendanceMethodChooser(checkType){const modal=document.getElementById('attendance-method-modal'),choices=document.getElementById('attendance-method-choices'),title=document.getElementById('attendance-method-modal-title'),subtitle=document.getElementById('attendance-method-modal-subtitle');if(!modal||!choices)return;const mode=(checkType||'IN').toUpperCase()==='OUT'?'OUT':'IN';const catalog={Face:{icon:'📷',title:'Face Recognition',desc:'Camera + liveness verification',href:`/employee/face?mode=${mode}`},OTP:{icon:'🔢',title:'Email OTP',desc:'6-digit OTP sent to authorized person',href:`/employee/otp?mode=${mode}`},WiFi:{icon:'📶',title:'Corporate Wi-Fi',desc:'Only the company-authorized IP/network can pass',href:`/employee/wifi?mode=${mode}`},GPS:{icon:'📍',title:'GPS / Field',desc:'GPS verification for Field / remote staff',href:`/employee/field?mode=${mode}`}};title.textContent=`Choose a Clock-${mode} method`;subtitle.textContent='Select one assigned method. The verification page completes the punch.';const methods=getAttendanceMethodOptions();choices.innerHTML=methods.length?methods.map(key=>{const item=catalog[key];if(!item)return '';return `<a class="attendance-method-option" href="${item.href}"><div class="option-icon">${item.icon}</div><strong>${item.title}</strong><span>${item.desc}</span></a>`;}).join(''):`<div style="grid-column:1/-1;padding:18px;border:1px dashed var(--border-subtle);border-radius:14px;color:var(--text-muted);text-align:center;">No attendance method is assigned to your account.</div>`;modal.classList.add('active');}
+function closeAttendanceMethodChooser(){const modal=document.getElementById('attendance-method-modal');if(modal)modal.classList.remove('active');}
+window.addEventListener('keydown',e=>{if(e.key==='Escape')closeAttendanceMethodChooser();});
+
+async function quickPunch(checkType) {
+  try {
+    const res = await fetch('/api/attendance/quick-punch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ check_type: checkType, method: 'Quick One-Click' })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      showToast(data.message || `Successfully Clocked ${checkType}!`, 'success');
+      await Promise.all([loadStatusSummary(), loadDailyRecords(), loadMyHistory()]);
+    } else {
+      showToast(data.error || 'Failed to record punch', 'error');
+    }
+  } catch (err) {
+    showToast('Network error recording punch', 'error');
+  }
+}
+
+async function loadDailyRecords() {
+  try {
+    const res = await fetch('/api/employee/daily-records');
+    const data = await res.json();
+    const tbody = document.getElementById('daily-records-body');
+
+    if (data.ok && data.records && data.records.length > 0) {
+      const esc = (v) => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const fmt = (t) => (window.CheckinCheckoutPanel && t) ? CheckinCheckoutPanel.fmtClock(t) : (t || '');
+      const notes = {
+        CHECKED_OUT: 'Full shift recorded',
+        CHECKED_IN: 'On duty — check-out pending',
+        PENDING_APPROVAL: 'Check-in awaiting approver',
+        MISSED_CHECK_OUT: 'Check-out was not punched',
+        MISSING_CHECK_IN: 'Check-in was not punched',
+        REJECTED: 'Punch rejected by approver'
+      };
+      tbody.innerHTML = data.records.map(r => {
+        const st = r.status || 'Present';
+        const badgeClass = (st === 'Present' || st === 'Approved') ? 'badge-emerald' : st === 'Late' ? 'badge-amber' : st === 'Pending Approval' ? 'badge-amber' : 'badge-rose';
+        let outCell;
+        if (r.check_out) outCell = `<span title="${esc(r.check_out)}">${esc(fmt(r.check_out))}</span>`;
+        else if (r.state === 'CHECKED_IN') outCell = '<span style="color:var(--text-muted);">In Progress</span>';
+        else outCell = '<span style="color:var(--rose);">Not punched</span>';
+        const hours = r.worked
+          ? `${esc(r.worked)}${r.is_live ? ' <span style="font-size:10.5px; color:var(--text-muted);">(so far)</span>' : ''}`
+          : '<span style="color:var(--text-muted);">—</span>';
+
+        return `
+          <tr>
+            <td style="font-family:var(--font-mono); font-size:12.5px; font-weight:700;">${esc(r.date)}</td>
+            <td style="font-family:var(--font-mono); font-size:12.5px; color:var(--emerald); font-weight:700;" title="${esc(r.check_in)}">${r.check_in ? esc(fmt(r.check_in)) : '-'}</td>
+            <td style="font-family:var(--font-mono); font-size:12.5px; color:var(--indigo); font-weight:700;">${outCell}</td>
+            <td><strong style="font-family:var(--font-mono); color:var(--cyan);">${hours}</strong></td>
+            <td><span class="badge badge-neutral">${esc((r.methods || []).join(' / ') || 'Standard')}</span></td>
+            <td><span class="badge ${badgeClass}">${esc(st)}</span></td>
+            <td style="font-size:12px; color:var(--text-secondary);">${notes[r.state] || ''}</td>
+          </tr>
+        `;
+      }).join('');
+    } else {
+      tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">⏱️</div><div class="empty-title">No Daily Shift Records Found</div><div class="empty-desc">Your daily check-in and check-out pairs will be tracked here.</div></div></td></tr>`;
+    }
+  } catch (err) {
+    console.error('Daily records error:', err);
+  }
+}
+
 async function loadMyHistory() {
   try {
     const res = await fetch('/api/attendance/my-history');
@@ -753,13 +1162,8 @@ async function loadMyHistory() {
     const tbody = document.getElementById('history-table-body');
     const rows = data.rows || data.logs || [];
 
-    // 1. Update Today's Live Status Card
-    updateTodayStatusCard(data.today, data.today_date);
-
-    // 2. Render Pie/Donut Chart & KPI Tiles
     renderAttendanceDonut(data.stats || {});
 
-    // 3. Render Logs Table
     if (rows && rows.length > 0) {
       tbody.innerHTML = rows.map(r => {
         const st = r.status || 'Present';
@@ -791,64 +1195,6 @@ async function loadMyHistory() {
     }
   } catch (err) {
     console.error('Error loading history:', err);
-  }
-}
-
-function updateTodayStatusCard(today, todayDate) {
-  const card = document.getElementById('today-status-card');
-  const icon = document.getElementById('today-status-icon');
-  const badge = document.getElementById('today-status-badge');
-  const headline = document.getElementById('today-status-headline');
-  const detail = document.getElementById('today-status-detail');
-  const actionWrap = document.getElementById('today-status-action');
-
-  if (today) {
-    card.className = 'today-status-card marked-present';
-    const st = today.status || 'Present';
-    const isLate = st === 'Late';
-    const isHalf = st === 'Half Day';
-
-    icon.textContent = '✓';
-    icon.style.background = isLate ? 'rgba(245,158,11,0.15)' : 'rgba(16,185,129,0.15)';
-    icon.style.color = isLate ? 'var(--amber)' : 'var(--emerald)';
-
-    badge.className = isLate ? 'badge badge-amber' : isHalf ? 'badge badge-rose' : 'badge badge-emerald';
-    badge.innerHTML = `<span class="badge-dot"></span> ${st.toUpperCase()}`;
-
-    headline.textContent = `Punched In at ${today.time} (${today.date})`;
-    
-    let meta = `Method: <strong>${today.method || 'Face AI'}</strong>`;
-    if (today.location && today.location.lat) {
-      meta += ` • 📍 GPS: ${today.location.lat.toFixed(4)}, ${today.location.lng.toFixed(4)}`;
-    } else if (today.ip) {
-      meta += ` • 📶 IP: ${today.ip}`;
-    }
-    if (today.is_offline_sync) meta += ` • 📦 Offline Synced`;
-    detail.innerHTML = meta;
-
-    actionWrap.innerHTML = `
-      <div style="display:flex; align-items:center; gap:8px;">
-        <span style="font-size:12px; font-weight:700; color:var(--emerald);">✓ Clocked In Today</span>
-        <button class="btn btn-secondary btn-sm" onclick="loadMyHistory()">🔄 Refresh</button>
-      </div>
-    `;
-  } else {
-    card.className = 'today-status-card not-marked';
-    icon.textContent = '⏳';
-    icon.style.background = 'rgba(245,158,11,0.15)';
-    icon.style.color = 'var(--amber)';
-
-    badge.className = 'badge badge-amber';
-    badge.textContent = 'NOT MARKED YET';
-
-    headline.textContent = `You haven't checked in for today (${todayDate || 'Today'})`;
-    detail.textContent = 'Please mark your attendance using Face AI, Dynamic Token, or Office Wi-Fi.';
-
-    actionWrap.innerHTML = `
-      <a href="/employee/face" class="btn btn-primary btn-md">
-        <span>Clock In Now ⚡</span>
-      </a>
-    `;
   }
 }
 
@@ -1052,5 +1398,6 @@ function showToast(msg, type = 'info') {
 
 window.onload = initEmployeePortal;
 </script>
+<script src="/static/js/ardh_logo.js?v=1"></script>
 </body>
 </html>

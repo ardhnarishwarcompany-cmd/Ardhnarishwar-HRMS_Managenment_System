@@ -3,7 +3,9 @@ import API from "../../api/axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { Layers, Users, CheckCircle2, Clock, Inbox } from "lucide-react";
+import PageHeader from "../../components/common/PageHeader";
 
+import { Inbox as HrPageIcon } from "lucide-react";
 const CARD_THEMES = [
   {
     gradient: "from-indigo-500 to-violet-600",
@@ -211,71 +213,11 @@ export default function LeadList() {
         }}
       />
 <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">
-        {/* ── HERO ─────────────────────────────────────────── */}
-        <div
-          className="ll-rise rounded-[26px] p-[1.5px]"
-          style={{
-            background:
-              "linear-gradient(120deg, rgba(99,102,241,0.9), rgba(217,70,239,0.7), rgba(14,165,233,0.7), rgba(99,102,241,0.9))",
-            backgroundSize: "300% 300%",
-            animation:
-              "ll-border-flow 8s ease infinite, ll-rise 0.55s cubic-bezier(0.22,1,0.36,1) both",
-          }}
-        >
-          <div className="relative overflow-hidden rounded-[24.5px] bg-slate-950 px-6 py-10 sm:px-10">
-            {/* aurora glows */}
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full blur-3xl"
-              style={{ background: "rgba(99,102,241,0.35)" }}
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute -right-16 top-0 h-64 w-64 rounded-full blur-3xl"
-              style={{ background: "rgba(217,70,239,0.25)" }}
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute bottom-0 left-1/2 h-56 w-96 -translate-x-1/2 rounded-full blur-3xl"
-              style={{ background: "rgba(14,165,233,0.18)" }}
-            />
-            {/* grid texture */}
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 opacity-[0.07]"
-              style={{
-                backgroundImage:
-                  "linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px)",
-                backgroundSize: "44px 44px",
-              }}
-            />
-            {/* sheen sweep */}
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent"
-              style={{ animation: "ll-sheen 6s ease-in-out infinite" }}
-            />
-
-            <div className="relative">
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-indigo-200 backdrop-blur">
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-                </span>
-                Lead Workspace
-              </span>
-              <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-                My{" "}
-                <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-                  Leads
-                </span>
-              </h1>
-              <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-400">
-                Track and follow up on the lead batches assigned to you.
-              </p>
-            </div>
-          </div>
-        </div>
+        <PageHeader
+          icon={HrPageIcon}
+          title="My Leads"
+          subtitle="Track and follow up on the lead batches assigned to you."
+        />
 
         {/* ── PREMIUM STAT CARDS ───────────────────────────── */}
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">

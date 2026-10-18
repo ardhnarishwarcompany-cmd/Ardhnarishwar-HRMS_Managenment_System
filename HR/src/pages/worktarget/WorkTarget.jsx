@@ -4,7 +4,9 @@ import TargetFilters from "../../components/worktarget/TargetFilters";
 import TargetTable from "../../components/worktarget/TargetTable";
 import AddTargetModal from "../../components/worktarget/AddTargetModal";
 import { Target, Trophy, Zap, XCircle, Plus } from "lucide-react";
+import PageHeader from "../../components/common/PageHeader";
 
+import { Target as HrPageIcon } from "lucide-react";
 /* ═══════════════ keyframes ═══════════════ */
 const styles = `
 @keyframes wtRise {
@@ -171,62 +173,16 @@ export default function WorkTarget() {
         />
       </div>
 <div className="relative mx-auto mt-6 max-w-[1600px] space-y-6">
-        {/* ── HERO BAND ─────────────────────────────────────── */}
-        <div className="wt-rise relative overflow-hidden rounded-3xl p-[1.5px]">
-          <span
-            className="absolute inset-0 rounded-3xl bg-[linear-gradient(120deg,rgba(139,92,246,0.75),rgba(217,70,239,0.4),rgba(99,102,241,0.6),rgba(139,92,246,0.75))]"
-            aria-hidden="true"
-          />
-          <div className="relative overflow-hidden rounded-[calc(1.5rem-1.5px)] bg-[#0b0817] px-8 py-9 md:px-12">
-            <div
-              className="absolute inset-0 opacity-[0.07]"
-              style={{
-                backgroundImage:
-                  "linear-gradient(to right, #818cf8 1px, transparent 1px), linear-gradient(to bottom, #818cf8 1px, transparent 1px)",
-                backgroundSize: "44px 44px",
-              }}
-              aria-hidden="true"
-            />
-            <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-violet-600/30 blur-3xl" aria-hidden="true" />
-            <div className="absolute -bottom-24 -left-12 h-56 w-56 rounded-full bg-fuchsia-600/20 blur-3xl" aria-hidden="true" />
-            <span className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-              <span
-                className="wt-anim absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent"
-                style={{ animation: "wtSheen 8s ease-in-out infinite" }}
-              />
-            </span>
-
-            <div className="relative flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-              <div>
-                <span className="inline-flex items-center gap-2 rounded-full border border-violet-400/30 bg-violet-500/10 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-violet-300">
-                  <span
-                    className="wt-anim h-1.5 w-1.5 rounded-full bg-fuchsia-400"
-                    style={{ animation: "wtBadgeDot 2s ease-in-out infinite" }}
-                    aria-hidden="true"
-                  />
-                  Goals &amp; OKRs
-                </span>
-                <h2 className="mt-3 text-3xl font-black tracking-tight text-white md:text-4xl text-balance">
-                  Work Target{" "}
-                  <span className="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-indigo-400 bg-clip-text text-transparent">
-                    Sheet
-                  </span>
-                </h2>
-                <p className="mt-2.5 max-w-xl text-sm leading-relaxed text-slate-400">
-                  {filters.quarter} {filters.year} targets — track goals,
-                  progress, and results across every department.
-                </p>
-              </div>
-              <button
-                onClick={() => setShowAdd(true)}
-                className="group inline-flex shrink-0 items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 via-fuchsia-600 to-indigo-600 px-6 py-3 text-sm font-bold text-white shadow-[0_16px_40px_-12px_rgba(139,92,246,0.7)] transition-all duration-300 hover:shadow-[0_20px_50px_-10px_rgba(217,70,239,0.7)] hover:brightness-110 active:scale-[0.98]"
-              >
-                <Plus size={16} aria-hidden="true" className="transition-transform duration-300 group-hover:rotate-90" />
-                Set New Target
-              </button>
-            </div>
-          </div>
-        </div>
+        <PageHeader
+          icon={HrPageIcon}
+          title="Work Target Sheet"
+          subtitle={`${filters.quarter} ${filters.year} targets \u2014 track goals, progress, and results across every department.`}
+        >
+          <button type="button" onClick={() => setShowAdd(true)} className="hr-btn">
+            <Plus size={16} aria-hidden="true" />
+            Set New Target
+          </button>
+        </PageHeader>
 
         {/* ── STAT TILES ────────────────────────────────────── */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

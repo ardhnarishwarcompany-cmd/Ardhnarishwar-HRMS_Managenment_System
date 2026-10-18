@@ -11,7 +11,7 @@ import {
   Loader2,
 } from "lucide-react";
 import API from "../../api/axios";
-import HRNavbar from "../../components/hr/HRNavbar";
+import ITShell from "./ITShell";
 
 const API_ORIGIN = (import.meta.env.VITE_API_BASE_URL || "").replace(
   /\/api\/?$/,
@@ -139,7 +139,7 @@ export default function Deliverables({ type }) {
       await API.post("/it-deliverables", fd, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      toast.success("Uploaded");
+      toast.success("Uploaded successfully");
       setShowModal(false);
       setTitle("");
       setDescription("");
@@ -153,7 +153,7 @@ export default function Deliverables({ type }) {
   };
 
   const remove = async (id) => {
-    if (!window.confirm("Delete this item permanently?")) return;
+    if (!window.confirm("Delete this deliverable?")) return;
     try {
       await API.delete(`/it-deliverables/${id}`);
       toast.success("Deleted");
@@ -164,127 +164,109 @@ export default function Deliverables({ type }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <HRNavbar />
-      <main className="max-w-6xl mx-auto px-4 md:px-8 py-8">
-        {/* header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow">
-              <Icon size={24} />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">{cfg.title}</h1>
-              <p className="text-sm text-gray-500">{cfg.subtitle}</p>
-            </div>
+    <ITShell
+      title={cfg.title}
+      subtitle={cfg.subtitle}
+      icon={Icon}
+      action={
+        <button
+          onClick={() => setShowModal(true)}
+          className="pbtn"
+        >
+          <Upload size={16} />
+          <span>Upload</span>
+        </button>
+      }
+    >
+      <div className="it-card p-0 overflow-hidden">
+        {loading ? (
+          <div className="flex items-center justify-center gap-2 py-16 text-[var(--mute)]">
+            <Loader2 size={18} className="animate-spin text-[var(--p)]" />
+            Loading…
           </div>
-          <button
-            onClick={() => setShowModal(true)}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition-colors"
-          >
-            <Upload size={16} />
-            Upload
-          </button>
-        </div>
-
-        {/* list */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          {loading ? (
-            <div className="flex items-center justify-center gap-2 py-16 text-gray-400">
-              <Loader2 size={18} className="animate-spin" />
-              Loading…
+        ) : items.length === 0 ? (
+          <div className="flex flex-col items-center gap-3 py-16 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-[var(--soft)] flex items-center justify-center text-[var(--p)]">
+              <Icon size={26} />
             </div>
-          ) : items.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 py-16 text-center">
-              <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
-                <Icon size={26} />
-              </div>
-              <p className="text-sm font-medium text-gray-600">
-                Nothing uploaded yet
-              </p>
-              <p className="text-xs text-gray-400">
-                Click Upload to add the first item
-              </p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
-                    <th className="px-5 py-3 font-semibold">Title</th>
-                    <th className="px-5 py-3 font-semibold">File</th>
-                    <th className="px-5 py-3 font-semibold">Size</th>
-                    <th className="px-5 py-3 font-semibold">Uploaded</th>
-                    <th className="px-5 py-3 font-semibold text-right">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {items.map((it) => (
-                    <tr key={it.id} className="hover:bg-gray-50/60">
-                      <td className="px-5 py-3.5">
-                        <p className="font-semibold text-gray-900">
-                          {it.title}
+            <p className="text-sm font-bold text-[var(--ink)]">
+              Nothing uploaded yet
+            </p>
+            <p className="text-xs text-[var(--mute)]">
+              Click Upload to add the first item
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-[var(--soft)] text-left text-xs uppercase tracking-wider text-[var(--mute)]">
+                  <th className="px-5 py-3.5 font-bold">Title</th>
+                  <th className="px-5 py-3.5 font-bold">File</th>
+                  <th className="px-5 py-3.5 font-bold">Size</th>
+                  <th className="px-5 py-3.5 font-bold">Uploaded</th>
+                  <th className="px-5 py-3.5 font-bold text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[var(--line)]">
+                {items.map((it) => (
+                  <tr key={it.id} className="hover:bg-[var(--soft)] transition-colors">
+                    <td className="px-5 py-4">
+                      <p className="font-bold text-[var(--ink)]">{it.title}</p>
+                      {it.description ? (
+                        <p className="text-xs text-[var(--mute)] line-clamp-1 mt-0.5">
+                          {it.description}
                         </p>
-                        {it.description ? (
-                          <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">
-                            {it.description}
-                          </p>
-                        ) : null}
-                      </td>
-                      <td className="px-5 py-3.5 text-gray-600 max-w-[220px] truncate">
-                        {it.file_name}
-                      </td>
-                      <td className="px-5 py-3.5 text-gray-600">
-                        {fmtSize(it.file_size)}
-                      </td>
-                      <td className="px-5 py-3.5 text-gray-600">
-                        {fmtDate(it.created_at)}
-                      </td>
-                      <td className="px-5 py-3.5">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() =>
-                              downloadFile(
-                                it.file_url,
-                                it.file_name,
-                              )
-                            }
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-semibold hover:bg-indigo-100 transition-colors"
-                          >
-                            <Download size={13} />
-                            Download
-                          </button>
-                          <button
-                            onClick={() => remove(it.id)}
-                            className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
-                            aria-label="Delete"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      </main>
+                      ) : null}
+                    </td>
+                    <td className="px-5 py-4 text-xs font-mono text-[var(--mute)] max-w-xs truncate">
+                      {it.file_name || it.file_path || "—"}
+                    </td>
+                    <td className="px-5 py-4 text-xs text-[var(--mute)] font-medium whitespace-nowrap">
+                      {fmtSize(it.file_size)}
+                    </td>
+                    <td className="px-5 py-4 text-xs text-[var(--mute)] whitespace-nowrap">
+                      {fmtDate(it.created_at)}
+                    </td>
+                    <td className="px-5 py-4 text-right whitespace-nowrap">
+                      <div className="inline-flex items-center gap-2">
+                        <button
+                          onClick={() => downloadFile(it.file_path, it.file_name)}
+                          className="p-2 rounded-xl border border-[var(--line)] bg-[var(--card)] text-[var(--p)] hover:bg-[var(--soft)] transition-colors shadow-sm"
+                          title="Download"
+                          aria-label={`Download ${it.title}`}
+                        >
+                          <Download size={15} />
+                        </button>
+                        <button
+                          onClick={() => remove(it.id)}
+                          className="p-2 rounded-xl border border-[var(--line)] bg-[var(--card)] text-rose-500 hover:bg-rose-50 transition-colors shadow-sm"
+                          title="Delete"
+                          aria-label={`Delete ${it.title}`}
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
       {/* upload modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md it-card p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-base font-bold text-gray-900">
+              <h2 className="text-base font-extrabold text-[var(--ink)]">
                 Upload — {cfg.title}
               </h2>
               <button
                 onClick={() => setShowModal(false)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-100"
+                className="w-8 h-8 rounded-xl flex items-center justify-center text-[var(--mute)] hover:bg-[var(--soft)]"
                 aria-label="Close"
               >
                 <X size={16} />
@@ -293,18 +275,18 @@ export default function Deliverables({ type }) {
 
             <div className="flex flex-col gap-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--mute)] mb-1.5">
                   Title *
                 </label>
                 <input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. Payment module demo"
-                  className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="it-input"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--mute)] mb-1.5">
                   Description
                 </label>
                 <textarea
@@ -312,42 +294,42 @@ export default function Deliverables({ type }) {
                   onChange={(e) => setDescription(e.target.value)}
                   rows={2}
                   placeholder="Optional short description"
-                  className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                  className="it-input resize-none"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1.5">
-                  File * <span className="font-normal">({cfg.hint})</span>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--mute)] mb-1.5">
+                  File * <span className="font-normal normal-case">({cfg.hint})</span>
                 </label>
                 <input
                   type="file"
                   accept={cfg.accept}
                   onChange={(e) => onPickFile(e.target.files?.[0] || null)}
-                  className="w-full text-sm text-gray-600 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700 file:text-xs file:font-semibold hover:file:bg-indigo-100"
+                  className="w-full text-sm text-[var(--mute)] file:mr-3 file:px-3 file:py-1.5 file:rounded-xl file:border-0 file:bg-purple-50 file:text-[var(--p)] file:text-xs file:font-bold hover:file:bg-purple-100"
                 />
                 {file && (
-                  <p className="text-xs text-gray-500 mt-1.5">
+                  <p className="text-xs text-[var(--mute)] mt-1.5 font-medium">
                     {file.name} · {fmtSize(file.size)}
                   </p>
                 )}
               </div>
 
-              <div className="flex justify-end gap-2 pt-1">
+              <div className="flex justify-end gap-2 pt-2">
                 <button
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-100"
+                  className="px-4 py-2 rounded-xl text-sm font-bold text-[var(--mute)] hover:bg-[var(--soft)]"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={submit}
                   disabled={saving}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 disabled:opacity-60"
+                  className="pbtn py-2 px-5 text-sm disabled:opacity-60"
                 >
                   {saving ? (
-                    <Loader2 size={14} className="animate-spin" />
+                    <Loader2 size={15} className="animate-spin" />
                   ) : (
-                    <Upload size={14} />
+                    <Upload size={15} />
                   )}
                   {saving ? "Uploading…" : "Upload"}
                 </button>
@@ -356,6 +338,6 @@ export default function Deliverables({ type }) {
           </div>
         </div>
       )}
-    </div>
+    </ITShell>
   );
 }

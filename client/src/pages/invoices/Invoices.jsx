@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { FileText } from "lucide-react";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -33,13 +34,14 @@ export default function Invoices() {
 
       {/* HEADER */}
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Invoice Management
-          </h1>
-          <p className="text-sm text-gray-500">
-            Manage and track all generated invoices
-          </p>
+        <div className="page-header-main">
+          <span className="page-header-icon">
+            <FileText size={26} strokeWidth={1.8} />
+          </span>
+          <div>
+            <h1 className="page-header-title">Invoice Management</h1>
+            <p className="page-header-subtitle">Manage and track all generated invoices</p>
+          </div>
         </div>
 
         <button

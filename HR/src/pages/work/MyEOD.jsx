@@ -14,6 +14,8 @@ import {
   Calendar,
   X,
 } from "lucide-react";
+import PageHeader from "../../components/common/PageHeader";
+import { FileEdit as HrPageIcon } from "lucide-react";
 const STATUS_CONFIG = {
   pending: {
     label: "Pending",
@@ -174,79 +176,23 @@ export default function MyEOD() {
         }}
       />
 <div className="relative mx-auto max-w-7xl space-y-6 px-4 pb-16 pt-6 sm:px-6 lg:px-8">
-        {/* ── HERO ─────────────────────────────────────────── */}
-        <div
-          className="eod-rise rounded-[26px] p-[1.5px]"
-          style={{
-            background:
-              "linear-gradient(120deg, rgba(99,102,241,0.9), rgba(217,70,239,0.7), rgba(14,165,233,0.7), rgba(99,102,241,0.9))",
-            backgroundSize: "300% 300%",
-            animation:
-              "eod-border-flow 8s ease infinite, eod-rise 0.55s cubic-bezier(0.22,1,0.36,1) both",
-          }}
+        <PageHeader
+          icon={HrPageIcon}
+          title="My EOD Reports"
+          subtitle="Submit and manage your daily end-of-day reports."
         >
-          <div className="relative overflow-hidden rounded-[24.5px] bg-slate-950 px-6 py-9 sm:px-10">
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full blur-3xl"
-              style={{ background: "rgba(99,102,241,0.35)" }}
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute -right-16 top-0 h-64 w-64 rounded-full blur-3xl"
-              style={{ background: "rgba(217,70,239,0.25)" }}
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 opacity-[0.07]"
-              style={{
-                backgroundImage:
-                  "linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px)",
-                backgroundSize: "44px 44px",
-              }}
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent"
-              style={{ animation: "eod-sheen 6s ease-in-out infinite" }}
-            />
-
-            <div className="relative flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-              <div>
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-indigo-200 backdrop-blur">
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-                  </span>
-                  Personal
-                </span>
-                <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-                  My EOD{" "}
-                  <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-                    Reports
-                  </span>
-                </h2>
-                <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-400">
-                  Submit and manage your daily end-of-day reports.
-                </p>
-              </div>
-              <button
-                onClick={() => {
-                  resetForm();
-                  setOpenModal(true);
-                }}
-                className="group inline-flex shrink-0 items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/40 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-indigo-800/40 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              >
-                <Plus
-                  size={16}
-                  aria-hidden="true"
-                  className="transition-transform duration-300 group-hover:rotate-90"
-                />
-                Submit EOD
-              </button>
-            </div>
-          </div>
-        </div>
+          <button
+            type="button"
+            onClick={() => {
+              resetForm();
+              setOpenModal(true);
+            }}
+            className="hr-btn"
+          >
+            <Plus size={16} aria-hidden="true" />
+            Submit EOD
+          </button>
+        </PageHeader>
 
         {/* ── CARDS ─────────────────────────────────────────── */}
         {loading ? (
@@ -461,30 +407,36 @@ export default function MyEOD() {
                 onSubmit={handleSubmit}
                 className="flex min-h-0 flex-1 flex-col"
               >
-                <div className="min-h-0 flex-1 space-y-5 overflow-y-auto p-7">
-                  <div>
-                    <label className={labelCls}>Date</label>
+                <div className="grid min-h-0 flex-1 gap-5 overflow-y-auto p-7 sm:grid-cols-2">
+                  <div className="sm:col-span-2">
+                    <label htmlFor="eod-date" className={labelCls}>
+                      Date
+                    </label>
                     <input
+                      id="eod-date"
                       type="date"
                       value={form.date}
                       onChange={(e) =>
                         setForm({ ...form, date: e.target.value })
                       }
-                      className={`${fieldCls} dark:[color-scheme:dark]`}
+                      className={`${fieldCls} dark:[color-scheme:dark] sm:max-w-xs`}
                     />
                   </div>
 
                   {[
-                    ["tasksCompleted", "Tasks Completed", "What did you finish today?"],
-                    ["tasksInProgress", "Tasks In Progress", "What is still ongoing?"],
-                    ["blockers", "Blockers", "Any roadblocks or issues?"],
-                    ["tomorrowPlan", "Tomorrow Plan", "What will you tackle next?"],
-                    ["notes", "Notes", "Anything else worth mentioning?"],
-                  ].map(([key, label, placeholder]) => (
-                    <div key={key}>
-                      <label className={labelCls}>{label}</label>
+                    ["tasksCompleted", "Tasks Completed", "What did you finish today?", false],
+                    ["tasksInProgress", "Tasks In Progress", "What is still ongoing?", false],
+                    ["blockers", "Blockers", "Any roadblocks or issues?", false],
+                    ["tomorrowPlan", "Tomorrow Plan", "What will you tackle next?", false],
+                    ["notes", "Notes", "Anything else worth mentioning?", true],
+                  ].map(([key, label, placeholder, fullWidth]) => (
+                    <div key={key} className={fullWidth ? "sm:col-span-2" : ""}>
+                      <label htmlFor={`eod-${key}`} className={labelCls}>
+                        {label}
+                      </label>
                       <textarea
-                        rows={3}
+                        id={`eod-${key}`}
+                        rows={fullWidth ? 2 : 4}
                         value={form[key]}
                         onChange={(e) =>
                           setForm({ ...form, [key]: e.target.value })

@@ -222,23 +222,26 @@ export default function MyAssignments() {
 
                       <div className="employee-mini-actions">
                         <button
+                          type="button"
                           onClick={() => handleProgress(assignment, "dec")}
-                          className=""
+                          className="cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98]"
                         >
                           -10%
                         </button>
 
                         <button
+                          type="button"
                           onClick={() => handleProgress(assignment, "inc")}
-                          className=""
+                          className="cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98]"
                         >
                           +10%
                         </button>
                       </div>
 
                       <button
+                        type="button"
                         onClick={() => setSelectedAssignment(assignment)}
-                        className="employee-view-btn"
+                        className="employee-view-btn cursor-pointer transition-all hover:scale-[1.01] active:scale-[0.99]"
                       >
                         <Eye size={16} />
                         View Details
@@ -376,7 +379,7 @@ export default function MyAssignments() {
             <div className="px-6 py-5 border-t flex justify-end">
               <button
                 onClick={() => setSelectedAssignment(null)}
-                className="px-5 py-2.5 rounded-xl bg-black text-white font-semibold hover:bg-gray-900"
+                className="px-5 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-gray-700 font-semibold hover:bg-gray-100 transition active:scale-[0.98]"
               >
                 Close
               </button>

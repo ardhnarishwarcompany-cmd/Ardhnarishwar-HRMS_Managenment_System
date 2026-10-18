@@ -11,7 +11,7 @@ export default function Input({
   return (
     <div>
       {label && (
-        <label className="text-sm font-semibold text-gray-700">
+        <label className="text-[13px] font-bold tracking-wide text-[var(--ink)]">
           {label}
         </label>
       )}
@@ -24,13 +24,12 @@ export default function Input({
           placeholder={placeholder}
           disabled={disabled}
           readOnly={readOnly}
-          className={`w-full border border-gray-200 rounded-xl px-4 py-2.5 outline-none
-                     focus:ring-2 focus:ring-black focus:border-black transition ${
-                       suffix ? "pr-11" : ""
-                     }`}
+          className={`input py-2.5 disabled:cursor-not-allowed disabled:opacity-60 read-only:bg-[var(--soft)] ${
+            suffix ? "pr-11" : ""
+          }`}
         />
         {suffix && (
-          <div className="absolute inset-y-0 right-2 flex items-center">
+          <div className="absolute inset-y-0 right-2 flex items-center text-[var(--mute)]">
             {suffix}
           </div>
         )}

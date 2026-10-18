@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import API from "../../services/api.js";
+import { Users } from "lucide-react";
+import PageHeader from "../../components/common/PageHeader";
 import toast from "react-hot-toast";
 import { useClientAuth } from "../../context/ClientAuthContext";
 
@@ -66,14 +68,12 @@ export default function LeadBatchDetail() {
     <div className="p-4 md:p-6 space-y-6">
 
       {/* HEADER */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-        <h1 className="text-xl md:text-2xl font-bold text-gray-800">
-          Lead Details
-        </h1>
-        <span className="text-sm text-gray-500">
-          Total: {localLeads.length}
-        </span>
-      </div>
+      <PageHeader
+        icon={Users}
+        title="Lead Details"
+        subtitle="Leads in this batch and their current status."
+        actions={<span className="badge badge-info">Total: {localLeads.length}</span>}
+      />
 
       {/* DESKTOP TABLE */}
       <div className="hidden md:block bg-white rounded-2xl shadow border overflow-hidden">

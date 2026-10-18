@@ -11,6 +11,8 @@ import API from "../../api/axios";
 import HrInterviewTable from "../../components/hr/HrInterviewTable";
 import AddInterviewModal from "../../components/hr/AddInterviewModal";
 import EditInterviewModal from "../../components/hr/EditInterviewModal";
+import PageHeader from "../../components/common/PageHeader";
+import { Users as HrPageIcon } from "lucide-react";
 /* ─── Premium stat tile (theme-aware) ──────────────────────── */
 function StatTile({ title, value, subText, icon: Icon, gradient, glow, hairline, delay }) {
   return (
@@ -177,68 +179,16 @@ export default function InterviewManagement() {
 
       <div className="relative">
 <div className="mx-auto mt-6 max-w-[1600px] space-y-6">
-          {/* ── HERO BAND ─────────────────────────────────────── */}
-          <div
-            className="relative rounded-3xl p-[1.5px]"
-            style={{
-              background:
-                "linear-gradient(120deg, rgba(129,140,248,0.7), rgba(192,132,252,0.5), rgba(34,211,238,0.4), rgba(129,140,248,0.7))",
-              backgroundSize: "300% 300%",
-              animation: "im-border-flow 8s ease infinite",
-            }}
+          <PageHeader
+            icon={HrPageIcon}
+            title="Interview Management"
+            subtitle="Track every candidate call, schedule interviews, and follow client decisions from one place."
           >
-            <div className="relative overflow-hidden rounded-[calc(1.5rem-1.5px)] bg-slate-950 px-8 py-10 md:px-12">
-              <div
-                className="absolute inset-0 opacity-[0.06]"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(to right, #818cf8 1px, transparent 1px), linear-gradient(to bottom, #818cf8 1px, transparent 1px)",
-                  backgroundSize: "44px 44px",
-                }}
-              />
-              {/* aurora glows */}
-              <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-violet-600/30 blur-3xl" />
-              <div className="pointer-events-none absolute -bottom-24 -left-12 h-56 w-56 rounded-full bg-indigo-600/25 blur-3xl" />
-              <div className="pointer-events-none absolute -top-10 left-1/3 h-48 w-48 rounded-full bg-fuchsia-600/20 blur-3xl" />
-              <div className="pointer-events-none absolute bottom-0 right-1/3 h-40 w-64 rounded-full bg-cyan-500/15 blur-3xl" />
-
-              {/* sheen sweep */}
-              <div
-                className="pointer-events-none absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent"
-                style={{ animation: "im-sheen 7s ease-in-out infinite" }}
-              />
-
-              <div className="relative flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-                <div>
-                  <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-indigo-200">
-                    <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
-                    Recruitment
-                  </span>
-                  <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-white md:text-4xl text-balance">
-                    Interview{" "}
-                    <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-                      Management
-                    </span>
-                  </h2>
-                  <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-400">
-                    Track every candidate call, schedule interviews, and follow
-                    client decisions from one place.
-                  </p>
-                </div>
-                <button
-                  onClick={() => setShowAdd(true)}
-                  className="group inline-flex shrink-0 items-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-indigo-900/50 transition-all hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-fuchsia-900/40 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                >
-                  <Plus
-                    size={16}
-                    aria-hidden="true"
-                    className="transition-transform duration-300 group-hover:rotate-90"
-                  />
-                  Add Interview
-                </button>
-              </div>
-            </div>
-          </div>
+            <button type="button" onClick={() => setShowAdd(true)} className="hr-btn">
+              <Plus size={16} aria-hidden="true" />
+              Add Interview
+            </button>
+          </PageHeader>
 
           {/* ── STAT TILES ────────────────────────────────────── */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

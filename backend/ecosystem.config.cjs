@@ -6,6 +6,7 @@ module.exports = {
     instances: 1,
     env: {
       NODE_ENV: "production",
+      TZ: "Asia/Kolkata",
       PORT: 5000
     },
     error_file: "./logs/err.log",

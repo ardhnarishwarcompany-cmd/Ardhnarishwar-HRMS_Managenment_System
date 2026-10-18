@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Wallet as PageIcon } from "lucide-react";
 import {
   TrendingUp,
   TrendingDown,
@@ -180,13 +181,16 @@ export default function ClientDashboard() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 text-balance">
-            Finance Dashboard
-          </h1>
-          <p className="text-slate-500 mt-1 text-sm">
-            Track revenue, expenses &amp; profitability at a glance.
-          </p>
+        <div className="page-header-main">
+          <span className="page-header-icon">
+            <PageIcon size={26} strokeWidth={1.8} />
+          </span>
+          <div>
+            <h1 className="page-header-title text-balance">Finance Dashboard</h1>
+            <p className="page-header-subtitle">
+              Track revenue, expenses &amp; profitability at a glance.
+            </p>
+          </div>
         </div>
 
         <div className="flex items-center gap-3 self-start md:self-auto">

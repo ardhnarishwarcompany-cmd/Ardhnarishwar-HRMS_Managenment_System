@@ -21,9 +21,13 @@ export default function AttendanceFilters({ filters, onFilterChange, rows = [] }
 
   const formatTimeForCsv = (t) => {
     if (!t) return "";
-    const date = new Date(t);
-    if (isNaN(date)) return String(t);
-    return date.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
+    // "13:05:00" -> "1:05 PM"
+    const match = String(t).match(/(\d{2}):(\d{2})/);
+    if (!match) return String(t);
+    let hour = Number(match[1]);
+    const suffix = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12 || 12;
+    return `${hour}:${match[2]} ${suffix}`;
   };
 
   const escapeCsv = (val) => {
@@ -44,8 +48,6 @@ export default function AttendanceFilters({ filters, onFilterChange, rows = [] }
       "Actual Login",
       "Expected Logout",
       "Actual Logout",
-      "Hours",
-      "Method",
       "Status",
       "Recorded By",
     ];
@@ -62,8 +64,6 @@ export default function AttendanceFilters({ filters, onFilterChange, rows = [] }
         formatTimeForCsv(row.actualLogin),
         formatTimeForCsv(row.expectedLogout),
         formatTimeForCsv(row.actualLogout),
-        row.hours ?? "",
-        row.method || "",
         row.status || "",
         row.markedByName || "",
       ].map(escapeCsv);

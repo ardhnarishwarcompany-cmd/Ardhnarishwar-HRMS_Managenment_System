@@ -15,7 +15,7 @@ import {
   Clock,
 } from "lucide-react";
 import API from "../../api/axios";
-import HRNavbar from "../../components/hr/HRNavbar";
+import ITShell from "./ITShell";
 
 const API_ORIGIN = (import.meta.env.VITE_API_BASE_URL || "").replace(
   /\/api\/?$/,
@@ -232,30 +232,21 @@ export default function SOPManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      <HRNavbar />
-
-      <div className="px-3 sm:px-6 lg:px-8 pt-6 max-w-7xl mx-auto">
-        {/* header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <BookOpen className="text-indigo-600" size={26} />
-              SOP Management
-            </h1>
-            <p className="text-sm text-gray-500 mt-0.5">
-              Internal SOP library, version control, acknowledgement &amp;
-              training tracking
-            </p>
-          </div>
-          <button
-            onClick={openCreate}
-            className="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-indigo-700 shadow"
-          >
-            <Upload size={16} />
-            Upload SOP
-          </button>
-        </div>
+    <ITShell
+      title="SOP Management"
+      subtitle="Internal SOP library, version control, acknowledgement & training tracking"
+      icon={BookOpen}
+      action={
+        <button
+          onClick={openCreate}
+          className="pbtn"
+        >
+          <Upload size={16} />
+          <span>Upload SOP</span>
+        </button>
+      }
+    >
+      <div className="flex flex-col gap-6">
 
         {/* tabs */}
         <div className="flex gap-2 mb-4">
@@ -820,6 +811,6 @@ export default function SOPManagement() {
           </div>
         </div>
       )}
-    </div>
+    </ITShell>
   );
 }

@@ -140,7 +140,7 @@ export default function MyAssignments() {
   };
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-6">
       <PageHeader
         title="My Work Assignments"
         desc="Track and update your assigned work"

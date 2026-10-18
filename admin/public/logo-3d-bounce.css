@@ -1,0 +1,32 @@
+/* Ardhnarishwar logo: 3D + bounce  (v1) */
+@keyframes ardhLogoBounce3d {
+  0%, 100% { transform: perspective(700px) translateY(0)    rotateY(-18deg) rotateX(6deg)  scale(1);    }
+  25%      { transform: perspective(700px) translateY(-6px) rotateY(0deg)   rotateX(0deg)  scale(1.08); }
+  50%      { transform: perspective(700px) translateY(0)    rotateY(18deg)  rotateX(-6deg) scale(1);    }
+  75%      { transform: perspective(700px) translateY(-4px) rotateY(0deg)   rotateX(0deg)  scale(1.05); }
+}
+@keyframes ardhLogoGlow {
+  0%, 100% { filter: drop-shadow(0 2px 4px rgba(0,0,0,.35)) drop-shadow(0 0 6px rgba(167,139,250,.55)); }
+  50%      { filter: drop-shadow(0 6px 8px rgba(0,0,0,.40)) drop-shadow(0 0 14px rgba(45,212,191,.70)); }
+}
+/* logo is the only child of its box: animate the whole box (so rounded/overflow:hidden never clips the bounce) */
+:has(> :is(img[src="/logo.jpeg"], img[src="/logo.png"], img[src="/ardhnarishwar-logo.jpg"], img[src*="/assets/ardhnarishwar-logo"]):only-child) {
+  transform-style: preserve-3d;
+  will-change: transform, filter;
+  animation: ardhLogoBounce3d 3s ease-in-out infinite, ardhLogoGlow 3s ease-in-out infinite !important;
+}
+/* logo sits next to text/other elements: animate only the image */
+:is(img[src="/logo.jpeg"], img[src="/logo.png"], img[src="/ardhnarishwar-logo.jpg"], img[src*="/assets/ardhnarishwar-logo"]):not(:only-child) {
+  transform-style: preserve-3d;
+  will-change: transform, filter;
+  border-radius: 12px;
+  animation: ardhLogoBounce3d 3s ease-in-out infinite, ardhLogoGlow 3s ease-in-out infinite !important;
+}
+/* never animate twice (old logo-fx-react.css in admin/client) */
+:is(img[src="/logo.jpeg"], img[src="/logo.png"], img[src="/ardhnarishwar-logo.jpg"], img[src*="/assets/ardhnarishwar-logo"]):only-child {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  :has(> :is(img[src="/logo.jpeg"], img[src="/logo.png"], img[src="/ardhnarishwar-logo.jpg"], img[src*="/assets/ardhnarishwar-logo"]):only-child),
+  :is(img[src="/logo.jpeg"], img[src="/logo.png"], img[src="/ardhnarishwar-logo.jpg"], img[src*="/assets/ardhnarishwar-logo"]):not(:only-child) { animation: none !important; }
+}

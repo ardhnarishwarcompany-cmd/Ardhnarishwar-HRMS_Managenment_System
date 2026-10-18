@@ -61,6 +61,7 @@ import LeadBatchDetail from "../pages/leads/LeadBatchDetail";
 import ServiceManagement from "../pages/dashboard/ServiceManagement";
 import ServiceTemplate from "../components/service-management/ServiceTemplate";
 import JoinedCandidates from "../pages/dashboard/JoinedCandidates";
+import ClientDecisions from "../pages/dashboard/ClientDecisions";
 import ClientAgreements from "../pages/dashboard/ClientAgreements";
 
 // ✅ Finance imports
@@ -150,6 +151,7 @@ export default function AppRoutes() {
         <Route path="/dashboard/security" element={<Security />} />
         <Route path="/dashboard/joining" element={<JoiningManagement />} />
         <Route path="/dashboard/joined-candidates" element={<JoinedCandidates />} />
+        <Route path="/dashboard/client-decisions" element={<ClientDecisions />} />
         <Route path="/dashboard/services" element={<ServiceManagement />} />
         <Route path="/dashboard/services/:id" element={<ServiceTemplate />} />
 

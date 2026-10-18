@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sign In • Global Attendance Management System</title>
-<link rel="icon" type="image/svg+xml" href="/favicon.ico">
+<title>Sign In • Ardhnarishwar Global Attendance Platform</title>
+<link rel="icon" type="image/png" href="/static/images/ardhnarishwar_logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/css/theme.css">
+<link rel="stylesheet" href="/static/css/ardhnarishwar_3d.css">
 <style>
 .login-wrapper {
   min-height: 100vh;
@@ -295,6 +296,65 @@
   animation: fadeIn 0.3s ease;
 }
 </style>
+<style id="login-logo-v2">
+/* clean golden emblem: no blue ring/glow, medium size */
+.hero-brand .ardh-medallion-nav,
+.ardh-hero-medallion{
+  background:transparent !important; border:none !important; padding:0 !important;
+  border-radius:50% !important; overflow:hidden;
+  box-shadow:0 1px 0 #B8902F,0 2px 0 #8F6D1E,0 8px 14px rgba(0,0,0,.55) !important;
+  filter:none !important;
+}
+.hero-brand .ardh-medallion-nav::before,.hero-brand .ardh-medallion-nav::after,
+.ardh-hero-medallion::before,.ardh-hero-medallion::after{display:none !important;}
+.hero-brand .ardh-medallion-nav{width:64px !important;height:64px !important;}
+.ardh-hero-medallion{width:92px !important;height:92px !important;}
+.hero-brand .ardh-medallion-nav img,.ardh-hero-medallion img{
+  width:100% !important;height:100% !important;object-fit:contain !important;border-radius:50% !important;}
+@media (max-width:600px){
+  .hero-brand .ardh-medallion-nav{width:52px !important;height:52px !important;}
+  .ardh-hero-medallion{width:76px !important;height:76px !important;}
+}
+</style>
+<style id="login-logo-bounce-v1">
+/* bouncing 3D logo (login page) */
+.hero-brand .ardh-medallion-nav { --lb: 7px; }
+.ardh-hero-medallion { --lb: 11px; }
+.hero-brand .ardh-medallion-nav,
+.ardh-hero-medallion {
+  transform-origin: 50% 100%;
+  will-change: transform;
+  cursor: pointer;
+  animation: loginLogoBounce 2.6s cubic-bezier(.36,.07,.19,.97) infinite !important;
+}
+.hero-brand .ardh-medallion-nav:hover,
+.ardh-hero-medallion:hover {
+  animation-play-state: paused !important;
+  filter: brightness(1.12) saturate(1.1) !important;
+  transform: perspective(500px) translateY(calc(var(--lb) * -1)) scale(1.1);
+}
+.hero-brand .ardh-medallion-nav.logo-spin,
+.ardh-hero-medallion.logo-spin {
+  animation: loginLogoSpin .9s cubic-bezier(.45,.05,.25,1) 1 !important;
+}
+@keyframes loginLogoBounce {
+  0%   { transform: perspective(500px) translateY(0) rotateY(-14deg) rotateX(4deg) scale(1.07,.91); }
+  16%  { transform: perspective(500px) translateY(calc(var(--lb) * -.55)) rotateY(-5deg) rotateX(2deg) scale(.97,1.05); }
+  40%  { transform: perspective(500px) translateY(calc(var(--lb) * -1)) rotateY(14deg) rotateX(0) scale(1,1); }
+  64%  { transform: perspective(500px) translateY(calc(var(--lb) * -.45)) rotateY(7deg) rotateX(-2deg) scale(.98,1.04); }
+  80%  { transform: perspective(500px) translateY(0) rotateY(-7deg) rotateX(3deg) scale(1.09,.89); }
+  88%  { transform: perspective(500px) translateY(calc(var(--lb) * -.22)) rotateY(-12deg) rotateX(2deg) scale(.99,1.02); }
+  100% { transform: perspective(500px) translateY(0) rotateY(-14deg) rotateX(4deg) scale(1.07,.91); }
+}
+@keyframes loginLogoSpin {
+  0%   { transform: perspective(500px) translateY(0) rotateY(0deg) scale(1); }
+  45%  { transform: perspective(500px) translateY(calc(var(--lb) * -1.1)) rotateY(180deg) scale(1.15); }
+  100% { transform: perspective(500px) translateY(0) rotateY(360deg) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-brand .ardh-medallion-nav, .ardh-hero-medallion { animation: none !important; }
+}
+</style>
 </head>
 <body>
 <div class="login-wrapper">
@@ -302,18 +362,12 @@
   <aside class="brand-hero-panel">
     <div class="hero-top">
       <div class="hero-brand">
-        <div class="hero-logo-box" style="display:flex; align-items:center; justify-content:center;">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="28" height="28">
-            <circle cx="24" cy="24" r="18" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
-            <ellipse cx="24" cy="24" rx="9" ry="18" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-dasharray="2 1"/>
-            <line x1="6" y1="24" x2="42" y2="24" stroke="#FFFFFF" stroke-width="1.8"/>
-            <circle cx="24" cy="24" r="5.5" fill="#FFFFFF"/>
-            <path d="M24 20v4l3 2" fill="none" stroke="#070B14" stroke-width="2" stroke-linecap="round"/>
-          </svg>
+        <div class="ardh-medallion-nav" style="width:54px; height:54px;">
+          <img src="/static/images/ardhnarishwar_logo_emblem.png" alt="Ardhnarishwar Logo" class="ardh-medallion-img">
         </div>
         <div>
-          <h1>Global Attendance Management System</h1>
-          <p>ENTERPRISE MULTI-TENANT WORKFORCE PLATFORM</p>
+          <h1 style="background: linear-gradient(135deg, #C084FC, #38BDF8, #FBBF24); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight:900; letter-spacing:0.5px;">ARDHNARISHWAR</h1>
+          <p>GLOBAL ENTERPRISE ATTENDANCE PLATFORM</p>
         </div>
       </div>
 
@@ -360,25 +414,14 @@
 
   <!-- Right Side: Clean Enterprise Login Form -->
   <main class="form-panel">
-    <div class="login-card">
+    <div class="login-card card-3d">
       <div class="login-header" style="text-align:center; margin-bottom:28px;">
-        <div style="display:inline-flex; align-items:center; justify-content:center; width:56px; height:56px; border-radius:16px; background:linear-gradient(135deg, rgba(16,185,129,0.15), rgba(99,102,241,0.15)); border:1px solid rgba(16,185,129,0.35); margin-bottom:14px; box-shadow:0 0 24px rgba(16,185,129,0.2);">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="34" height="34">
-            <defs>
-              <linearGradient id="loginLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#10B981"/>
-                <stop offset="100%" stop-color="#6366F1"/>
-              </linearGradient>
-            </defs>
-            <circle cx="24" cy="24" r="18" fill="none" stroke="url(#loginLogoGrad)" stroke-width="2.5"/>
-            <ellipse cx="24" cy="24" rx="9" ry="18" fill="none" stroke="url(#loginLogoGrad)" stroke-width="1.8" stroke-dasharray="2 1"/>
-            <line x1="6" y1="24" x2="42" y2="24" stroke="url(#loginLogoGrad)" stroke-width="1.8"/>
-            <circle cx="24" cy="24" r="5.5" fill="#10B981"/>
-            <path d="M24 20v4l3 2" fill="none" stroke="#070B14" stroke-width="2" stroke-linecap="round"/>
-            <circle cx="34" cy="14" r="3.5" fill="#06B6D4"/>
-          </svg>
+        <div style="display:flex; justify-content:center; margin-bottom:14px;">
+          <div class="ardh-hero-medallion" style="width:76px; height:76px; margin:0 auto; box-shadow:0 0 30px rgba(168,85,247,0.35);">
+            <img src="/static/images/ardhnarishwar_logo_emblem.png" alt="Ardhnarishwar" class="ardh-hero-img" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+          </div>
         </div>
-        <h2 style="font-size:22px; font-weight:800; letter-spacing:-0.4px; margin-bottom:6px; color:var(--text-primary);">Global Attendance Management System</h2>
+        <h2 style="font-size:22px; font-weight:800; letter-spacing:-0.4px; margin-bottom:6px; background: linear-gradient(135deg, #C084FC, #38BDF8); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">ARDHNARISHWAR</h2>
         <p style="font-size:13px; color:var(--text-secondary); margin:0;">Enterprise Multi-Tenant Global Workforce Platform</p>
       </div>
 
@@ -398,14 +441,14 @@
           <span>👑</span> Super Admin
         </button>
         <button class="role-tab" id="tab-company_admin" onclick="switchRole('company_admin')">
-          <span>🏢</span> Company
+          <span>🏢</span> Company Admin
         </button>
         <button class="role-tab" id="tab-employee" onclick="switchRole('employee')">
-          <span>👤</span> Employee
+          <span>👤</span> Employee / Candidate
         </button>
       </div>
       <div id="role-hint" style="font-size:11.5px; color:var(--text-muted); margin:-16px 0 18px; text-align:center; min-height:16px;">
-        Super Admin: use your global email address (no Workspace ID required)
+        👑 Ardhnarishwar Super Admin: global access to companies, subscriptions, health & platform logs
       </div>
 
       <form id="login-form" onsubmit="handleLogin(event)" style="display:flex; flex-direction:column; gap:16px;">
@@ -420,7 +463,7 @@
 
         <!-- Super Admin Email / Company Admin Contact / Employee ID -->
         <div class="form-group" id="group-identifier">
-          <label class="form-label" id="label-identifier">Corporate Email Address</label>
+          <label class="form-label" id="label-identifier">Super Admin Email (Ardhnarishwar)</label>
           <div class="input-with-icon">
             <span class="input-icon" id="icon-identifier">✉️</span>
             <input type="text" id="identifier" class="form-input" placeholder="superadmin@ardhnarishwar.com" required>
@@ -471,29 +514,25 @@ function switchRole(role) {
   const inputId = document.getElementById('identifier');
   const iconId = document.getElementById('icon-identifier');
   const hintEl = document.getElementById('role-hint');
-  const portalSubtext = document.getElementById('portal-subtext');
 
   if (role === 'super_admin') {
     groupComp.style.display = 'none';
-    labelId.textContent = 'Global Admin Email';
+    labelId.textContent = 'Super Admin Email (Ardhnarishwar)';
     inputId.placeholder = 'superadmin@ardhnarishwar.com';
     iconId.textContent = '✉️';
-    if (portalSubtext) portalSubtext.textContent = 'Sign in with Global Super Admin credentials';
-    if (hintEl) hintEl.textContent = 'Super Admin: use your global email address (no Workspace ID required)';
+    if (hintEl) hintEl.textContent = '👑 Ardhnarishwar Super Admin: global access to companies, subscriptions, health & platform logs';
   } else if (role === 'company_admin') {
     groupComp.style.display = 'block';
-    labelId.textContent = 'Admin Contact Number / Email';
-    inputId.placeholder = 'e.g. 9876543210 or admin@company.com';
+    labelId.textContent = 'Company Admin Email or Mobile';
+    inputId.placeholder = 'e.g. admin@company.com or 9876543210';
     iconId.textContent = '📱';
-    if (portalSubtext) portalSubtext.textContent = 'Sign in to your client company management portal';
-    if (hintEl) hintEl.textContent = 'Company Admin: enter Workspace ID + your registered mobile/email';
+    if (hintEl) hintEl.textContent = '🏢 Company Admin: manage workforce, shifts, attendance rules & monthly records';
   } else {
     groupComp.style.display = 'block';
-    labelId.textContent = 'Employee ID / Registered Mobile';
-    inputId.placeholder = 'e.g. EMP-001 or 9876543210';
+    labelId.textContent = 'Employee / Candidate ID or Mobile';
+    inputId.placeholder = 'e.g. EMP-101 or 9876543210';
     iconId.textContent = '👤';
-    if (portalSubtext) portalSubtext.textContent = 'Sign in to employee self-service clock-in portal';
-    if (hintEl) hintEl.textContent = 'Employee: enter Workspace ID + your Employee ID (e.g. EMP-201) and password';
+    if (hintEl) hintEl.textContent = '👤 Employee / Candidate: view attendance status, working hours & mark daily punches';
   }
 }
 
@@ -631,6 +670,22 @@ function showToast(msg, type = 'info') {
     setTimeout(() => toast.remove(), 300);
   }, 4000);
 }
+</script>
+<script src="/static/js/ardhnarishwar_runtime.js"></script>
+<script id="login-logo-spin-v1">
+(function () {
+  function init() {
+    document.querySelectorAll('.hero-brand .ardh-medallion-nav, .ardh-hero-medallion').forEach(function (el) {
+      el.addEventListener('click', function () {
+        el.classList.remove('logo-spin'); void el.offsetWidth; el.classList.add('logo-spin');
+      });
+      el.addEventListener('animationend', function (e) {
+        if (e.animationName === 'loginLogoSpin') el.classList.remove('logo-spin');
+      });
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
 </script>
 </body>
 </html>

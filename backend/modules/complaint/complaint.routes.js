@@ -4,6 +4,8 @@ import {
   getComplaints,
   addReply,
   getSingleComplaint, updateStatus,
+  updateComplaint,
+  deleteComplaint,
 } from "./complaint.controller.js";
 
 // import { complaintAuth } from "../../middleware/complaintAuth.middleware.js";
@@ -21,6 +23,8 @@ router.post("/", createComplaint);
 router.post("/:id/reply", addReply);
 router.get("/:id", getSingleComplaint);
 router.put("/:id/status", updateStatus);
+router.put("/:id", updateComplaint);
+router.delete("/:id", deleteComplaint);
 
 export default router;
 

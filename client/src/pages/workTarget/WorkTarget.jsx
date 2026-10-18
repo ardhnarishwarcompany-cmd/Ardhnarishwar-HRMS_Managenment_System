@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
+import { Target } from "lucide-react";
 
 import AddWorkTargetModal from "../../components/workTarget/AddWorkTargetModal";
 import EditWorkTargetModal from "../../components/workTarget/EditWorkTargetModal";
@@ -18,8 +19,12 @@ import {
 import {
   getEmployees,
 } from "../../services/employeesService";
+import { useClientAuth } from "../../context/ClientAuthContext";
 
 export default function WorkTarget() {
+  const { client } = useClientAuth();
+  const isEmployee = String(client?.role || "").toUpperCase() === "CLIENT_EMPLOYEE";
+
   const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
 
@@ -47,23 +52,23 @@ export default function WorkTarget() {
 
   useEffect(() => {
     const fetchAll = async () => {
-      try {
-        const [targetRes, deptRes, empRes] = await Promise.all([
-          getWorkTargets(),
-          getDepartments(),
-          getEmployees(),
-        ]);
+      // The employee directory is admin-only (403 for CLIENT_EMPLOYEE); load each
+      // dataset independently so one failure cannot blank the whole page.
+      const [targetRes, deptRes, empRes] = await Promise.allSettled([
+        getWorkTargets(),
+        getDepartments(),
+        isEmployee ? Promise.resolve({ data: { data: [] } }) : getEmployees(),
+      ]);
 
-        setTargets(targetRes.data?.data ?? []);
-        setDepartments(deptRes.data?.data || []);
-        setEmployees(empRes.data?.data || []);
-      } catch (err) {
-        toast.error(err?.response?.data?.message || "Failed to load data");
-      }
+      if (targetRes.status === "fulfilled") setTargets(targetRes.value.data?.data ?? []);
+      else toast.error(targetRes.reason?.response?.data?.message || "Failed to load targets");
+
+      if (deptRes.status === "fulfilled") setDepartments(deptRes.value.data?.data || []);
+      if (empRes.status === "fulfilled") setEmployees(empRes.value.data?.data || []);
     };
 
     fetchAll();
-  }, []);
+  }, [isEmployee]);
 
   const deptById = useMemo(() => {
     const obj = {};
@@ -260,19 +265,25 @@ export default function WorkTarget() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Work Target</h1>
-          <p className="text-gray-500 mt-1">
-            Set and manage work targets for employees.
-          </p>
+        <div className="page-header-main">
+          <span className="page-header-icon">
+            <Target size={26} strokeWidth={1.8} />
+          </span>
+          <div>
+            <h1 className="page-header-title">Work Target</h1>
+            <p className="page-header-subtitle">
+              {isEmployee
+                ? "Targets assigned to you by your company."
+                : "Set and manage work targets for employees."}
+            </p>
+          </div>
         </div>
 
-        <button
-          onClick={openAddModal}
-          className="px-5 py-2.5 rounded-xl bg-black text-white font-semibold hover:bg-gray-900 transition"
-        >
-          + Add Target
-        </button>
+        {!isEmployee && (
+          <button onClick={openAddModal} className="btn-primary btn-inline">
+            + Add Target
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -342,14 +353,21 @@ export default function WorkTarget() {
                   <th className="text-left px-5 py-4 font-semibold">Target Value</th>
                   <th className="text-left px-5 py-4 font-semibold">Duration</th>
                   <th className="text-left px-5 py-4 font-semibold">Status</th>
-                  <th className="text-right px-5 py-4 font-semibold">Action</th>
+                  {!isEmployee && (
+                    <th className="text-right px-5 py-4 font-semibold">Action</th>
+                  )}
                 </tr>
               </thead>
 
               <tbody>
                 {filteredTargets.map((t) => {
                   const deptName = deptById[t.departmentId]?.name || "All";
-                  const emp = empById[t.employeeId] || {};
+                  // Employees have no directory access; the only assigned target they can see is their own.
+                  const emp =
+                    empById[t.employeeId] ||
+                    (isEmployee && Number(t.employeeId) === Number(client?.id)
+                      ? { name: client?.name, employeeCode: client?.employeeCode }
+                      : {});
                   const badge = getTypeBadge(t.targetType);
                   const isActive = t.isActive === 1 || t.isActive === true;
 
@@ -407,21 +425,23 @@ export default function WorkTarget() {
                         </span>
                       </td>
 
-                      <td className="px-5 py-4 text-right whitespace-nowrap">
-                        <button
-                          onClick={() => openEditModal(t)}
-                          className="px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 font-semibold transition"
-                        >
-                          Edit
-                        </button>
+                      {!isEmployee && (
+                        <td className="px-5 py-4 text-right whitespace-nowrap">
+                          <button
+                            onClick={() => openEditModal(t)}
+                            className="px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 font-semibold transition"
+                          >
+                            Edit
+                          </button>
 
-                        <button
-                          onClick={() => handleDelete(t.id)}
-                          className="ml-2 px-3 py-2 rounded-xl bg-red-100 hover:bg-red-200 text-red-700 font-semibold transition"
-                        >
-                          Delete
-                        </button>
-                      </td>
+                          <button
+                            onClick={() => handleDelete(t.id)}
+                            className="ml-2 px-3 py-2 rounded-xl bg-red-100 hover:bg-red-200 text-red-700 font-semibold transition"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   );
                 })}

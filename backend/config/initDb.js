@@ -367,6 +367,33 @@ CREATE TABLE IF NOT EXISTS client_interviews (
 );
 `);
 
+  // Older databases pre-date the Leads link and the client decision timestamp.
+  // Self-heal on boot so HR "Add Interview" and the Super Admin "Client
+  // Decisions" page never fail with "unknown column".
+  const interviewExtraColumns = [
+    ["lead_id", "INT NULL"],
+    ["client_decided_at", "DATETIME NULL"],
+  ];
+  for (const [column, definition] of interviewExtraColumns) {
+    const [[exists]] = await db.query(
+      `SELECT COUNT(*) AS count FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'client_interviews' AND COLUMN_NAME = ?`,
+      [column],
+    );
+    if (!Number(exists.count)) {
+      await db.query(`ALTER TABLE client_interviews ADD COLUMN ${column} ${definition}`);
+    }
+  }
+  const [[leadIndex]] = await db.query(
+    `SELECT COUNT(*) AS count FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'client_interviews' AND INDEX_NAME = 'idx_ci_lead'`,
+  );
+  if (!Number(leadIndex.count)) {
+    await db.query(`ALTER TABLE client_interviews ADD INDEX idx_ci_lead (lead_id)`);
+  }
+  // Rows decided before the column existed: fall back to their last update time.
+  await db.query(
+    `UPDATE client_interviews SET client_decided_at = updated_at WHERE client_status <> 'pending' AND client_decided_at IS NULL`,
+  );
+
   // ================================
   // CLIENT EMPLOYEE PAYROLL
   // ================================
@@ -764,6 +791,16 @@ CREATE TABLE IF NOT EXISTS internal_messages (
   if (!internalColumnNames.has('recipient_id')) {
     await db.query(`ALTER TABLE internal_messages ADD COLUMN recipient_id INT NULL AFTER sender_id`);
   }
+  // Unread tracking (HR chat IT-contacts list + mark-as-read) depends on read_at.
+  if (!internalColumnNames.has('read_at')) {
+    await db.query(`ALTER TABLE internal_messages ADD COLUMN read_at DATETIME NULL AFTER created_at`);
+  }
+  const [[internalRecipientIndex]] = await db.query(
+    `SELECT COUNT(*) AS count FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'internal_messages' AND INDEX_NAME = 'idx_recipient_unread'`,
+  );
+  if (!Number(internalRecipientIndex.count)) {
+    await db.query(`ALTER TABLE internal_messages ADD INDEX idx_recipient_unread (recipient_id, read_at)`);
+  }
 
   await db.query(`ALTER TABLE internal_messages MODIFY room VARCHAR(64) NOT NULL`);
 
@@ -1032,6 +1069,46 @@ CREATE TABLE IF NOT EXISTS client_expenses (
   )
 `);
 
+  // Older databases pre-date the GEO / client-sync / audit / shift columns that
+  // the HR, IT, Client and Super Admin attendance queries select. Self-heal on
+  // boot so none of them fail with "Unknown column 'a.marked_by_id'".
+  const attendanceExtraColumns = [
+    ["method", "ENUM('MANUAL','OTP','WIFI','GEO') DEFAULT 'MANUAL'"],
+    ["check_in_lat", "DECIMAL(10,7) NULL"],
+    ["check_in_lng", "DECIMAL(10,7) NULL"],
+    ["check_out_lat", "DECIMAL(10,7) NULL"],
+    ["check_out_lng", "DECIMAL(10,7) NULL"],
+    ["geo_status", "ENUM('INSIDE','OUTSIDE') NULL"],
+    ["office_id", "INT NULL"],
+    ["source", "VARCHAR(20) NULL"],
+    ["client_id", "INT NULL"],
+    ["marked_by_id", "INT NULL"],
+    ["marked_by_name", "VARCHAR(150) NULL"],
+    ["marked_by_role", "VARCHAR(50) NULL"],
+    ["marked_by_at", "TIMESTAMP NULL DEFAULT NULL"],
+    // Shift chosen by the Super Admin when marking, snapshotted so later edits
+    // to the shift definitions never change what was recorded.
+    ["shift_id", "INT NULL"],
+    ["shift_name", "VARCHAR(100) NULL"],
+    ["shift_start", "TIME NULL"],
+    ["shift_end", "TIME NULL"],
+  ];
+  for (const [column, definition] of attendanceExtraColumns) {
+    const [[exists]] = await db.query(
+      `SELECT COUNT(*) AS count FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'super_admin_attendance' AND COLUMN_NAME = ?`,
+      [column],
+    );
+    if (!Number(exists.count)) {
+      await db.query(`ALTER TABLE super_admin_attendance ADD COLUMN ${column} ${definition}`);
+    }
+  }
+  const [[attendanceDayIndex]] = await db.query(
+    `SELECT COUNT(*) AS count FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'super_admin_attendance' AND INDEX_NAME = 'idx_saa_employee_date'`,
+  );
+  if (!Number(attendanceDayIndex.count)) {
+    await db.query(`ALTER TABLE super_admin_attendance ADD INDEX idx_saa_employee_date (employee_id, date)`);
+  }
+
   // ================================
   // LOGIN TIME SETTINGS (GLOBAL)
   // ================================
@@ -1056,6 +1133,18 @@ CREATE TABLE IF NOT EXISTS client_expenses (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   )
 `);
+
+  // Office default timing (IST): 09:00 AM – 06:30 PM. Seeded only when the
+  // table is empty so an admin-edited value is never overwritten on boot.
+  const [[loginSettingsCount]] = await db.query(
+    `SELECT COUNT(*) AS total FROM login_settings`
+  );
+  if (!Number(loginSettingsCount?.total)) {
+    await db.query(`
+      INSERT INTO login_settings (default_login_time, default_logout_time, grace_period, late_threshold)
+      VALUES ('09:00:00', '18:30:00', 15, 15)
+    `);
+  }
 
   // ================================
   // EMPLOYEE CUSTOM LOGIN SETTINGS
@@ -1952,6 +2041,46 @@ CREATE TABLE IF NOT EXISTS client_agreements (
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       INDEX idx_email_status (status),
       INDEX idx_email_created (created_at)
+    )
+  `);
+
+  /* Website forms: make sure tables exist and status supports Hold / Solved */
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS web_form_submissions (
+      id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+      form_type VARCHAR(40) NOT NULL DEFAULT 'contact',
+      name VARCHAR(150) NOT NULL,
+      email VARCHAR(150) NULL,
+      phone VARCHAR(30) NULL,
+      subject VARCHAR(200) NULL,
+      message TEXT NULL,
+      payload JSON NULL,
+      source VARCHAR(150) NULL,
+      status VARCHAR(20) DEFAULT 'New',
+      created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  try {
+    // ENUM -> VARCHAR so new statuses (Hold, Solved) can be stored; old 'Converted' becomes 'Read'
+    await db.query("ALTER TABLE web_form_submissions MODIFY status VARCHAR(20) DEFAULT 'New'");
+    await db.query("UPDATE web_form_submissions SET status = 'Read' WHERE status = 'Converted'");
+  } catch (e) {
+    console.error("[initDb] web_form_submissions status migration:", e.message);
+  }
+
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS web_form_replies (
+      id INT PRIMARY KEY AUTO_INCREMENT,
+      submission_id INT NOT NULL,
+      message TEXT NOT NULL,
+      sent_by_id VARCHAR(50) NULL,
+      sent_by_name VARCHAR(150) NULL,
+      sent_by_role VARCHAR(30) NULL,
+      to_email VARCHAR(150) NULL,
+      email_status ENUM('sent','failed','skipped') DEFAULT 'sent',
+      email_error TEXT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      INDEX idx_wfr_submission (submission_id)
     )
   `);
 

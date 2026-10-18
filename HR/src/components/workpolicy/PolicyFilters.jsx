@@ -62,12 +62,13 @@ export default function PolicyFilters({ filters, onFilterChange }) {
           >
             <option value="">All Departments</option>
             <option value="All">All Departments</option>
-            <option value="Engineering">Engineering</option>
             <option value="Marketing">Marketing</option>
             <option value="Sales">Sales</option>
             <option value="HR">HR</option>
-            <option value="Finance">Finance</option>
-            <option value="Operations">Operations</option>
+            <option value="IT">IT</option>
+            <option value="Frontend">Frontend</option>
+            <option value="Quality Assurance">Quality Assurance</option>
+            <option value="Others">Others</option>
           </select>
         </div>
       </div>

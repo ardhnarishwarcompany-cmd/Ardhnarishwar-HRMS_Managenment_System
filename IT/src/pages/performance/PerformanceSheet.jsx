@@ -13,9 +13,10 @@ import {
   XCircle,
   Award,
   Calendar,
+  X,
 } from "lucide-react";
 
-import HRNavbar from "../../components/hr/HRNavbar";
+import ITShell from "../it/ITShell";
 
 const STATUS_CONFIG = {
   excellent: {
@@ -128,21 +129,25 @@ export default function MyPerformance() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (!viewModal) return undefined;
+
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") setViewModal(false);
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [viewModal]);
+
   return (
-    <div className="p-4">
-      <HRNavbar />
-
-      {/* HEADER */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">
-          My Performance Reviews
-        </h1>
-
-        <p className="text-gray-500 text-sm mt-1">
-          View all your
-          performance evaluations
-        </p>
-      </div>
+    <ITShell
+      title="My Performance Reviews"
+      subtitle="View all your HR performance evaluations and ratings"
+      icon={Award}
+    >
+      <div className="flex flex-col gap-6">
 
       {/* CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
@@ -249,138 +254,145 @@ export default function MyPerformance() {
       )}
 
       {/* VIEW MODAL */}
-      {viewModal &&
-        selectedRecord && (
-          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white rounded-[32px] w-full max-w-4xl max-h-[92vh] overflow-hidden shadow-2xl">
-              
-              {/* HEADER */}
-              <div className="bg-black text-white p-7">
-                <div className="flex justify-between items-start">
+      {viewModal && selectedRecord && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm"
+          onClick={() => setViewModal(false)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="performance-review-title"
+            onClick={(event) => event.stopPropagation()}
+            className="flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl"
+          >
+            {/* HEADER */}
+            <div className="relative shrink-0 overflow-hidden bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 px-6 py-5 text-white md:px-8 md:py-6">
+              <div className="absolute inset-0 opacity-10" aria-hidden="true">
+                <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white" />
+                <div className="absolute bottom-0 left-0 h-24 w-24 rounded-full bg-white" />
+              </div>
+
+              <div className="relative flex items-start justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10 backdrop-blur">
+                    <Award size={26} aria-hidden="true" />
+                  </div>
+
                   <div>
-                    <h2 className="text-3xl font-bold">
+                    <h2
+                      id="performance-review-title"
+                      className="text-2xl font-extrabold tracking-tight md:text-3xl"
+                    >
                       Performance Review
                     </h2>
 
-                    <p className="text-gray-300 mt-2">
-                      {
-                        selectedRecord.employeeName
-                      }
+                    <p className="mt-1 text-sm text-indigo-200">
+                      {selectedRecord.employeeName}
                     </p>
                   </div>
-
-                  <button
-                    onClick={() =>
-                      setViewModal(
-                        false
-                      )
-                    }
-                    className="w-10 h-10 rounded-xl bg-white/10"
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
-
-              {/* BODY */}
-              <div className="p-7 overflow-y-auto max-h-[70vh]">
-                
-                {/* SCORE */}
-                <div className="bg-gray-50 rounded-3xl p-6 mb-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-gray-500 mb-2">
-                        Overall Score
-                      </p>
-
-                      <div className="flex items-end gap-1">
-                        <span className="text-5xl font-extrabold">
-                          {
-                            selectedRecord.avgScore
-                          }
-                        </span>
-
-                        <span className="text-gray-400 mb-2">
-                          /10
-                        </span>
-                      </div>
-                    </div>
-
-                    <Award
-                      size={60}
-                    />
-                  </div>
                 </div>
 
-                {/* CRITERIA */}
-                <div className="space-y-4">
-                  {PERFORMANCE_CRITERIA.map(
-                    (
-                      criteria
-                    ) => {
-                      const value =
-                        selectedRecord
-                          .scores?.[
-                          criteria.id
-                        ] || 0;
-
-                      return (
-                        <div
-                          key={
-                            criteria.id
-                          }
-                          className="bg-gray-50 rounded-2xl p-4"
-                        >
-                          <div className="flex justify-between mb-2">
-                            <p className="font-medium">
-                              {
-                                criteria.name
-                              }
-                            </p>
-
-                            <p className="font-bold">
-                              {value}
-                              /10
-                            </p>
-                          </div>
-
-                          <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className={`h-full ${
-                                value >= 8
-                                  ? "bg-green-500"
-                                  : value >=
-                                      6
-                                    ? "bg-yellow-500"
-                                    : "bg-red-500"
-                              }`}
-                              style={{
-                                width: `${value * 10}%`,
-                              }}
-                            />
-                          </div>
-                        </div>
-                      );
-                    }
-                  )}
-                </div>
-
-                {/* REMARKS */}
-                <div className="mt-6 bg-gray-50 rounded-3xl p-6">
-                  <h3 className="font-bold text-lg mb-3">
-                    Remarks
-                  </h3>
-
-                  <p className="text-gray-700 whitespace-pre-wrap">
-                    {
-                      selectedRecord.remarks
-                    }
-                  </p>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setViewModal(false)}
+                  aria-label="Close"
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/10 backdrop-blur transition hover:bg-white/20"
+                >
+                  <X size={18} aria-hidden="true" />
+                </button>
               </div>
             </div>
+
+            {/* BODY */}
+            <div className="min-h-0 flex-1 overflow-y-auto p-6 md:p-8">
+              {/* SCORE */}
+              <div className="mb-6 rounded-3xl border border-indigo-100 bg-gradient-to-br from-indigo-50 to-white p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                      Overall Score
+                    </p>
+
+                    <div className="flex items-end gap-1">
+                      <span className="text-5xl font-extrabold tracking-tight text-slate-900">
+                        {selectedRecord.avgScore}
+                      </span>
+
+                      <span className="mb-2 text-slate-400">/10</span>
+                    </div>
+                  </div>
+
+                  <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-200">
+                    <Award size={36} aria-hidden="true" />
+                  </div>
+                </div>
+              </div>
+
+              {/* CRITERIA */}
+              <div className="flex flex-col gap-3">
+                {PERFORMANCE_CRITERIA.map((criteria) => {
+                  const value = selectedRecord.scores?.[criteria.id] || 0;
+
+                  return (
+                    <div
+                      key={criteria.id}
+                      className="rounded-2xl border border-slate-100 bg-slate-50/60 p-4"
+                    >
+                      <div className="mb-2 flex justify-between">
+                        <p className="text-sm font-semibold text-slate-700">
+                          {criteria.name}
+                        </p>
+
+                        <p className="text-sm font-bold text-slate-900">
+                          {value}
+                          /10
+                        </p>
+                      </div>
+
+                      <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-200">
+                        <div
+                          className={`h-full rounded-full transition-all ${
+                            value >= 8
+                              ? "bg-gradient-to-r from-emerald-500 to-teal-500"
+                              : value >= 6
+                                ? "bg-gradient-to-r from-amber-500 to-orange-500"
+                                : "bg-gradient-to-r from-rose-500 to-pink-500"
+                          }`}
+                          style={{ width: `${value * 10}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* REMARKS */}
+              <div className="mt-6 rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-6">
+                <h3 className="mb-3 text-lg font-bold tracking-tight text-slate-900">
+                  Remarks
+                </h3>
+
+                <p className="whitespace-pre-wrap leading-relaxed text-slate-700">
+                  {selectedRecord.remarks || "No remarks"}
+                </p>
+              </div>
+            </div>
+
+            {/* FOOTER */}
+            <div className="flex shrink-0 justify-end border-t border-slate-100 bg-slate-50/60 px-6 py-4 md:px-8">
+              <button
+                type="button"
+                onClick={() => setViewModal(false)}
+                className="rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-indigo-200 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-300"
+              >
+                Close
+              </button>
+            </div>
           </div>
-        )}
-    </div>
+        </div>
+      )}
+      </div>
+    </ITShell>
   );
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Wrench } from "lucide-react";
 import API from "../../services/api";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -64,13 +65,14 @@ export default function ServiceManagement() {
     <div className="p-6 space-y-8 bg-gray-50 min-h-screen">
       {/* HEADER */}
       <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Service Management
-          </h1>
-          <p className="text-gray-500 text-sm mt-1">
-            Manage your service plans and pricing
-          </p>
+        <div className="page-header-main">
+          <span className="page-header-icon">
+            <Wrench size={26} strokeWidth={1.8} />
+          </span>
+          <div>
+            <h1 className="page-header-title">Service Management</h1>
+            <p className="page-header-subtitle">Manage your service plans and pricing</p>
+          </div>
         </div>
 
         {/* 🔥 INVENTORY BUTTON */}

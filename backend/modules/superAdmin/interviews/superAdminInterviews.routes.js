@@ -9,6 +9,8 @@ import {
   deleteInterview,
   getAllHRNames,
   updateJoinedStatus,
+  getClientDecisions,
+  getClientDecisionSummary,
 } from "./superAdminInterviews.controller.js";
 
 const router = express.Router();
@@ -16,6 +18,10 @@ const router = express.Router();
 router.use(protect(["SUPER_ADMIN", "TL", "MANAGER"]));
 
 router.get("/hr-list", getAllHRNames);
+
+// Client Decisions must be registered before "/:id" so the literal path wins.
+router.get("/client-decisions/summary", getClientDecisionSummary);
+router.get("/client-decisions", getClientDecisions);
 
 router.post("/", createInterview);
 router.get("/", getAllInterviews);

@@ -46,15 +46,9 @@ import {
   GitPullRequest,
 } from "lucide-react";
 
-const linkClass = ({ isActive }) =>
-  `flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-200
-   ${
-     isActive
-       ? "bg-gradient-to-r from-[#4f63f0]/30 to-[#7c8cf5]/15 text-white border border-[#7c8cf5]/40 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_6px_16px_-6px_rgba(79,99,240,0.45)]"
-       : "text-white/60 border border-transparent hover:bg-white/[0.07] hover:text-white"
-   }`;
+const linkClass = ({ isActive }) => `adm-link ${isActive ? "on" : ""}`;
 
-export default function Sidebar() {
+export default function Sidebar({ onNavigate }) {
   const location = useLocation();
 
   const { auth } = useAuth();
@@ -104,6 +98,12 @@ export default function Sidebar() {
             to: "/dashboard/interview-scheduling",
             label: "Interview Scheduling",
             icon: <CalendarDays size={18} />,
+          },
+          {
+            key: "client-decisions",
+            to: "/dashboard/client-decisions",
+            label: "Client Decisions",
+            icon: <UserCheck size={18} />,
           },
           {
             key: "services",
@@ -556,109 +556,75 @@ const filteredDashboardChildren =
   );
   
   return (
-    <aside className="w-64 sm:w-72 h-screen flex flex-col overflow-hidden bg-gradient-to-b from-[#0B1220] via-[#0A0F1D] to-[#050812] border-r border-white/10">
-      {/* Logo (fixed, never scrolls) */}
-      <div className="px-5 pt-5 mb-6 flex items-center gap-3 shrink-0">
-        <img
-          src="/logo.jpeg"
-          alt="logo"
-          className="w-10 h-10 object-contain rounded-lg shadow"
-        />
-
-        <div>
-          <h1 className="text-sm font-bold text-white leading-tight">
-            ARDHNARISHWAR
-          </h1>
-          <p className="text-[10px] text-white/60">HRMS Admin Panel</p>
+    <aside className="adm-aside" aria-label="Primary navigation">
+      <div className="adm-brand">
+        <div className="adm-logo" aria-hidden="true">
+          <img
+            src="/ardhnarishwar-logo.jpg"
+            alt="Ardhnarishwar Logo"
+            className="w-full h-full object-cover rounded-[15px]"
+          />
+        </div>
+        <div className="min-w-0">
+          <b>ARDHNARISHWAR</b>
+          <small>HRMS Admin Panel</small>
         </div>
       </div>
 
-      {/* Scrollable area: menu + footer */}
-      <div className="sidebar-scroll flex-1 overflow-y-auto px-5 pb-5">
-      <nav className="space-y-1">
+      <nav className="adm-nav sidebar-scroll">
         {filteredNavItems.map((item) => {
           const hasChildren = !!item.children?.length;
           const active = isSectionActive(item);
 
-          // Dropdown
           if (hasChildren) {
+            const isOpen = !!openMenu[item.key];
+            const children =
+              item.key === "dashboard" ? filteredDashboardChildren : item.children;
+
             return (
               <div key={item.key}>
                 <button
+                  type="button"
                   onClick={() => toggleMenu(item.key)}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-200
-                    ${
-                      openMenu[item.key]
-                        ? "sticky top-0 z-10 bg-[#0B1220]"
-                        : ""
-                    }
-                    ${
-                      active
-                        ? "bg-gradient-to-r from-[#4f63f0]/30 to-[#7c8cf5]/15 text-white border border-[#7c8cf5]/40 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_6px_16px_-6px_rgba(79,99,240,0.45)]"
-                        : "text-white/60 border border-transparent bg-transparent hover:bg-white/[0.07] hover:text-white"
-                    }
-                  `}
+                  aria-expanded={isOpen}
+                  aria-controls={`adm-sub-${item.key}`}
+                  className={`adm-grp ${active ? "is-active" : ""}`}
                 >
-                  <span className="flex items-center gap-3">
-                    {item.icon}
-                    <span>{item.label}</span>
-                  </span>
-
-                  {/* Arrow only if children exists */}
-                  <ChevronDown
-                    size={18}
-                    className={`transition-transform duration-200 ${
-                      openMenu[item.key] ? "rotate-180" : "rotate-0"
-                    }`}
-                  />
+                  {item.icon}
+                  <span>{item.label}</span>
+                  <ChevronDown size={18} className="adm-ch" />
                 </button>
 
-                <div
-                  className={`ml-4 pl-3 border-l border-white/10 transition-all duration-300
-                  ${
-                    openMenu[item.key]
-                      ? "max-h-[5000px] opacity-100 mt-2"
-                      : "max-h-0 opacity-0 mt-0 overflow-hidden"
-                  }
-                  `}
-                >
-                  {(item.key === "dashboard"
-                    ? filteredDashboardChildren
-                    : item.children
-                  ).map((child) => (
-                    <NavLink
-                      key={child.to}
-                      to={child.to}
-                      end={child.to === "/dashboard/finance"}
-                      className={linkClass}
-                    >
-                      {child.icon}
-                      {child.label}
-                    </NavLink>
-                  ))}
-                </div>
+                {isOpen && (
+                  <div id={`adm-sub-${item.key}`} className="adm-sub mt-1.5">
+                    {children.map((child) => (
+                      <NavLink
+                        key={child.to}
+                        to={child.to}
+                        end={child.to === "/dashboard/finance"}
+                        className={linkClass}
+                        onClick={onNavigate}
+                      >
+                        {child.icon}
+                        {child.label}
+                      </NavLink>
+                    ))}
+                  </div>
+                )}
               </div>
             );
           }
 
-          // Normal link
           return (
-            <NavLink key={item.to} to={item.to} className={linkClass}>
-              {item.icon}
-              {item.label}
-            </NavLink>
+            <div key={item.to} className="adm-root">
+              <NavLink to={item.to} className={linkClass} onClick={onNavigate}>
+                {item.icon}
+                {item.label}
+              </NavLink>
+            </div>
           );
         })}
       </nav>
-
-      {/* Footer */}
-      <div className="mt-10 p-4 rounded-2xl bg-white/5 border border-white/10">
-        <p className="text-white text-sm font-semibold">Admin Tip</p>
-        <p className="text-white/60 text-xs mt-1 leading-relaxed">
-          Keep roles clean: Admin → HR → Employee.
-        </p>
-      </div>
-      </div>
     </aside>
   );
 }

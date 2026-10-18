@@ -19,11 +19,24 @@ export const getItEmployees = async (req, res) => {
 /* ================= TASK ASSIGNMENT ================= */
 export const getTasks = async (req, res) => {
   try {
+    const manager = isItManager(req);
+    const employeeId = Number(req.employee?.id || req.employee?.employee_id);
+
+    if (!manager && (!Number.isInteger(employeeId) || employeeId <= 0)) {
+      return res.status(401).json({
+        message: "Unable to identify the logged-in employee",
+      });
+    }
+
     const [rows] = await db.query(
       `SELECT t.*, ${EMP_JOIN("t.assigned_to", "assigned_to_name")},
               COALESCE(${EMP_JOIN("t.created_by", "x").replace(" AS x", "")}, t.created_by_label) AS created_by_name
-       FROM it_tasks t ORDER BY FIELD(t.status,'To Do','In Progress','Review','Done'), t.due_date IS NULL, t.due_date`,
+       FROM it_tasks t
+       ${manager ? "" : "WHERE t.assigned_to = ?"}
+       ORDER BY FIELD(t.status,'To Do','In Progress','Review','Done'), t.due_date IS NULL, t.due_date`,
+      manager ? [] : [employeeId],
     );
+
     res.json(rows);
   } catch (err) {
     console.error("getTasks error:", err);
@@ -61,10 +74,22 @@ export const updateTaskStatus = async (req, res) => {
     const allowed = ["To Do", "In Progress", "Review", "Done"];
     if (!allowed.includes(status))
       return res.status(400).json({ message: "Invalid status" });
-    const [r] = await db.query("UPDATE it_tasks SET status=? WHERE id=?", [
-      status,
-      req.params.id,
-    ]);
+    const manager = isItManager(req);
+    const employeeId = Number(req.employee?.id || req.employee?.employee_id);
+
+    if (!manager && (!Number.isInteger(employeeId) || employeeId <= 0)) {
+      return res.status(401).json({
+        message: "Unable to identify the logged-in employee",
+      });
+    }
+
+    const [r] = await db.query(
+      `UPDATE it_tasks
+       SET status=?
+       WHERE id=?
+       ${manager ? "" : "AND assigned_to=?"}`,
+      manager ? [status, req.params.id] : [status, req.params.id, employeeId],
+    );
     if (!r.affectedRows)
       return res.status(404).json({ message: "Task not found" });
     res.json({ message: "Task updated" });
@@ -76,10 +101,30 @@ export const updateTaskStatus = async (req, res) => {
 
 export const deleteTask = async (req, res) => {
   try {
-    await db.query("DELETE FROM it_tasks WHERE id=?", [req.params.id]);
+    const manager = isItManager(req);
+    const employeeId = Number(req.employee?.id || req.employee?.employee_id);
+
+    if (!manager && (!Number.isInteger(employeeId) || employeeId <= 0)) {
+      return res.status(401).json({
+        message: "Unable to identify the logged-in employee",
+      });
+    }
+
+    const [r] = await db.query(
+      `DELETE FROM it_tasks
+       WHERE id=?
+       ${manager ? "" : "AND assigned_to=?"}`,
+      manager ? [req.params.id] : [req.params.id, employeeId],
+    );
+
+    if (!r.affectedRows) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
     res.json({ message: "Task deleted" });
   } catch (err) {
-    res.status(500).json({ message: "Failed to delete task" });
+    console.error("deleteTask error:", err);
+    res.status(500).json({ message: "Failed to fetch task" });
   }
 };
 

@@ -292,6 +292,13 @@ export const updatePolicy = async (req, res) => {
       req.body
     );
 
+    if (!data) {
+      return res.status(404).json({
+        success: false,
+        message: "Policy not found or not editable by this account",
+      });
+    }
+
     res.json({ success: true, policy: data });
   } catch (err) {
     console.error("UPDATE POLICY:", err);
@@ -305,7 +312,14 @@ export const deletePolicy = async (req, res) => {
     if (req.employee) return res.status(403).json({success:false,message:"Only client administrators can manage work policies"});
     const clientId = await getClientId(req.client.client_code);
 
-    await service.deletePolicy(req.params.id, clientId);
+    const removed = await service.deletePolicy(req.params.id, clientId);
+
+    if (!removed) {
+      return res.status(404).json({
+        success: false,
+        message: "Policy not found or not editable by this account",
+      });
+    }
 
     res.json({ success: true });
   } catch (err) {

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import toast from "react-hot-toast";
 import {
   AlertTriangle,
@@ -54,6 +55,18 @@ export default function DailyWorkSubmission() {
   const [q, setQ] = useState("");
   const [onlyBlockers, setOnlyBlockers] = useState(false);
   const [menuId, setMenuId] = useState(null);
+  const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
+
+  useEffect(() => {
+    if (menuId === null) return undefined;
+    const close = () => setMenuId(null);
+    window.addEventListener("scroll", close, true);
+    window.addEventListener("resize", close);
+    return () => {
+      window.removeEventListener("scroll", close, true);
+      window.removeEventListener("resize", close);
+    };
+  }, [menuId]);
   const [viewRow, setViewRow] = useState(null);
   const [form, setForm] = useState({
     work_date: today(),
@@ -363,7 +376,7 @@ export default function DailyWorkSubmission() {
             <button
               type="submit"
               disabled={saving}
-              className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition hover:from-indigo-500 hover:to-violet-500 disabled:opacity-60"
+              className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-600 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/25 transition hover:shadow-purple-500/40 hover:-translate-y-0.5 disabled:opacity-60"
             >
               <Send size={15} className="transition-transform group-hover:translate-x-0.5" />
               {saving ? "Submitting…" : existingForDate ? "Update submission" : "Submit daily work"}
@@ -429,11 +442,11 @@ export default function DailyWorkSubmission() {
                 return (
                   <li
                     key={r.id}
-                    className="relative magic-rise"
+                    className={`relative magic-rise ${menuId === r.id ? "z-30" : ""}`}
                     style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}
                   >
                     <span
-                      className={`absolute -left-6 top-5 h-[18px] w-[18px] rounded-full border-4 border-white shadow dark:border-slate-900 ${
+                      className={`absolute -left-6 top-7 h-[18px] w-[18px] rounded-full border-4 border-white shadow dark:border-slate-900 ${
                         hasBlocker
                           ? "bg-amber-400"
                           : isToday
@@ -441,9 +454,9 @@ export default function DailyWorkSubmission() {
                           : "bg-emerald-400"
                       }`}
                     />
-                    <MagicCard className="it-daily-entry">
-                      <div className="it-daily-entry__content">
-                      <div className="flex flex-wrap items-start justify-between gap-3">
+                    <MagicCard className="it-daily-entry !overflow-visible [&_.magic-card__surface]:!overflow-visible">
+                      <div className="it-daily-entry__content p-4 sm:p-5">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
                           <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-sm font-bold text-white">
                             {(r.employee_name || "E").charAt(0).toUpperCase()}
@@ -470,15 +483,24 @@ export default function DailyWorkSubmission() {
 
                           <button
                             type="button"
-                            onClick={() => setMenuId(menuId === r.id ? null : r.id)}
+                            onClick={(e) => {
+                              const rect = e.currentTarget.getBoundingClientRect();
+                              setMenuPos({
+                                top: rect.bottom + 6,
+                                left: Math.max(8, rect.right - 176),
+                              });
+                              setMenuId(menuId === r.id ? null : r.id);
+                            }}
                             className="grid h-8 w-8 place-items-center rounded-lg border border-gray-200 bg-white text-gray-500 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-indigo-500/10 dark:hover:text-indigo-300"
                             title="More actions"
                           >
                             <MoreVertical size={16} />
                           </button>
 
-                          {menuId === r.id && (
-                            <div className="absolute right-0 top-10 z-50 w-44 overflow-hidden rounded-xl border border-gray-200 bg-white p-1.5 shadow-xl dark:border-slate-700 dark:bg-slate-900">
+                          {menuId === r.id && createPortal(
+                            <>
+                            <div className="fixed inset-0 z-[199]" onClick={() => setMenuId(null)} />
+                            <div style={{ top: menuPos.top, left: menuPos.left }} className="fixed z-[200] w-44 overflow-hidden rounded-xl border border-gray-200 bg-white p-1.5 shadow-xl dark:border-slate-700 dark:bg-slate-900">
                               <button
                                 type="button"
                                 onClick={() => {
@@ -513,11 +535,13 @@ export default function DailyWorkSubmission() {
                                 Delete
                               </button>
                             </div>
+                            </>,
+                            document.body
                           )}
                         </div>
                       </div>
 
-                      <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-gray-700 dark:text-slate-300">
+                      <p className="mt-4 whitespace-pre-wrap break-words text-sm leading-relaxed text-gray-700 dark:text-slate-300">
                         {r.summary}
                       </p>
 

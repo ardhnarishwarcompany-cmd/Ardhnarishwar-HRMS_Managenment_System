@@ -17,10 +17,16 @@ import ITShell from "./ITShell";
 import MagicCard, { MagicStat, MagicEmpty } from "../../components/common/MagicCard";
 
 const n = (v) => Number(v || 0);
-const pct = (a, b) => (b > 0 ? Math.round((a / b) * 100) : 0);
+// When total is 0 (0/0 tasks, 0/0 PRs, 0/0 bugs - no outstanding items), mark 100% complete
+const pct = (a, b) => {
+  const numA = Number(a || 0);
+  const numB = Number(b || 0);
+  if (numB <= 0) return 100;
+  return Math.min(100, Math.max(0, Math.round((numA / numB) * 100)));
+};
 
 /* ---------- small pieces ---------- */
-function Ring({ value = 0, size = 128, stroke = 10, glow = "99 102 241" }) {
+function Ring({ value = 0, size = 128, stroke = 10, glow = "124 58 237" }) {
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const off = c - (Math.min(100, Math.max(0, value)) / 100) * c;
@@ -130,7 +136,7 @@ export default function PerformanceReporting() {
 
   const focus = isManager ? team : me || team;
   const completion = pct(n(focus.tasks_done), n(focus.tasks_total));
-  const mergeRate = me ? pct(n(me.prs_merged), n(me.prs_total)) : 0;
+  const mergeRate = me ? pct(n(me.prs_merged), n(me.prs_total)) : 100;
 
   return (
     <ITShell>

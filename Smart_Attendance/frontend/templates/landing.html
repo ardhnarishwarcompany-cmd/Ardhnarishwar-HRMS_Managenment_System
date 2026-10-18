@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Global Attendance Management System • Enterprise Portal</title>
-<link rel="icon" type="image/svg+xml" href="/favicon.ico">
+<title>Ardhnarishwar 3D • Global SaaS Workforce & Attendance Platform</title>
+<link rel="icon" type="image/png" href="/static/images/ardhnarishwar_logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/css/theme.css">
+<link rel="stylesheet" href="/static/css/ardhnarishwar_3d.css">
 <style>
 /* ── Universal Page Base & Layout ─────────────────────────────── */
 body {
@@ -548,21 +549,41 @@ body {
   color: var(--text-muted);
 }
 </style>
+<link rel="stylesheet" href="/static/css/ardh_logo.css?v=1">
 </head>
 <body>
 
-<div class="unified-container">
+<canvas id="ardh-3d-canvas" style="position:fixed; top:0; left:0; width:100vw; height:100vh; pointer-events:none; z-index:0; opacity:0.75;"></canvas>
+
+<div class="unified-container" style="position:relative; z-index:1;">
   <!-- 1. Top Header & Super Admin Quick Access -->
   <header class="top-header">
     <div class="brand-section">
-      <div class="brand-icon">🏛️</div>
+      <div class="ardh-medallion-nav" title="Ardhnarishwar 3D Emblem">
+        <img src="/static/images/ardhnarishwar_logo_emblem.png" alt="Ardhnarishwar Logo">
+      </div>
       <div>
-        <div class="brand-name">Ardhnarishwar SaaS</div>
-        <div class="brand-sub">GLOBAL ATTENDANCE CLOUD</div>
+        <div class="brand-name" style="background: linear-gradient(135deg, #FFFFFF 20%, #F59E0B 50%, #C084FC 80%, #38BDF8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Ardhnarishwar 3D</div>
+        <div class="brand-sub" style="color:var(--ardh-gold); letter-spacing:1px;">GLOBAL SAAS ATTENDANCE PLATFORM</div>
       </div>
     </div>
 
     <div class="header-actions">
+      <!-- 3D Audio FX Toggle -->
+      <button class="btn-sound-fx" title="Toggle 3D Audio Sound FX">
+        <span>🔊</span> <span>Sound On</span>
+      </button>
+
+      <!-- Runtime Live Status Indicator -->
+      <div class="runtime-live-pill" title="Live Runtime Synchronization Engine Active">
+        <span class="pulse-dot"></span> <span>RUNTIME LIVE</span>
+      </div>
+
+      <!-- Master Runtime Refresh Button -->
+      <button class="btn-runtime-refresh" onclick="ArdhnarishwarRuntime.triggerGlobalSync(true)" title="Runtime Live Synchronizer">
+        <span class="refresh-icon">🔄</span> <span>Refresh Stream</span>
+      </button>
+
       <!-- Theme Switcher Dropdown -->
       <div class="theme-selector-wrap">
         <button class="theme-btn-trigger" onclick="toggleThemeMenu(event)" title="Choose Appearance Theme">
@@ -619,7 +640,47 @@ body {
     </div>
   </header>
 
-  <!-- 2. Dynamic Local Time & Global Geolocation Telemetry HUD (No static hardcoded clocks) -->
+  <!-- 3D Interactive Hero Showcase featuring ARDHNARISHWAR 3D Emblem -->
+  <section class="card-3d" style="padding: 30px 24px; margin-bottom: 24px; text-align: center; position: relative;">
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+      <!-- 3D Rotating Rings and Medallion -->
+      <div class="ardh-hero-3d-stage">
+        <div class="ardh-orbit-ring ardh-orbit-ring-1"></div>
+        <div class="ardh-orbit-ring ardh-orbit-ring-2"></div>
+        <div class="ardh-hero-medallion tilt-3d" title="Ardhnarishwar 3D Interactive Emblem (Tilt on Mouse Movement)">
+          <img src="/static/images/ardhnarishwar_logo_emblem.png" alt="Ardhnarishwar 3D Emblem">
+        </div>
+      </div>
+
+      <div class="badge badge-emerald" style="margin-bottom: 12px; font-family: var(--font-mono); letter-spacing: 1px; font-size:11px;">
+        ✦ ARDHNARISHWAR DUAL BIOMETRIC & QUANTUM GEO-FENCE ATTENDANCE ✦
+      </div>
+      <h1 style="font-size: 32px; font-weight: 800; letter-spacing: -0.5px; margin: 0 0 10px 0; background: linear-gradient(135deg, #FFFFFF 25%, #F59E0B 55%, #C084FC 80%, #38BDF8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        Ardhnarishwar 3D Global Workforce Platform
+      </h1>
+      <p style="max-width: 680px; font-size: 14.5px; color: var(--text-secondary); line-height: 1.6; margin: 0 auto 20px;">
+        Empowering global enterprises with AI-driven 3D facial recognition, dynamic Wi-Fi subnet verification, GPS field geofencing, encrypted OTP dual-approvals, and sub-second runtime data synchronization.
+      </p>
+
+      <!-- Portals Quick Runtime Launcher -->
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; align-items: center;">
+        <a href="/portal/organization" class="btn btn-primary" style="background: linear-gradient(135deg, #7C3AED, #A855F7); border: none; padding: 10px 20px; font-weight: 700; border-radius: var(--radius-full); box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4); text-decoration: none; color: #FFF; display: flex; align-items: center; gap: 8px;">
+          <span>🏢</span> Organization Portal
+        </a>
+        <a href="/portal/employee" class="btn btn-secondary" style="background: linear-gradient(135deg, #0891B2, #06B6D4); border: none; padding: 10px 20px; font-weight: 700; border-radius: var(--radius-full); box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4); text-decoration: none; color: #FFF; display: flex; align-items: center; gap: 8px;">
+          <span>👤</span> Employee Self-Service
+        </a>
+        <button class="btn btn-runtime-refresh" onclick="ArdhnarishwarRuntime.triggerGlobalSync(true)">
+          <span class="refresh-icon">🔄</span> <span>Runtime Live Refresh</span>
+        </button>
+        <div class="auto-refresh-toggle" onclick="ArdhnarishwarRuntime.toggleAutoRefresh()">
+          <span>⚡ Auto-Sync: <b>ON (15s)</b></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Dynamic Local Time & Global Geolocation Telemetry HUD -->
   <div class="telemetry-hud-bar">
     <div class="telemetry-group">
       <div class="telemetry-pill active" id="telemetry-time-pill">
@@ -648,16 +709,22 @@ body {
   <!-- 3. Central Switcher Deck (Unified Single URL Controller) -->
   <nav class="main-nav-deck">
     <button class="nav-tab-btn active" id="btn-tab-register" onclick="switchMainTab('register')">
-      <span>🌟</span> Register (New Users)
+      <span>🌟</span> Register
     </button>
     <button class="nav-tab-btn tab-login" id="btn-tab-login" onclick="switchMainTab('login')">
-      <span>🔐</span> Sign In (Existing Users)
+      <span>🔐</span> Sign In
+    </button>
+    <button class="nav-tab-btn" id="btn-tab-portals" onclick="switchMainTab('portals')">
+      <span>🚀</span> 3D Portals Hub
+    </button>
+    <button class="nav-tab-btn" id="btn-tab-features" onclick="switchMainTab('features')">
+      <span>✨</span> 3D Features
     </button>
     <button class="nav-tab-btn tab-status" id="btn-tab-status" onclick="switchMainTab('status')">
       <span>🔍</span> Track Status
     </button>
     <button class="nav-tab-btn tab-health" id="btn-tab-health" onclick="switchMainTab('health')">
-      <span>💚</span> Telemetry & Health
+      <span>💚</span> Health
     </button>
   </nav>
 
@@ -910,6 +977,174 @@ body {
         <button type="button" class="btn btn-secondary btn-sm" onclick="fillSuperAdminDemo()">🏛️ Demo Super Admin</button>
       </div>
     </form>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- VIEW: 3D PORTALS RUNTIME HUB                                    -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section class="panel-card" id="view-panel-portals" style="display:none; max-width: 1040px;">
+    <div class="panel-header">
+      <div class="badge badge-purple" style="margin-bottom:10px;">Runtime Ecosystem</div>
+      <h2>3D Enterprise Portals & Modes</h2>
+      <p>Direct live entrypoints tailored for executive governance, employee self-service, and multi-modal biometric kiosks.</p>
+    </div>
+
+    <div class="ardh-portals-hub">
+      <!-- 1. Organization Portal -->
+      <a href="/portal/organization" class="ardh-portal-card tilt-3d">
+        <div class="ardh-portal-head">
+          <div class="ardh-portal-icon">🏢</div>
+          <span class="ardh-portal-pill">EXECUTIVE</span>
+        </div>
+        <div>
+          <div class="ardh-portal-title">Organization Portal</div>
+          <div class="ardh-portal-desc">Manage Wi-Fi subnets, GPS perimeter boundaries, designated approvers, and pending OTP queues in runtime.</div>
+        </div>
+        <div class="ardh-portal-link">Launch Workspace →</div>
+      </a>
+
+      <!-- 2. Employee Portal -->
+      <a href="/portal/employee" class="ardh-portal-card tilt-3d">
+        <div class="ardh-portal-head">
+          <div class="ardh-portal-icon">👤</div>
+          <span class="ardh-portal-pill" style="color:#34D399; background:rgba(16,185,129,0.15); border-color:rgba(16,185,129,0.3);">SELF-SERVICE</span>
+        </div>
+        <div>
+          <div class="ardh-portal-title">Employee Portal</div>
+          <div class="ardh-portal-desc">Check-in history, shift telemetry, client field visit logging, work mode switcher (WFO/WFH/Field).</div>
+        </div>
+        <div class="ardh-portal-link" style="color:#34D399;">Open My Portal →</div>
+      </a>
+
+      <!-- 3. Face Biometric -->
+      <a href="/attendance/face" class="ardh-portal-card tilt-3d">
+        <div class="ardh-portal-head">
+          <div class="ardh-portal-icon">📸</div>
+          <span class="ardh-portal-pill" style="color:#38BDF8; background:rgba(6,182,212,0.15); border-color:rgba(6,182,212,0.3);">AI BIOMETRIC</span>
+        </div>
+        <div>
+          <div class="ardh-portal-title">3D Face Attendance</div>
+          <div class="ardh-portal-desc">Ultra-fast sub-second biometric verification with animated facial mesh radar and anti-spoof liveness.</div>
+        </div>
+        <div class="ardh-portal-link" style="color:#38BDF8;">Start Face Scan →</div>
+      </a>
+
+      <!-- 4. Wi-Fi Check-In -->
+      <a href="/attendance/wifi" class="ardh-portal-card tilt-3d">
+        <div class="ardh-portal-head">
+          <div class="ardh-portal-icon">📶</div>
+          <span class="ardh-portal-pill" style="color:#F59E0B; background:rgba(245,158,11,0.15); border-color:rgba(245,158,11,0.3);">NETWORK GATE</span>
+        </div>
+        <div>
+          <div class="ardh-portal-title">Enterprise Wi-Fi</div>
+          <div class="ardh-portal-desc">Direct corporate intranet subnet validation. Zero-app touchless presence confirmation.</div>
+        </div>
+        <div class="ardh-portal-link" style="color:#F59E0B;">Check Wi-Fi Gateway →</div>
+      </a>
+
+      <!-- 5. Field GPS Attendance -->
+      <a href="/attendance/field" class="ardh-portal-card tilt-3d">
+        <div class="ardh-portal-head">
+          <div class="ardh-portal-icon">📍</div>
+          <span class="ardh-portal-pill" style="color:#EC4899; background:rgba(236,72,153,0.15); border-color:rgba(236,72,153,0.3);">GPS RADAR</span>
+        </div>
+        <div>
+          <div class="ardh-portal-title">Field Officer Tracker</div>
+          <div class="ardh-portal-desc">High-precision geofencing, client location tracking, and real-time distance verification from base.</div>
+        </div>
+        <div class="ardh-portal-link" style="color:#EC4899;">Launch Field Radar →</div>
+      </a>
+
+      <!-- 6. Super Admin Center -->
+      <div class="ardh-portal-card tilt-3d" onclick="openSuperAdminDrawer()" style="cursor:pointer;">
+        <div class="ardh-portal-head">
+          <div class="ardh-portal-icon">🏛️</div>
+          <span class="ardh-portal-pill" style="color:#F43F5E; background:rgba(244,63,94,0.15); border-color:rgba(244,63,94,0.3);">ROOT CONTROL</span>
+        </div>
+        <div>
+          <div class="ardh-portal-title">Super Admin Portal</div>
+          <div class="ardh-portal-desc">Platform-wide multi-tenant controls, tenant approvals, audit records, and zero-data bootstrap recovery.</div>
+        </div>
+        <div class="ardh-portal-link" style="color:#F43F5E;">Open Super Console →</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- VIEW: 3D FEATURES MATRIX                                        -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section class="panel-card" id="view-panel-features" style="display:none; max-width: 1040px;">
+    <div class="panel-header">
+      <div class="badge badge-emerald" style="margin-bottom:10px;">Platform Capabilities</div>
+      <h2>Ardhnarishwar 3D Feature Matrix</h2>
+      <p>Architected for extreme fault tolerance, sub-second latency, anti-spoofing biometrics, and runtime data flow.</p>
+    </div>
+
+    <div class="ardh-features-grid">
+      <!-- Feature 1 -->
+      <div class="ardh-feature-card tilt-3d">
+        <div class="ardh-feature-icon purple">🧬</div>
+        <div class="ardh-feature-title">3D AI Biometric Face Recognition</div>
+        <div class="ardh-feature-desc">128-point facial landmark topology with active liveness challenge to eliminate photos, printouts, and deepfakes.</div>
+        <span class="ardh-feature-badge">Anti-Spoofing Level 4</span>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="ardh-feature-card tilt-3d">
+        <div class="ardh-feature-icon teal">⚡</div>
+        <div class="ardh-feature-title">Runtime Live Synchronization</div>
+        <div class="ardh-feature-desc">Continuous bi-directional polling and master refresh engine ensuring zero staleness across all employee and admin screens.</div>
+        <span class="ardh-feature-badge">Zero Staleness</span>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="ardh-feature-card tilt-3d">
+        <div class="ardh-feature-icon gold">🛡️</div>
+        <div class="ardh-feature-title">Enterprise Wi-Fi Subnet Gating</div>
+        <div class="ardh-feature-desc">Matches client IP against allowed CIDR subnet blocks. Rejects mobile hotspots and unauthorized remote proxies.</div>
+        <span class="ardh-feature-badge">CIDR / IPv4 / IPv6</span>
+      </div>
+
+      <!-- Feature 4 -->
+      <div class="ardh-feature-card tilt-3d">
+        <div class="ardh-feature-icon emerald">📍</div>
+        <div class="ardh-feature-title">Quantum GPS Geofence Radar</div>
+        <div class="ardh-feature-desc">Haversine spherical distance calculation enforces strict perimeter radiuses (10m - 10,000m) with live accuracy telemetry.</div>
+        <span class="ardh-feature-badge">Sub-Meter Precision</span>
+      </div>
+
+      <!-- Feature 5 -->
+      <div class="ardh-feature-card tilt-3d">
+        <div class="ardh-feature-icon purple">🌐</div>
+        <div class="ardh-feature-title">Universal Multi-Timezone Engine</div>
+        <div class="ardh-feature-desc">Normalized UTC backend with dynamic entity-level local time projection. Supports cross-midnight shifts seamlessly.</div>
+        <span class="ardh-feature-badge">ISO 8601 UTC</span>
+      </div>
+
+      <!-- Feature 6 -->
+      <div class="ardh-feature-card tilt-3d">
+        <div class="ardh-feature-icon teal">🔐</div>
+        <div class="ardh-feature-title">Encrypted Dual-Approval OTP</div>
+        <div class="ardh-feature-desc">Secure 6-digit challenge code workflow allowing managers to authorize off-site exceptions with immutable digital trail.</div>
+        <span class="ardh-feature-badge">HMAC-SHA256</span>
+      </div>
+
+      <!-- Feature 7 -->
+      <div class="ardh-feature-card tilt-3d">
+        <div class="ardh-feature-icon gold">📊</div>
+        <div class="ardh-feature-title">Instant Multi-Format Data Exporter</div>
+        <div class="ardh-feature-desc">One-click real-time export of daily attendance, leave logs, monthly matrices, and audit logs to Excel CSV and JSON.</div>
+        <span class="ardh-feature-badge">Instant Download</span>
+      </div>
+
+      <!-- Feature 8 -->
+      <div class="ardh-feature-card tilt-3d">
+        <div class="ardh-feature-icon emerald">🎵</div>
+        <div class="ardh-feature-title">3D Audio & Visual Soundscape</div>
+        <div class="ardh-feature-desc">Integrated Web Audio API sound effects for punches, refreshes, and alerts with seamless instant mute toggle.</div>
+        <span class="ardh-feature-badge">Web Audio Synth</span>
+      </div>
+    </div>
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -1425,13 +1660,18 @@ async function submitQuickBiometricAttendance(e) {
 
 /* ── 2. Unified Navigation Controller (Single URL Engine) ──────── */
 function switchMainTab(tab) {
-  const tabs = ['register', 'login', 'status', 'health'];
+  const tabs = ['register', 'login', 'portals', 'features', 'status', 'health'];
   tabs.forEach(t => {
     const btn = document.getElementById(`btn-tab-${t}`);
     const panel = document.getElementById(`view-panel-${t}`);
     if (btn) btn.classList.toggle('active', t === tab);
     if (panel) panel.style.display = (t === tab) ? 'block' : 'none';
   });
+
+  // Re-trigger 3D tilt tracking for cards inside newly visible view
+  if (window.ArdhnarishwarRuntime && window.ArdhnarishwarRuntime.setup3DCardTilt) {
+    setTimeout(window.ArdhnarishwarRuntime.setup3DCardTilt, 50);
+  }
 
   // Update URL hash smoothly without reloading page
   history.replaceState(null, null, `/#${tab}`);
@@ -1962,7 +2202,7 @@ window.onload = () => {
     }
   }
 
-  if (['register', 'login', 'status', 'health'].includes(tab)) {
+  if (['register', 'login', 'portals', 'features', 'status', 'health'].includes(tab)) {
     switchMainTab(tab);
   } else if (tab === 'superadmin') {
     switchMainTab('login');
@@ -1990,5 +2230,7 @@ window.onload = () => {
 </script>
 <script src="/static/js/theme.js"></script>
 <script src="/static/js/telemetry.js"></script>
+<script src="/static/js/ardhnarishwar_runtime.js"></script>
+<script src="/static/js/ardh_logo.js?v=1"></script>
 </body>
 </html>

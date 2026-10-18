@@ -15,6 +15,7 @@ export const SIDEBAR_PERMISSIONS = {
       "candidate-management",
       "joined-candidates",
       "interview-scheduling",
+      "client-decisions",
       "services",
       "hr-calling",
       "sales-reports",

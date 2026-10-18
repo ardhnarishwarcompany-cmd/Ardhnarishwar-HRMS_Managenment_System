@@ -17,16 +17,18 @@ export const getMyAssignments = async (
 };
 
 export const getAssignmentById = async (
-  id
+  id,
+  employeeCode
 ) => {
   const [rows] = await db.query(
     `
     SELECT *
     FROM work_assignments
     WHERE id = ?
+      AND assigned_to = ?
     LIMIT 1
     `,
-    [id]
+    [id, employeeCode]
   );
 
   return rows[0];
@@ -34,7 +36,8 @@ export const getAssignmentById = async (
 
 export const updateAssignment = async (
   id,
-  data
+  data,
+  employeeCode
 ) => {
   return db.query(
     `
@@ -43,11 +46,13 @@ export const updateAssignment = async (
       status = ?,
       progress = ?
     WHERE id = ?
+      AND assigned_to = ?
     `,
     [
       data.status,
       data.progress,
       id,
+      employeeCode,
     ]
   );
 };

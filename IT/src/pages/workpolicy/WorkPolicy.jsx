@@ -52,27 +52,12 @@ export default function WorkPolicy() {
   const hasFilters = Object.values(filters).some(Boolean);
 
   return (
-    <ITShell>
+    <ITShell
+      title="Work Policy Sheet"
+      subtitle="Company work guidelines and policies published by HR and Super Admin (read-only)"
+      icon={ScrollText}
+    >
       <div className="flex flex-col gap-6">
-        {/* Hero */}
-        <MagicCard glow="79 70 229" className="overflow-hidden">
-          <div className="relative overflow-hidden rounded-[15px] bg-slate-950 px-7 py-8 text-white">
-            <div aria-hidden className="pointer-events-none absolute inset-0 opacity-80" style={{ background: "radial-gradient(700px circle at 85% -30%, rgba(99,102,241,.6), transparent 60%), radial-gradient(500px circle at 0% 120%, rgba(217,70,239,.25), transparent 60%)" }} />
-            <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[.07]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,.8) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.8) 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
-            <div className="relative flex flex-wrap items-end justify-between gap-6">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-300">Governance</p>
-                <h1 className="mt-2 text-3xl font-bold tracking-tight">Work Policy Sheet</h1>
-                <p className="mt-2 max-w-xl text-sm text-white/60">
-                  Company work guidelines and policies published by HR and Super Admin. This view is read-only for the IT department.
-                </p>
-              </div>
-              <span className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white/80">
-                <ScrollText size={14} /> Read-only
-              </span>
-            </div>
-          </div>
-        </MagicCard>
 
         {/* KPIs */}
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">

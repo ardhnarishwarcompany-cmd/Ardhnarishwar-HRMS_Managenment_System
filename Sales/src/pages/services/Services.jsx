@@ -69,7 +69,7 @@ export default function ServiceManagement() {
   };
 
   return (
-    <div className="min-h-screen space-y-6 bg-slate-50 p-6">
+    <div className="space-y-6">
       {/* HEADER */}
 
       <PageHeader

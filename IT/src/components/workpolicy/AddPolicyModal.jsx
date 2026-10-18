@@ -96,28 +96,28 @@ export default function AddPolicyModal({ open, onClose, onSuccess, policy = null
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="policy-form-title"
     >
       <div
-        className="w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-black/5 dark:bg-slate-900"
+        className="w-full max-w-2xl overflow-hidden rounded-[28px] border border-[var(--line)] bg-[var(--card)] shadow-2xl transition-all dark:bg-slate-900"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative overflow-hidden bg-slate-950 px-7 py-6 text-white">
+        <div className="relative overflow-hidden bg-gradient-to-r from-[#6d28d9] via-[#7c3aed] to-[#c026d3] px-7 py-6 text-white shadow-md">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 opacity-70"
-            style={{ background: "radial-gradient(600px circle at 90% -20%, rgba(99,102,241,.55), transparent 60%)" }}
+            className="pointer-events-none absolute inset-0 opacity-25"
+            style={{ background: "radial-gradient(500px circle at 90% 10%, rgba(255,255,255,0.4), transparent 60%)" }}
           />
           <div className="relative flex items-start justify-between gap-4">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-indigo-300">
+              <span className="inline-flex items-center rounded-lg bg-white/20 px-2.5 py-0.5 font-mono text-xs font-bold text-white backdrop-blur-md border border-white/25">
                 {isEdit ? `Editing ${policy.policyId || ""}` : "Work policy"}
-              </p>
-              <h3 id="policy-form-title" className="mt-1 text-xl font-bold tracking-tight">
+              </span>
+              <h3 id="policy-form-title" className="mt-2 text-xl font-bold tracking-tight text-white drop-shadow-sm">
                 {isEdit ? "Edit policy" : "Add new policy"}
               </h3>
             </div>
@@ -125,7 +125,7 @@ export default function AddPolicyModal({ open, onClose, onSuccess, policy = null
               type="button"
               onClick={onClose}
               aria-label="Close"
-              className="rounded-lg p-1.5 text-white/60 transition hover:bg-white/10 hover:text-white"
+              className="rounded-xl bg-white/15 p-2 text-white/90 backdrop-blur-sm transition hover:bg-white/25 hover:text-white"
             >
               <X size={18} />
             </button>
@@ -178,7 +178,8 @@ export default function AddPolicyModal({ open, onClose, onSuccess, policy = null
               <button
                 type="submit"
                 disabled={saving}
-                className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-600/25 transition hover:bg-indigo-700 disabled:opacity-60"
+                className="inline-flex items-center gap-2 rounded-xl py-2.5 px-5 text-sm font-bold text-white shadow-lg shadow-purple-600/30 transition-all hover:shadow-purple-600/50 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60"
+                style={{ background: "linear-gradient(135deg, #6d28d9, #c026d3)" }}
               >
                 {saving ? <Loader2 size={16} className="animate-spin" /> : isEdit ? <Save size={16} /> : <Plus size={16} />}
                 {saving ? "Saving..." : isEdit ? "Save changes" : "Create policy"}

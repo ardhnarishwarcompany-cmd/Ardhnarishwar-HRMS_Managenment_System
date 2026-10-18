@@ -114,17 +114,9 @@ export const geoPunch = async (req, res) => {
       return res.status(401).json({ success: false, message: "No employee in token" });
 
     const fence = await resolveFence(latitude, longitude);
-    if (!fence.hasOffices)
-      return res.status(400).json({
-        success: false,
-        message: "No office locations configured. Ask admin to add one.",
-      });
-    if (fence.geo_status === "OUTSIDE")
-      return res.status(403).json({
-        success: false,
-        message: `Outside geo-fence: ${fence.distance_m}m from ${fence.office.name} (allowed ${fence.office.radius_m}m)`,
-        distance_m: fence.distance_m,
-      });
+    const officeName = fence.office?.name || "Office";
+    const officeId = fence.office?.id || null;
+    const isInside = fence.geo_status === "INSIDE";
 
     const today = new Date().toISOString().slice(0, 10);
     const now = new Date().toTimeString().slice(0, 8);
@@ -151,21 +143,33 @@ export const geoPunch = async (req, res) => {
           latitude,
           longitude,
           fence.geo_status,
-          fence.office.id,
+          officeId,
         ],
       );
       return res.json({
         success: true,
         action: "check_in",
-        message: `Checked in at ${fence.office.name} (${fence.distance_m}m away)`,
+        message: isInside
+          ? `Checked in at ${officeName}`
+          : `Checked in (GPS recorded)`,
       });
     }
 
-    if (existing.check_out)
-      return res.status(400).json({
-        success: false,
-        message: "Already checked out for today",
+    if (existing.check_out) {
+      await db.query(
+        `UPDATE super_admin_attendance
+         SET check_in = ?, check_out = NULL, check_in_lat = ?, check_in_lng = ?, geo_status = ?, office_id = ?
+         WHERE id = ?`,
+        [now, latitude, longitude, fence.geo_status, officeId, existing.id],
+      );
+      return res.json({
+        success: true,
+        action: "check_in",
+        message: isInside
+          ? `Checked in at ${officeName}`
+          : `Checked in (GPS recorded)`,
       });
+    }
 
     await db.query(
       `UPDATE super_admin_attendance
@@ -176,7 +180,9 @@ export const geoPunch = async (req, res) => {
     return res.json({
       success: true,
       action: "check_out",
-      message: `Checked out at ${fence.office.name} (${fence.distance_m}m away)`,
+      message: isInside
+        ? `Checked out at ${officeName}`
+        : `Checked out (GPS recorded)`,
     });
   } catch (e) {
     res.status(500).json({ success: false, message: e.message });

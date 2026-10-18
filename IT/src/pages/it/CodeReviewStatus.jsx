@@ -142,26 +142,26 @@ export default function CodeReviewStatus() {
     >
       <form
         onSubmit={submit}
-        className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6 grid grid-cols-1 md:grid-cols-4 gap-3 items-end"
+        className="it-card mb-6 grid grid-cols-1 md:grid-cols-4 gap-4 items-end"
       >
-        <div className="flex flex-col gap-1 md:col-span-2">
-          <label className="text-xs text-gray-500">PR title *</label>
+        <div className="flex flex-col gap-1.5 md:col-span-2">
+          <label className="text-xs font-semibold text-[var(--mute)]">PR title *</label>
           <input
             value={form.pr_title}
             onChange={(e) =>
               setForm((f) => ({ ...f, pr_title: e.target.value }))
             }
             placeholder="e.g. feat: add payroll auto-generation"
-            className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
+            className="it-input"
             required
           />
         </div>
-        <div className="flex flex-col gap-1 md:col-span-2">
-          <label className="text-xs text-gray-500">Linked task (shows Merged status to Super Admin)</label>
+        <div className="flex flex-col gap-1.5 md:col-span-2">
+          <label className="text-xs font-semibold text-[var(--mute)]">Linked task (shows Merged status to Super Admin)</label>
           <select
             value={form.task_id}
             onChange={(e) => setForm((f) => ({ ...f, task_id: e.target.value }))}
-            className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
+            className="it-input"
           >
             <option value="">No linked task</option>
             {tasks.map((t) => (
@@ -171,8 +171,8 @@ export default function CodeReviewStatus() {
             ))}
           </select>
         </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-gray-500">PR link</label>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-[var(--mute)]">PR link</label>
           <input
             type="url"
             value={form.pr_link}
@@ -180,7 +180,7 @@ export default function CodeReviewStatus() {
               setForm((f) => ({ ...f, pr_link: e.target.value }))
             }
             placeholder="https://github.com/..."
-            className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
+            className="it-input"
           />
         </div>
         <div className="flex gap-3">
@@ -189,7 +189,7 @@ export default function CodeReviewStatus() {
             onChange={(e) =>
               setForm((f) => ({ ...f, reviewer_id: e.target.value }))
             }
-            className="border border-gray-200 rounded-lg px-3 py-2 text-sm flex-1"
+            className="it-input flex-1"
           >
             <option value="">Any reviewer</option>
             {employees.map((emp) => (
@@ -201,7 +201,7 @@ export default function CodeReviewStatus() {
           <button
             type="submit"
             disabled={saving}
-            className="bg-indigo-600 text-white rounded-lg px-4 py-2 text-sm font-medium hover:bg-indigo-700 disabled:opacity-50"
+            className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-purple-500/25 transition hover:shadow-purple-500/40 hover:-translate-y-0.5 disabled:opacity-50"
           >
             {saving ? "..." : "Request"}
           </button>
@@ -209,9 +209,9 @@ export default function CodeReviewStatus() {
       </form>
 
       {loading ? (
-        <div className="text-center py-10 text-gray-500">Loading...</div>
+        <div className="text-center py-10 text-[var(--mute)]">Loading...</div>
       ) : rows.length === 0 ? (
-        <div className="text-center py-10 bg-white rounded-2xl border border-gray-100 text-gray-500 text-sm">
+        <div className="it-card text-center py-12 text-[var(--mute)] text-sm">
           No code reviews yet.
         </div>
       ) : (
@@ -219,7 +219,7 @@ export default function CodeReviewStatus() {
           {rows.map((r) => (
             <div
               key={r.id}
-              className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4"
+              className="it-card !p-4 hover:border-purple-300 transition"
             >
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                 <div className="min-w-0 flex-1">

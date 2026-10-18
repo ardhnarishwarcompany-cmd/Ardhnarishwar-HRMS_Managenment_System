@@ -69,6 +69,95 @@ export const getAllInterviews = async (queryParams = {}) => {
 };
 
 /* =========================
+   CLIENT DECISIONS (Interview Tracker outcomes)
+   HR schedules -> client accepts/rejects in the client portal -> rows land here.
+========================= */
+const CLIENT_DECISIONS = ["accepted", "rejected"];
+const CALL_STATUS_INTERVIEW_SCHEDULED = 6;
+
+export const getClientDecisions = async (queryParams = {}) => {
+  const {
+    page = 1, limit = 50, search = "", decision = "",
+    hr = "", client = "", joined = "",
+  } = queryParams;
+
+  const parsedPage = Math.max(1, Number(page) || 1);
+  const parsedLimit = Math.min(500, Math.max(1, Number(limit) || 50));
+  const offset = (parsedPage - 1) * parsedLimit;
+
+  let where = ` WHERE ci.client_status <> 'pending'`;
+  const values = [];
+
+  if (CLIENT_DECISIONS.includes(decision)) {
+    where += ` AND ci.client_status = ?`;
+    values.push(decision);
+  }
+  if (search?.trim()) {
+    const s = `%${search.trim()}%`;
+    where += ` AND (ci.candidate_name LIKE ? OR ci.candidate_phone LIKE ? OR ci.job_profile LIKE ? OR c.company_name LIKE ? OR c.client_code LIKE ?)`;
+    values.push(s, s, s, s, s);
+  }
+  if (hr) {
+    if (/^\d+$/.test(String(hr))) {
+      where += ` AND ci.hr_employee_id = ?`;
+      values.push(Number(hr));
+    } else {
+      where += ` AND e.name LIKE ?`;
+      values.push(`%${String(hr).trim()}%`);
+    }
+  }
+  if (client) {
+    if (/^\d+$/.test(String(client))) {
+      where += ` AND ci.client_id = ?`;
+      values.push(Number(client));
+    } else {
+      where += ` AND c.client_code = ?`;
+      values.push(String(client).trim());
+    }
+  }
+  if (joined === "Yes" || joined === "No") {
+    where += ` AND ci.joined = ?`;
+    values.push(joined);
+  }
+
+  const sql = `
+    SELECT ci.*, e.name AS hr_name, c.client_code, c.company_name, l.name AS language_name,
+           COALESCE(ci.client_decided_at, ci.updated_at) AS decided_at
+    ${INTERVIEW_FROM}${where}
+    ORDER BY decided_at DESC, ci.id DESC LIMIT ? OFFSET ?`;
+  const countSql = `SELECT COUNT(*) AS total ${INTERVIEW_FROM}${where}`;
+
+  const [rows] = await db.query(sql, [...values, parsedLimit, offset]);
+  const [countResult] = await db.query(countSql, values);
+  const totalRows = countResult[0]?.total || 0;
+
+  return {
+    rows,
+    totalRows,
+    currentPage: parsedPage,
+    totalPages: Math.max(1, Math.ceil(totalRows / parsedLimit)),
+  };
+};
+
+export const getClientDecisionSummary = async () => {
+  const [[row]] = await db.query(
+    `SELECT
+       SUM(client_status = 'pending' AND call_status_id = ?) AS awaiting,
+       SUM(client_status = 'accepted') AS accepted,
+       SUM(client_status = 'rejected') AS rejected,
+       SUM(client_status = 'accepted' AND joined = 'Yes') AS joined
+     FROM client_interviews`,
+    [CALL_STATUS_INTERVIEW_SCHEDULED],
+  );
+  return {
+    awaiting: Number(row?.awaiting || 0),
+    accepted: Number(row?.accepted || 0),
+    rejected: Number(row?.rejected || 0),
+    joined: Number(row?.joined || 0),
+  };
+};
+
+/* =========================
    GET SCHEDULED INTERVIEWS (legacy, with JOINs)
 ========================= */
 export const getScheduledInterviews = async ({

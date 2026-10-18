@@ -316,7 +316,12 @@ export const nextProposalNumber = async () => {
     "SELECT COUNT(*) AS cnt FROM proposals WHERE proposal_number LIKE ?",
     [`PRP-${year}-%`],
   );
-  return `PRP-${year}-${String(cnt + 1).padStart(4, "0")}`;
+  const [[mx]] = await db.query(
+    "SELECT MAX(CAST(SUBSTRING_INDEX(proposal_number, '-', -1) AS UNSIGNED)) AS mx FROM proposals WHERE proposal_number LIKE ?",
+    [`PRP-${year}-%`],
+  );
+  const next = Math.max(Number(mx && mx.mx) || 0, Number(cnt) || 0) + 1;
+  return `PRP-${year}-${String(next).padStart(4, "0")}`;
 };
 
 export const parseRow = (row) => ({

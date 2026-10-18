@@ -27,8 +27,9 @@ const fmt = (v) => {
 
 /* split price into a big figure + small unit for the card hero */
 const priceParts = (s) => {
-  if (s.pricing_type === "CTC_PERCENT") return { fig: `${fmt(s.pricing_value)}%`, unit: "of CTC" };
-  if (s.pricing_type === "DAYS_SALARY") return { fig: fmt(s.pricing_value), unit: "days salary" };
+  const val = parseFloat(s.pricing_value);
+  if (s.pricing_type === "CTC_PERCENT" && !isNaN(val) && val < 100) return { fig: `${fmt(s.pricing_value)}%`, unit: "of CTC" };
+  if (s.pricing_type === "DAYS_SALARY" && !isNaN(val) && val <= 90) return { fig: fmt(s.pricing_value), unit: "days salary" };
   return { fig: `Rs. ${fmt(s.pricing_value)}`, unit: "fixed" };
 };
 

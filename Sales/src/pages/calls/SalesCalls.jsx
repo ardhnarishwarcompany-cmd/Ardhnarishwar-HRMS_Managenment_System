@@ -11,11 +11,12 @@ import AddEditCallModal from "../../components/calls/AddEditCallModal";
 import {
   Phone,
   CheckCircle,
-  XCircle,
   PauseCircle,
   Clock,
   CalendarClock,
   AlertTriangle,
+  Plus,
+  RefreshCw,
 } from "lucide-react";
 
 export default function SalesCalls() {
@@ -31,7 +32,7 @@ export default function SalesCalls() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
 
-  // modal state (future ready)
+  // modal state
   const [editingCall, setEditingCall] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
@@ -85,10 +86,10 @@ export default function SalesCalls() {
     const accepted = calls.filter((c) => c.status === "accepted").length;
     const hold = calls.filter((c) => c.status === "hold").length;
 
-    // ✅ SALES DONE (based on sold_date)
+    // SALES DONE (based on sold_date)
     const salesDone = calls.filter((c) => c.sold_date).length;
 
-    // ❗ only non-rejected calls should count for follow-ups
+    // only non-rejected calls should count for follow-ups
     const validFollowupCalls = calls.filter(
       (c) => c.status !== "rejected" && c.follow_up_datetime,
     );
@@ -96,7 +97,7 @@ export default function SalesCalls() {
     const totalFollowUps = validFollowupCalls.length;
 
     const upcomingFollowUps = validFollowupCalls.filter(
-      (c) => new Date(c.status !== "rejected" && c.follow_up_datetime) >= now,
+      (c) => new Date(c.follow_up_datetime) >= now,
     ).length;
 
     const overdueFollowUps = validFollowupCalls.filter(
@@ -122,97 +123,107 @@ export default function SalesCalls() {
     setOpenModal(true);
   };
 
+  const openCreate = () => {
+    setEditingCall(null);
+    setOpenModal(true);
+  };
+
   return (
-    <div className="m-5">
+    <div className="space-y-6">
       <PageHeader
         title="Sales Calls"
         desc="Manage and track your customer calls"
+        actions={
+          <>
+            <button
+              type="button"
+              onClick={fetchCalls}
+              disabled={loading}
+              className="btn-on-brand-ghost"
+            >
+              <RefreshCw size={16} aria-hidden="true" className={loading ? "animate-spin" : ""} />
+              Refresh
+            </button>
+            <button type="button" onClick={openCreate} className="btn-on-brand">
+              <Plus size={16} aria-hidden="true" />
+              Add Call
+            </button>
+          </>
+        }
       />
 
-      <div className="flex justify-end mb-4">
-        <button
-          onClick={() => {
-            setEditingCall(null);
-            setOpenModal(true);
-          }}
-          className="btn-primary"
-        >
-          + Add Call
-        </button>
-      </div>
-
       {/* ================= STATS ================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4 mb-6">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-6 2xl:grid-cols-7">
         <StatCard
           title="Total Calls"
           value={stats.total}
           subText="All call records"
-          icon={<Phone size={26} />}
-          gradient="bg-gradient-to-r from-blue-500/90 to-cyan-500/90"
+          icon={<Phone />}
+          gradient="bg-gradient-to-br from-blue-500 to-blue-700"
         />
 
         <StatCard
           title="Lead Generated"
           value={stats.accepted}
           subText="Successful conversions"
-          icon={<CheckCircle size={26} />}
-          gradient="bg-gradient-to-r from-green-500/90 to-emerald-500/90"
+          icon={<CheckCircle />}
+          gradient="bg-gradient-to-br from-teal-500 to-teal-700"
         />
 
         <StatCard
           title="Sales Done"
           value={stats.salesDone}
           subText="Successful conversions"
-          icon={<CheckCircle size={26} />}
-          gradient="bg-gradient-to-r from-emerald-500/90 to-green-600/90"
+          icon={<CheckCircle />}
+          gradient="bg-gradient-to-br from-emerald-500 to-green-700"
         />
 
         <StatCard
           title="On Hold"
           value={stats.hold}
           subText="Pending decisions"
-          icon={<PauseCircle size={26} />}
-          gradient="bg-gradient-to-r from-yellow-500/90 to-amber-500/90"
+          icon={<PauseCircle />}
+          gradient="bg-gradient-to-br from-orange-500 to-amber-700"
         />
 
         <StatCard
           title="Need Follow-ups"
           value={stats.upcomingFollowUps}
           subText="Upcoming follow-ups"
-          icon={<CalendarClock size={26} />}
-          gradient="bg-gradient-to-r from-indigo-500/90 to-blue-500/90"
+          icon={<CalendarClock />}
+          gradient="bg-gradient-to-br from-indigo-500 to-indigo-700"
         />
 
         <StatCard
           title="Total Follow-ups"
           value={stats.totalFollowUps}
           subText="All scheduled"
-          icon={<Clock size={26} />}
-          gradient="bg-gradient-to-r from-purple-500/90 to-fuchsia-500/90"
+          icon={<Clock />}
+          gradient="bg-gradient-to-br from-violet-500 to-purple-700"
         />
 
         <StatCard
           title="Pending Follow-ups"
           value={stats.overdueFollowUps}
           subText="Overdue tasks"
-          icon={<AlertTriangle size={26} />}
-          gradient="bg-gradient-to-r from-orange-500/90 to-red-500/90"
+          icon={<AlertTriangle />}
+          gradient="bg-gradient-to-br from-rose-500 to-red-700"
         />
       </div>
 
-      {/* ================= FILTERS ================= */}
-      <CallsFilterBar
-        search={search}
-        setSearch={setSearch}
-        status={status}
-        setStatus={setStatus}
-      />
+      {/* ================= FILTERS + TABLE ================= */}
+      <section className="sp-card overflow-hidden" aria-label="Call records">
+        <CallsFilterBar
+          search={search}
+          setSearch={setSearch}
+          status={status}
+          setStatus={setStatus}
+          count={filteredCalls.length}
+        />
+        <CallsTable calls={filteredCalls} loading={loading} onEdit={handleEdit} />
+      </section>
 
-      {/* ================= TABLE ================= */}
-      <CallsTable calls={filteredCalls} loading={loading} onEdit={handleEdit} />
-
-      {/* ================= ADD CALL ================= */}
-
+      {/* ================= ADD / EDIT CALL ================= */}
       <AddEditCallModal
         isOpen={openModal}
         onClose={() => setOpenModal(false)}
@@ -221,7 +232,6 @@ export default function SalesCalls() {
         BASE_URL={BASE_URL}
         token={token}
       />
-      {/* Modal will plug here next step */}
     </div>
   );
 }

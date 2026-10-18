@@ -14,7 +14,7 @@ export const updateMyAssignment = async (
   employeeCode
 ) => {
   const existing =
-    await query.getAssignmentById(id);
+    await query.getAssignmentById(id, employeeCode);
 
   if (!existing) {
     throw new Error(
@@ -40,6 +40,7 @@ export const updateMyAssignment = async (
 
   return query.updateAssignment(
     id,
-    payload
+    payload,
+    employeeCode
   );
 };

@@ -21,6 +21,7 @@ import {
   History,
   AlertCircle,
   Handshake,
+  UserCheck,
 } from "lucide-react";
 
 export const CLIENT_MENU = [
@@ -72,7 +73,12 @@ export const CLIENT_MENU = [
     path: "/attendance",
     icon: CalendarDays,
   },
-
+  {
+    key: "INTERVIEW_TRACKER",
+    label: "Interview Tracker",
+    path: "/interviews",
+    icon: UserCheck,
+  },
   {
     key: "PAYROLL",
     label: "Payroll",

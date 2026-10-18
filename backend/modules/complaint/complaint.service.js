@@ -175,3 +175,46 @@ export const updateStatus = async (id, status) => {
   return res;
 };
 
+
+const httpError = (status, message) => {
+  const e = new Error(message);
+  e.status = status;
+  return e;
+};
+
+const loadOwned = async (id, user) => {
+  const [[c]] = await db.query(
+    `SELECT id, status, created_by_id, created_by_role FROM complaints WHERE id = ? AND is_active = 1`,
+    [id],
+  );
+  if (!c) throw httpError(404, "Complaint not found");
+  if (
+    Number(c.created_by_id) !== Number(user.id) ||
+    String(c.created_by_role) !== String(user.role)
+  )
+    throw httpError(403, "You can only change your own complaint");
+  return c;
+};
+
+// EDIT (owner only, only while status is open)
+export const updateComplaint = async (id, user, data) => {
+  const c = await loadOwned(id, user);
+  if (c.status !== "open") throw httpError(400, "Only open complaints can be edited");
+  const title = String(data.title || "").trim();
+  const description = String(data.description || "").trim();
+  const priority = String(data.priority || "").toLowerCase();
+  if (!title || !description) throw httpError(400, "Title and description are required");
+  if (!["low", "medium", "high"].includes(priority)) throw httpError(400, "Invalid priority");
+  const [res] = await db.query(
+    `UPDATE complaints SET title = ?, description = ?, priority = ? WHERE id = ?`,
+    [title.slice(0, 255), description, priority, id],
+  );
+  return res;
+};
+
+// DELETE (owner only, soft delete)
+export const deleteComplaint = async (id, user) => {
+  await loadOwned(id, user);
+  const [res] = await db.query(`UPDATE complaints SET is_active = 0 WHERE id = ?`, [id]);
+  return res;
+};

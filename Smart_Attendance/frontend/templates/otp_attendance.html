@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>In-App Verification Code • Global Attendance Management System</title>
-<link rel="icon" type="image/svg+xml" href="/favicon.ico">
+<title>Email OTP Attendance • Ardhnarishwar Global Platform</title>
+<link rel="icon" type="image/png" href="/static/images/ardhnarishwar_logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/css/theme.css">
+<link rel="stylesheet" href="/static/css/ardhnarishwar_3d.css">
 <style>
 .clockin-container {
   min-height: 100vh;
@@ -101,15 +102,33 @@
   justify-content: space-between;
   font-size: 13px;
 }
+@media (max-width: 520px) {
+  .clockin-container { padding: 16px 10px; }
+  .clockin-card { padding: 22px 16px; border-radius: 18px; gap: 16px; }
+  .clockin-header h1 { font-size: 19px !important; }
+  .clockin-header p { font-size: 12px; line-height: 1.5; }
+  .emp-badge-bar { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .otp-box { gap: 5px; margin: 8px 0; }
+  .otp-digit { width: 42px; height: 50px; font-size: 20px; }
+}
+@media (max-width: 360px) {
+  .otp-digit { width: 37px; height: 46px; font-size: 18px; }
+  .clockin-card { padding: 18px 12px; }
+}
 </style>
+<link rel="stylesheet" href="/static/css/ardh_logo.css?v=1">
 </head>
 <body>
 <div class="clockin-container">
-  <div class="clockin-card">
+  <div class="clockin-card card-3d">
     <div class="clockin-header">
-      <div class="clockin-icon">🔢</div>
-      <h1>In-App Verification Code</h1>
-      <p>Secure 2-factor private authentication code</p>
+      <div style="display:flex; justify-content:center; margin-bottom:12px;">
+        <div class="ardh-medallion-nav" style="width:56px; height:56px;">
+          <img src="/static/images/ardhnarishwar_logo_emblem.png" alt="Ardhnarishwar Logo" class="ardh-medallion-img">
+        </div>
+      </div>
+      <h1 style="background:linear-gradient(135deg, #C084FC, #38BDF8, #FBBF24); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-size:22px; font-weight:900;">ARDHNARISHWAR EMAIL OTP</h1>
+      <p>Secure attendance OTP delivered to the company-authorized HR / Manager email</p>
     </div>
 
     <div class="emp-badge-bar">
@@ -122,13 +141,23 @@
       </div>
     </div>
 
+    <!-- Clock-IN / Clock-OUT Selector -->
+    <div style="display:flex; background:var(--bg-input); padding:4px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle); margin-bottom:14px;">
+      <button type="button" id="toggle-punch-in" onclick="setPunchType('IN')" style="flex:1; padding:8px 12px; border-radius:6px; border:none; font-weight:700; font-size:12.5px; cursor:pointer; background:var(--emerald); color:#fff; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;">
+        <span>🟢 Clock-IN</span>
+      </button>
+      <button type="button" id="toggle-punch-out" onclick="setPunchType('OUT')" style="flex:1; padding:8px 12px; border-radius:6px; border:none; font-weight:700; font-size:12.5px; cursor:pointer; background:transparent; color:var(--text-secondary); display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;">
+        <span>🔴 Clock-OUT</span>
+      </button>
+    </div>
+
     <!-- Step 1: Send / Generate Code -->
     <div id="step-send">
       <p style="font-size:13px; color:var(--text-muted); text-align:center; margin-bottom:16px;">
-        Click below to dispatch an authentication code to your private in-app notification vault.
+        Click below to send a one-time attendance OTP to the company's authorized HR / Manager email.
       </p>
       <button class="btn btn-indigo btn-lg" style="width:100%;" id="btn-request-code" onclick="requestCode()">
-        Dispatch Verification Code →
+        Send OTP to Authorized Email →
       </button>
     </div>
 
@@ -147,19 +176,14 @@
         Verify Code & Mark Attendance →
       </button>
 
-      <div style="display:flex; justify-content:space-between; align-items:center; font-size:12.5px;">
-        <span onclick="fetchInAppPrivateCode()" style="color:var(--cyan); cursor:pointer; font-weight:600; text-decoration:underline;">
-          🔑 Retrieve In-App Code
-        </span>
+      <div style="display:flex; justify-content:flex-end; align-items:center; font-size:12.5px;">
         <span onclick="requestCode()" style="color:var(--text-muted); cursor:pointer; text-decoration:underline;">
-          Resend Code
+          Resend OTP
         </span>
       </div>
     </div>
 
-    <a href="/employee" style="text-align:center; color:var(--text-muted); font-size:13px; text-decoration:none; margin-top:4px;">
-      ← Return to Employee Dashboard
-    </a>
+    <a href="/employee" class="btn btn-secondary btn-sm" style="text-decoration:none; margin-top:4px;">← Return to Portal</a>
   </div>
 </div>
 
@@ -169,8 +193,50 @@
 <script>
 let currentCompanyId = "";
 let currentEmpId = "";
+let currentPunchType = "IN";
+
+function setPunchType(type) {
+  currentPunchType = type;
+  const inBtn = document.getElementById('toggle-punch-in');
+  const outBtn = document.getElementById('toggle-punch-out');
+  const verifyBtn = document.getElementById('btn-verify');
+
+  if (type === 'OUT') {
+    if (inBtn) {
+      inBtn.style.background = 'transparent';
+      inBtn.style.color = 'var(--text-secondary)';
+    }
+    if (outBtn) {
+      outBtn.style.background = 'var(--rose)';
+      outBtn.style.color = '#fff';
+    }
+    if (verifyBtn && !verifyBtn.disabled) {
+      verifyBtn.textContent = 'Verify Code & Clock-OUT →';
+    }
+  } else {
+    if (inBtn) {
+      inBtn.style.background = 'var(--emerald)';
+      inBtn.style.color = '#fff';
+    }
+    if (outBtn) {
+      outBtn.style.background = 'transparent';
+      outBtn.style.color = 'var(--text-secondary)';
+    }
+    if (verifyBtn && !verifyBtn.disabled) {
+      verifyBtn.textContent = 'Verify Code & Clock-IN →';
+    }
+  }
+}
 
 async function initPage() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const modeParam = (urlParams.get('mode') || '').toUpperCase();
+  if (modeParam === 'OUT') {
+    setPunchType('OUT');
+  } else {
+    setPunchType('IN');
+  }
+
   try {
     const res = await fetch('/api/me');
     const data = await res.json();
@@ -186,7 +252,7 @@ async function initPage() {
 
 async function requestCode() {
   const btn = document.getElementById('btn-request-code');
-  btn.textContent = 'Generating Private Code...';
+  btn.textContent = 'Sending OTP to authorized email...';
   btn.disabled = true;
 
   try {
@@ -200,17 +266,17 @@ async function requestCode() {
       document.getElementById('step-send').style.display = 'none';
       const verifyStep = document.getElementById('step-verify');
       verifyStep.style.display = 'flex';
-      showToast(data.message, 'success');
+      showToast(`${data.message} ${data.recipients ? '(' + data.recipients.join(', ') + ')' : ''}`, 'success');
       document.getElementById('d1').focus();
     } else {
       showToast(data.error || 'Failed to generate code', 'error');
       btn.disabled = false;
-      btn.textContent = 'Dispatch Verification Code →';
+      btn.textContent = 'Send OTP to Authorized Email →';
     }
   } catch (err) {
     showToast('Server communication failure', 'error');
     btn.disabled = false;
-    btn.textContent = 'Dispatch Verification Code →';
+    btn.textContent = 'Send OTP to Authorized Email →';
   }
 }
 
@@ -235,23 +301,7 @@ function getEnteredCode() {
   return s;
 }
 
-async function fetchInAppPrivateCode() {
-  try {
-    const res = await fetch('/api/attendance/my-active-otp');
-    const data = await res.json();
-    if (data.ok && data.otp_code) {
-      const code = data.otp_code;
-      for (let i = 1; i <= 6; i++) {
-        document.getElementById(`d${i}`).value = code[i-1] || '';
-      }
-      showToast(`Private In-App Code: ${code} (Expires in ${data.expires_in_seconds}s)`, 'success');
-    } else {
-      showToast(data.error || 'No active code in private vault', 'error');
-    }
-  } catch (err) {
-    showToast('Failed to retrieve code from private vault', 'error');
-  }
-}
+
 
 async function verifyOTP() {
   const code = getEnteredCode();
@@ -271,24 +321,25 @@ async function verifyOTP() {
       body: JSON.stringify({
         company_id: currentCompanyId,
         emp_id: currentEmpId,
-        otp: code
+        otp: code,
+        check_type: currentPunchType
       })
     });
     const data = await res.json();
 
     if (data.ok) {
       showToast(data.message, 'success');
-      btn.textContent = 'Verified ✓';
+      btn.textContent = `Clock-${currentPunchType} Verified ✓`;
       setTimeout(() => { window.location.href = '/employee'; }, 2000);
     } else {
       showToast(data.error || 'Code verification failed', 'error');
       btn.disabled = false;
-      btn.textContent = 'Verify Code & Mark Attendance →';
+      btn.textContent = `Verify Code & Clock-${currentPunchType} →`;
     }
   } catch (err) {
     showToast('Network error verifying code', 'error');
     btn.disabled = false;
-    btn.textContent = 'Verify Code & Mark Attendance →';
+    btn.textContent = `Verify Code & Clock-${currentPunchType} →`;
   }
 }
 
@@ -308,5 +359,7 @@ window.onload = initPage;
 </script>
 <script src="/static/js/theme.js"></script>
 <script src="/static/js/telemetry.js"></script>
+<script src="/static/js/ardhnarishwar_runtime.js"></script>
+<script src="/static/js/ardh_logo.js?v=1"></script>
 </body>
 </html>

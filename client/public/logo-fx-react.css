@@ -1,0 +1,13 @@
+img[src="/logo.jpeg"],img[src="/logo.png"]{
+  transform-style:preserve-3d;will-change:transform,filter;
+  animation:arBounce3d 2.6s ease-in-out infinite, arGlow 2.6s ease-in-out infinite;
+}
+@keyframes arBounce3d{
+  0%,100%{transform:perspective(600px) translateY(0) rotateY(-14deg) rotateX(4deg) scale(1)}
+  50%{transform:perspective(600px) translateY(-5px) rotateY(14deg) rotateX(-4deg) scale(1.06)}
+}
+@keyframes arGlow{
+  0%,100%{filter:drop-shadow(0 0 5px rgba(167,139,250,.6)) drop-shadow(0 0 12px rgba(45,212,191,.35))}
+  50%{filter:drop-shadow(0 0 12px rgba(196,181,253,.95)) drop-shadow(0 0 26px rgba(45,212,191,.75))}
+}
+@media (prefers-reduced-motion:reduce){img[src="/logo.jpeg"],img[src="/logo.png"]{animation:none}}

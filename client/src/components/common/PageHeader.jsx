@@ -6,19 +6,19 @@ function RenderIcon({ icon, size }) {
   if (!icon) return null;
   if (isValidElement(icon)) return icon;
   const Icon = icon;
-  return <Icon size={size} />;
+  return <Icon size={size} strokeWidth={1.8} />;
 }
 
-// Shared premium page header: icon chip + title + subtitle + actions slot.
+// Shared page header: gradient icon tile + large title + subtitle + actions slot.
 // Wraps gracefully on mobile (actions drop below the title).
 export default function PageHeader({ icon, title, subtitle, desc, actions }) {
   const sub = subtitle || desc;
   return (
     <div className="page-header animate-fadeUp">
-      <div className="flex items-start gap-3 min-w-0">
+      <div className="page-header-main">
         {icon ? (
-          <span className="icon-chip mt-0.5">
-            <RenderIcon icon={icon} size={20} />
+          <span className="page-header-icon">
+            <RenderIcon icon={icon} size={26} />
           </span>
         ) : null}
         <div className="min-w-0">
@@ -28,11 +28,7 @@ export default function PageHeader({ icon, title, subtitle, desc, actions }) {
           ) : null}
         </div>
       </div>
-      {actions ? (
-        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-          {actions}
-        </div>
-      ) : null}
+      {actions ? <div className="page-header-actions">{actions}</div> : null}
     </div>
   );
 }

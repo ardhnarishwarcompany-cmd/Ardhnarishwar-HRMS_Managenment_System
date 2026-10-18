@@ -74,3 +74,13 @@ export const getLanguages = async (req, res) => {
     res.status(400).json({ success: false, message: e.message });
   }
 };
+
+// ================= GET CLIENTS
+export const getClients = async (req, res) => {
+  try {
+    const data = await service.getClientsService();
+    res.json({ success: true, data });
+  } catch (e) {
+    res.status(400).json({ success: false, message: e.message });
+  }
+};

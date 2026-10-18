@@ -54,6 +54,14 @@ export const ensureAttendanceSyncColumns = async () => {
 
   await addColumnIfMissing("source", "VARCHAR(20) NULL DEFAULT NULL");
   await addColumnIfMissing("client_id", "INT NULL DEFAULT NULL");
+  await addColumnIfMissing("marked_by_id", "INT NULL DEFAULT NULL");
+  await addColumnIfMissing("marked_by_name", "VARCHAR(150) NULL DEFAULT NULL");
+  await addColumnIfMissing("marked_by_role", "VARCHAR(50) NULL DEFAULT NULL");
+  await addColumnIfMissing("marked_by_at", "TIMESTAMP NULL DEFAULT NULL");
+  await addColumnIfMissing("shift_id", "INT NULL DEFAULT NULL");
+  await addColumnIfMissing("shift_name", "VARCHAR(100) NULL DEFAULT NULL");
+  await addColumnIfMissing("shift_start", "TIME NULL DEFAULT NULL");
+  await addColumnIfMissing("shift_end", "TIME NULL DEFAULT NULL");
 
   columnsReady = true;
 };

@@ -5,9 +5,6 @@ import {
   Clock,
   Coffee,
   CalendarDays,
-  MapPin,
-  Wifi,
-  KeyRound,
   UserCog,
   Smartphone,
 } from "lucide-react";
@@ -51,33 +48,6 @@ const statusConfig = {
   },
 };
 
-const methodConfig = {
-  GEO: {
-    label: "GPS / Geo",
-    icon: MapPin,
-    className:
-      "bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300",
-  },
-  WIFI: {
-    label: "WiFi",
-    icon: Wifi,
-    className:
-      "bg-cyan-50 text-cyan-700 dark:bg-cyan-500/10 dark:text-cyan-300",
-  },
-  OTP: {
-    label: "OTP",
-    icon: KeyRound,
-    className:
-      "bg-violet-50 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300",
-  },
-  MANUAL: {
-    label: "Manual",
-    icon: UserCog,
-    className:
-      "bg-slate-100 text-slate-700 dark:bg-white/10 dark:text-white/70",
-  },
-};
-
 const formatDate = (value) => {
   if (!value) return "—";
 
@@ -106,16 +76,6 @@ const formatTime = (value) => {
   return `${hour}:${minute} ${suffix}`;
 };
 
-const formatHours = (value) => {
-  if (value === null || value === undefined || value === "") return "—";
-
-  const hours = Number(value);
-
-  if (Number.isNaN(hours)) return value;
-
-  return `${hours.toFixed(2)} hrs`;
-};
-
 const getTimeStatus = (actual, expected) => {
   if (!actual || !expected) return null;
 
@@ -130,11 +90,6 @@ const getTimeStatus = (actual, expected) => {
     Number(expectedText.replace(":", "."))
     ? "Early"
     : "Late";
-};
-
-const getMethod = (row) => {
-  const method = String(row.method || "MANUAL").toUpperCase();
-  return methodConfig[method] || methodConfig.MANUAL;
 };
 
 const getRecordedVia = (row) => {
@@ -159,20 +114,6 @@ const getRecordedVia = (row) => {
 
 function StatusBadge({ status }) {
   const config = statusConfig[status] || statusConfig.absent;
-  const Icon = config.icon;
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ${config.className}`}
-    >
-      <Icon size={13} />
-      {config.label}
-    </span>
-  );
-}
-
-function MethodBadge({ row }) {
-  const config = getMethod(row);
   const Icon = config.icon;
 
   return (
@@ -231,11 +172,50 @@ function RecordedVia({ row }) {
   );
 }
 
+function ShiftCell({ row }) {
+  if (!row.shiftName) {
+    return (
+      <div>
+        <p className="text-xs font-medium text-slate-400 dark:text-white/35">
+          Default timing
+        </p>
+        {row.expectedLogin && row.expectedLogout && (
+          <p className="mt-0.5 text-xs text-slate-500 dark:text-white/50">
+            {formatTime(row.expectedLogin)} – {formatTime(row.expectedLogout)} IST
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-start gap-2">
+      <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-300">
+        <Clock size={13} />
+      </div>
+      <div>
+        <p className="text-sm font-bold text-slate-800 dark:text-white/85">
+          {row.shiftName}
+        </p>
+        <p className="mt-0.5 text-xs text-slate-400 dark:text-white/35">
+          {formatTime(row.shiftStart)} – {formatTime(row.shiftEnd)}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function AttendanceTable({
   rows = [],
   loading = false,
   onRefresh,
+  scope = "all",
 }) {
+  const subtitle =
+    scope === "me"
+      ? "Your attendance history and how each record was recorded"
+      : "Attendance for every employee — Super Admin marks, client portal and system records";
+
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_18px_45px_-28px_rgba(109,40,217,0.35)] dark:border-white/10 dark:bg-white/[0.04] dark:shadow-[0_24px_55px_-28px_rgba(0,0,0,0.8)] dark:backdrop-blur-xl">
       <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-5 py-4 dark:border-white/10">
@@ -244,7 +224,7 @@ export default function AttendanceTable({
             Attendance Records
           </h3>
           <p className="mt-0.5 text-xs text-slate-400 dark:text-white/40">
-            Your attendance history and how each record was recorded
+            {subtitle}
           </p>
         </div>
 
@@ -283,7 +263,7 @@ export default function AttendanceTable({
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-[1450px] w-full text-left">
+          <table className="min-w-[1400px] w-full text-left">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50/80 dark:border-white/10 dark:bg-white/[0.025]">
                 <th className="px-5 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400 dark:text-white/40">
@@ -296,6 +276,9 @@ export default function AttendanceTable({
                   Department
                 </th>
                 <th className="px-5 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400 dark:text-white/40">
+                  Shift
+                </th>
+                <th className="px-5 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400 dark:text-white/40">
                   Expected Login
                 </th>
                 <th className="px-5 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400 dark:text-white/40">
@@ -306,12 +289,6 @@ export default function AttendanceTable({
                 </th>
                 <th className="px-5 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400 dark:text-white/40">
                   Actual Logout
-                </th>
-                <th className="px-5 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400 dark:text-white/40">
-                  Hours
-                </th>
-                <th className="px-5 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400 dark:text-white/40">
-                  Method
                 </th>
                 <th className="px-5 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400 dark:text-white/40">
                   Recorded Via
@@ -366,6 +343,10 @@ export default function AttendanceTable({
                     </td>
 
                     <td className="whitespace-nowrap px-5 py-4">
+                      <ShiftCell row={row} />
+                    </td>
+
+                    <td className="whitespace-nowrap px-5 py-4">
                       <span className="text-sm font-semibold text-slate-600 dark:text-white/60">
                         {formatTime(row.expectedLogin)}
                       </span>
@@ -407,16 +388,6 @@ export default function AttendanceTable({
                           </p>
                         )}
                       </div>
-                    </td>
-
-                    <td className="whitespace-nowrap px-5 py-4">
-                      <span className="rounded-lg bg-slate-100 px-2.5 py-1.5 text-sm font-bold text-slate-700 dark:bg-white/5 dark:text-white/70">
-                        {formatHours(row.hours)}
-                      </span>
-                    </td>
-
-                    <td className="whitespace-nowrap px-5 py-4">
-                      <MethodBadge row={row} />
                     </td>
 
                     <td className="whitespace-nowrap px-5 py-4">

@@ -31,45 +31,27 @@ export default function Invoices() {
   }, []);
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6">
       <PageHeader
-        title="Field Sales"
-        desc="Manage company leads collected by BDM"
+        title="Invoices"
+        desc="Manage and track all generated invoices"
+        actions={
+          <button type="button" onClick={() => navigate("/create-invoice")} className="btn-on-brand">
+            <Plus size={16} aria-hidden="true" />
+            Create Invoice
+          </button>
+        }
       />
 
-      {/* HEADER */}
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-600 to-green-600 text-white shadow-lg shadow-emerald-200">
-            <FileText size={19} aria-hidden="true" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
-              Invoice Management
-            </h1>
-            <p className="text-sm text-slate-500">
-              Manage and track all generated invoices
-            </p>
-          </div>
-        </div>
-
-        <button
-          onClick={() => navigate("/create-invoice")}
-          className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-emerald-200 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-300"
-        >
-          <Plus size={15} aria-hidden="true" />
-          Create Invoice
-        </button>
-      </div>
-
       {/* TABLE CARD */}
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="sp-card overflow-hidden">
         {/* TOP BAR */}
         <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-          <h3 className="text-sm font-bold tracking-tight text-slate-900">
-            All Invoices
-          </h3>
-          <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200">
+          <div className="flex items-center gap-2.5">
+            <FileText size={16} aria-hidden="true" className="text-brand-600" />
+            <h2 className="text-sm font-bold tracking-tight text-slate-900">All Invoices</h2>
+          </div>
+          <span className="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700 ring-1 ring-brand-100">
             {invoices.length} {invoices.length === 1 ? "invoice" : "invoices"}
           </span>
         </div>

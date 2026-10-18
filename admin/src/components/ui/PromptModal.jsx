@@ -45,26 +45,26 @@ export default function PromptModal({
   };
 
   const inputClass =
-    "w-full rounded-xl border px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition focus:outline-none focus:ring-4 " +
+    "input py-2.5 " +
     (touched && invalid
-      ? "border-red-300 bg-red-50/50 focus:border-red-500 focus:ring-red-500/10"
-      : "border-gray-200 bg-gray-50/50 focus:border-gray-900 focus:bg-white focus:ring-gray-900/5");
+      ? "!border-[var(--red)] !bg-[var(--red-soft)]/40 focus:!shadow-[0_0_0_4px_rgba(220,38,38,0.12)]"
+      : "");
 
   return (
     <Modal open={open} title={title} onClose={onClose} width="max-w-md">
-      <form onSubmit={submit} className="space-y-5">
+      <form onSubmit={submit} className="space-y-6">
         {description && (
-          <p className="text-sm leading-relaxed text-gray-600">{description}</p>
+          <p className="text-sm leading-relaxed text-[var(--mute)]">{description}</p>
         )}
 
         <div>
           {label && (
             <label
               htmlFor="prompt-modal-input"
-              className="mb-1.5 block text-[13px] font-medium text-gray-600"
+              className="mb-2 block text-[13px] font-bold tracking-wide text-[var(--ink)]"
             >
               {label}
-              {required && <span className="ml-0.5 text-red-500">*</span>}
+              {required && <span className="ml-0.5 text-[var(--red)]">*</span>}
             </label>
           )}
           {multiline ? (
@@ -91,23 +91,21 @@ export default function PromptModal({
             />
           )}
           {touched && invalid && (
-            <p className="mt-1.5 text-xs text-red-500">This field is required.</p>
+            <p className="mt-1.5 text-xs font-semibold text-[var(--red)]">This field is required.</p>
           )}
         </div>
 
         <div className="flex justify-end gap-3">
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-xl bg-gray-100 px-5 py-2.5 font-semibold transition hover:bg-gray-200"
-          >
+          <button type="button" onClick={onClose} className="btn-secondary">
             {cancelText}
           </button>
           <button
             type="submit"
-            className={`rounded-xl px-5 py-2.5 font-semibold text-white transition ${
-              danger ? "bg-red-600 hover:bg-red-700" : "bg-black hover:bg-gray-900"
-            }`}
+            className={
+              danger
+                ? "inline-flex items-center justify-center gap-2 rounded-2xl bg-[var(--red)] px-5 py-2.5 text-sm font-bold text-white shadow-[0_10px_22px_rgba(220,38,38,0.25)] transition hover:-translate-y-px hover:bg-red-700"
+                : "btn-primary"
+            }
           >
             {submitText}
           </button>

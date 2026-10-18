@@ -198,7 +198,8 @@ export default function MyEOD() {
       action={
         <button
           onClick={openCreate}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-lg shadow-indigo-500/25 transition"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-bold shadow-lg shadow-purple-600/25 transition-all hover:shadow-purple-600/40 hover:scale-[1.01] active:scale-[0.99]"
+          style={{ background: "linear-gradient(135deg, #6d28d9, #c026d3)" }}
         >
           <Plus size={16} />
           {todayReport ? "Submit another" : "Submit today's EOD"}
@@ -255,9 +256,12 @@ export default function MyEOD() {
             <button
               key={k}
               onClick={() => setFilter(k)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-                filter === k ? "bg-indigo-600 text-white shadow" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                filter === k
+                  ? "text-white shadow-md shadow-purple-600/25"
+                  : "bg-[var(--card)] border border-[var(--line)] text-[var(--mute)] hover:bg-[var(--soft)] hover:text-[var(--ink)]"
               }`}
+              style={filter === k ? { background: "linear-gradient(135deg, #6d28d9, #c026d3)" } : {}}
             >
               {l}
             </button>
@@ -287,60 +291,63 @@ export default function MyEOD() {
             const Icon = st.icon;
             const hasBlocker = (r.blockers || "").trim();
             return (
-              <MagicCard key={r.id} className="eod-report-card magic-rise" style={{ animationDelay: `${i * 40}ms` }}>
-                <div className="eod-report-card__content">
-                <div className="flex items-start justify-between gap-3 mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 flex items-center justify-center">
-                      <FileText size={20} />
-                    </div>
-                    <div>
-                      <p className="font-bold text-gray-900 leading-tight">{relDate(r.date)}</p>
-                      <p className="text-xs text-gray-500">{dayjs(r.date).format("D MMMM YYYY")}</p>
-                    </div>
-                  </div>
-                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold ring-1 ${st.chip}`}>
-                    <Icon size={12} /> {st.label}
-                  </span>
-                </div>
-
-                <div className="flex flex-col gap-3 flex-1">
+              <MagicCard key={r.id} className="eod-report-card magic-rise h-full" style={{ animationDelay: `${i * 40}ms` }}>
+                <div className="eod-report-card__content p-6 flex flex-col justify-between h-full">
                   <div>
-                    <p className="text-[11px] uppercase tracking-wider font-semibold text-gray-400 mb-1">Completed</p>
-                    <p className="text-sm text-gray-700 line-clamp-3 whitespace-pre-line">{r.tasksCompleted || "—"}</p>
-                  </div>
-                  {r.tomorrowPlan && (
-                    <div>
-                      <p className="text-[11px] uppercase tracking-wider font-semibold text-gray-400 mb-1">Tomorrow</p>
-                      <p className="text-sm text-gray-600 line-clamp-2 whitespace-pre-line">{r.tomorrowPlan}</p>
+                    <div className="flex items-start justify-between gap-3 mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-100 to-indigo-50 dark:from-purple-950/40 dark:to-indigo-950/30 text-purple-700 dark:text-purple-300 flex items-center justify-center shadow-xs shrink-0">
+                          <FileText size={22} />
+                        </div>
+                        <div>
+                          <p className="font-bold text-[var(--ink)] text-base leading-tight dark:text-white">{relDate(r.date)}</p>
+                          <p className="text-xs text-[var(--mute)] mt-0.5">{dayjs(r.date).format("D MMMM YYYY")}</p>
+                        </div>
+                      </div>
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ring-1 ${st.chip} shadow-xs`}>
+                        <Icon size={12} /> {st.label}
+                      </span>
                     </div>
-                  )}
-                  {hasBlocker && (
-                    <div className="rounded-xl bg-rose-50 dark:bg-rose-500/10 border border-rose-100 dark:border-rose-500/30 px-3 py-2">
-                      <p className="text-[11px] font-bold text-rose-600 mb-0.5 inline-flex items-center gap-1">
-                        <AlertCircle size={11} /> Blocker
-                      </p>
-                      <p className="text-xs text-rose-700 dark:text-rose-300 line-clamp-2">{r.blockers}</p>
-                    </div>
-                  )}
-                </div>
 
-                <div className="flex gap-2 pt-4 mt-4 border-t border-gray-100">
-                  <button
-                    onClick={() => setViewing(r)}
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold transition"
-                  >
-                    <Eye size={14} /> View
-                  </button>
-                  {editable(r) && (
+                    <div className="flex flex-col gap-3 my-4">
+                      <div className="rounded-2xl bg-[var(--soft)]/60 dark:bg-slate-800/50 border border-[var(--line)]/70 dark:border-slate-800 p-3.5">
+                        <p className="text-[11px] uppercase tracking-wider font-bold text-[var(--mute)] mb-1">Completed</p>
+                        <p className="text-sm font-semibold text-[var(--ink)] dark:text-slate-200 line-clamp-3 whitespace-pre-line leading-relaxed">{r.tasksCompleted || "—"}</p>
+                      </div>
+                      {r.tomorrowPlan && (
+                        <div className="rounded-2xl bg-[var(--soft)]/40 dark:bg-slate-800/30 border border-[var(--line)]/50 dark:border-slate-800/60 p-3">
+                          <p className="text-[11px] uppercase tracking-wider font-bold text-[var(--mute)] mb-1">Tomorrow</p>
+                          <p className="text-sm text-[var(--ink)]/80 dark:text-slate-300 line-clamp-2 whitespace-pre-line leading-relaxed">{r.tomorrowPlan}</p>
+                        </div>
+                      )}
+                      {hasBlocker && (
+                        <div className="rounded-2xl bg-rose-50/80 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/40 p-3">
+                          <p className="text-[11px] font-bold text-rose-700 dark:text-rose-300 mb-1 inline-flex items-center gap-1.5">
+                            <AlertCircle size={13} /> Blocker
+                          </p>
+                          <p className="text-xs font-medium text-rose-800 dark:text-rose-200 line-clamp-2 leading-relaxed">{r.blockers}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2.5 pt-4 border-t border-[var(--line)] dark:border-slate-800 mt-2">
                     <button
-                      onClick={() => openEdit(r)}
-                      className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-semibold transition"
+                      onClick={() => setViewing(r)}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl border border-[var(--line)] bg-[var(--card)] hover:bg-[var(--soft)] text-[var(--ink)] text-sm font-bold transition-all shadow-xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-700"
                     >
-                      <Edit size={14} /> Edit
+                      <Eye size={15} /> View
                     </button>
-                  )}
-                </div>
+                    {editable(r) && (
+                      <button
+                        onClick={() => openEdit(r)}
+                        className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl text-white text-sm font-bold shadow-md shadow-purple-600/25 hover:shadow-purple-600/40 hover:scale-[1.01] active:scale-[0.99] transition-all"
+                        style={{ background: "linear-gradient(135deg, #6d28d9, #c026d3)" }}
+                      >
+                        <Edit size={15} /> Edit
+                      </button>
+                    )}
+                  </div>
                 </div>
               </MagicCard>
             );
@@ -350,38 +357,45 @@ export default function MyEOD() {
 
       {/* Create / edit modal */}
       {openModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setOpenModal(false)}>
-          <div className="bg-white rounded-3xl w-full max-w-3xl max-h-[92vh] flex flex-col shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-start justify-between px-7 py-5 border-b border-gray-100">
-              <div>
-                <h2 className="text-xl font-bold text-gray-900">{editId ? "Edit EOD report" : "Submit EOD report"}</h2>
-                <p className="text-sm text-gray-500">Only &quot;Tasks completed&quot; is required.</p>
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setOpenModal(false)}>
+          <div className="bg-[var(--card)] rounded-[28px] w-full max-w-3xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-[var(--line)] dark:bg-slate-900 dark:border-slate-800" onClick={(e) => e.stopPropagation()}>
+            <div className="relative overflow-hidden bg-gradient-to-r from-[#6d28d9] via-[#7c3aed] to-[#c026d3] px-7 py-6 text-white shadow-md">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 opacity-25"
+                style={{ background: "radial-gradient(500px circle at 90% 10%, rgba(255,255,255,0.4), transparent 60%)" }}
+              />
+              <div className="relative flex items-start justify-between gap-4">
+                <div>
+                  <h2 className="text-xl font-bold text-white drop-shadow-sm">{editId ? "Edit EOD report" : "Submit EOD report"}</h2>
+                  <p className="text-xs text-white/80 mt-0.5">Only &quot;Tasks completed&quot; is required.</p>
+                </div>
+                <button onClick={() => setOpenModal(false)} className="rounded-xl bg-white/15 p-2 text-white/90 backdrop-blur-sm transition hover:bg-white/25 hover:text-white" aria-label="Close">
+                  <X size={18} />
+                </button>
               </div>
-              <button onClick={() => setOpenModal(false)} className="w-9 h-9 rounded-xl hover:bg-gray-100 flex items-center justify-center text-gray-500" aria-label="Close">
-                <X size={18} />
-              </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-7 py-5 flex flex-col gap-5">
+            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-7 py-6 flex flex-col gap-5">
               <div className="max-w-xs">
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">Date</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--mute)] mb-1.5">Date</label>
                 <input
                   type="date"
                   value={form.date}
                   max={todayStr}
                   onChange={(e) => setForm({ ...form, date: e.target.value })}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                  className="w-full border border-[var(--line)] rounded-xl px-4 py-2.5 text-sm bg-[var(--card)] text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-purple-500/40 dark:bg-slate-800 dark:border-slate-700 dark:text-white"
                 />
               </div>
 
               <div className="grid md:grid-cols-2 gap-5">
                 {FIELDS.map(([key, label, ph, req]) => (
                   <div key={key} className={key === "tasksCompleted" || key === "notes" ? "md:col-span-2" : ""}>
-                    <label className="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
+                    <label className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-[var(--mute)] mb-1.5">
                       <span>
                         {label} {req && <span className="text-rose-500">*</span>}
                       </span>
-                      <span className="normal-case tracking-normal font-normal text-gray-400">{(form[key] || "").length}/2000</span>
+                      <span className="normal-case tracking-normal font-normal text-[var(--mute)]">{(form[key] || "").length}/2000</span>
                     </label>
                     <textarea
                       rows={key === "tasksCompleted" ? 4 : 3}
@@ -389,22 +403,23 @@ export default function MyEOD() {
                       value={form[key]}
                       placeholder={ph}
                       onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-                      className={`w-full border rounded-xl px-4 py-3 text-sm resize-none bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/40 ${
-                        key === "blockers" ? "border-rose-200 focus:ring-rose-400/40" : "border-gray-200"
+                      className={`w-full border rounded-xl px-4 py-3 text-sm resize-none bg-[var(--card)] text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-purple-500/40 dark:bg-slate-800 dark:text-white ${
+                        key === "blockers" ? "border-rose-300 focus:ring-rose-400/40 dark:border-rose-900" : "border-[var(--line)] dark:border-slate-700"
                       }`}
                     />
                   </div>
                 ))}
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
-                <button type="button" onClick={() => setOpenModal(false)} className="px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold">
+              <div className="flex justify-end gap-3 pt-4 border-t border-[var(--line)] dark:border-slate-800">
+                <button type="button" onClick={() => setOpenModal(false)} className="px-5 py-2.5 rounded-xl border border-[var(--line)] bg-[var(--card)] hover:bg-[var(--soft)] text-[var(--ink)] text-sm font-semibold transition dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200">
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white text-sm font-semibold shadow-lg shadow-indigo-500/25"
+                  className="px-6 py-2.5 rounded-xl text-white text-sm font-bold shadow-lg shadow-purple-600/25 transition-all hover:shadow-purple-600/40 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60"
+                  style={{ background: "linear-gradient(135deg, #6d28d9, #c026d3)" }}
                 >
                   {saving ? "Saving…" : editId ? "Update report" : "Submit report"}
                 </button>
@@ -416,18 +431,27 @@ export default function MyEOD() {
 
       {/* View modal */}
       {viewing && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setViewing(null)}>
-          <div className="bg-white rounded-3xl w-full max-w-3xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
-            <div className="px-7 py-6 bg-gradient-to-br from-indigo-600 to-violet-600 text-white">
-              <div className="flex items-start justify-between gap-4">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setViewing(null)}>
+          <div className="bg-[var(--card)] rounded-[28px] w-full max-w-3xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-[var(--line)] dark:bg-slate-900 dark:border-slate-800" onClick={(e) => e.stopPropagation()}>
+            <div className="relative overflow-hidden bg-gradient-to-r from-[#6d28d9] via-[#7c3aed] to-[#c026d3] px-7 py-6 text-white shadow-md">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 opacity-25"
+                style={{ background: "radial-gradient(500px circle at 90% 10%, rgba(255,255,255,0.4), transparent 60%)" }}
+              />
+              <div className="relative flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-xs uppercase tracking-widest text-indigo-200 font-semibold">EOD report</p>
-                  <h2 className="text-2xl font-bold mt-1">{dayjs(viewing.date).format("dddd, D MMMM YYYY")}</h2>
-                  <span className={`mt-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold ring-1 ${STATUS[viewing.status]?.chip || ""}`}>
-                    {STATUS[viewing.status]?.label}
-                  </span>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="inline-flex items-center rounded-lg bg-white/20 px-2.5 py-0.5 text-xs font-bold text-white backdrop-blur-md border border-white/25">
+                      EOD REPORT
+                    </span>
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-xs font-bold ring-1 bg-white/20 text-white border border-white/30`}>
+                      {STATUS[viewing.status]?.label}
+                    </span>
+                  </div>
+                  <h2 className="text-2xl font-bold mt-2 text-white drop-shadow-sm">{dayjs(viewing.date).format("dddd, D MMMM YYYY")}</h2>
                 </div>
-                <button onClick={() => setViewing(null)} className="w-9 h-9 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center" aria-label="Close">
+                <button onClick={() => setViewing(null)} className="rounded-xl bg-white/15 p-2 text-white/90 backdrop-blur-sm transition hover:bg-white/25 hover:text-white" aria-label="Close">
                   <X size={18} />
                 </button>
               </div>
@@ -435,25 +459,25 @@ export default function MyEOD() {
 
             <div className="flex-1 overflow-y-auto px-7 py-6 grid md:grid-cols-2 gap-4">
               {[
-                ["Tasks completed", viewing.tasksCompleted, CheckCircle, "text-emerald-600 bg-emerald-50"],
-                ["In progress", viewing.tasksInProgress, Clock, "text-indigo-600 bg-indigo-50"],
-                ["Blockers", viewing.blockers, AlertCircle, "text-rose-600 bg-rose-50"],
-                ["Tomorrow's plan", viewing.tomorrowPlan, Calendar, "text-violet-600 bg-violet-50"],
-                ["Notes", viewing.notes, StickyNote, "text-gray-600 bg-gray-100"],
+                ["Tasks completed", viewing.tasksCompleted, CheckCircle, "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-400"],
+                ["In progress", viewing.tasksInProgress, Clock, "text-indigo-600 bg-indigo-50 dark:bg-indigo-950/40 dark:text-indigo-400"],
+                ["Blockers", viewing.blockers, AlertCircle, "text-rose-600 bg-rose-50 dark:bg-rose-950/40 dark:text-rose-400"],
+                ["Tomorrow's plan", viewing.tomorrowPlan, Calendar, "text-violet-600 bg-violet-50 dark:bg-violet-950/40 dark:text-violet-400"],
+                ["Notes", viewing.notes, StickyNote, "text-gray-600 bg-gray-100 dark:bg-slate-800 dark:text-slate-300"],
               ].map(([label, val, Icon, tone]) => (
-                <div key={label} className={`rounded-2xl border border-gray-100 p-4 ${label === "Notes" ? "md:col-span-2" : ""}`}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className={`w-8 h-8 rounded-lg flex items-center justify-center ${tone}`}>
-                      <Icon size={15} />
+                <div key={label} className={`rounded-2xl border border-[var(--line)] bg-[var(--soft)]/50 p-4 dark:border-slate-800 dark:bg-slate-800/40 ${label === "Notes" ? "md:col-span-2" : ""}`}>
+                  <div className="flex items-center gap-2.5 mb-2.5">
+                    <span className={`w-8 h-8 rounded-xl flex items-center justify-center ${tone} shadow-xs`}>
+                      <Icon size={16} />
                     </span>
-                    <p className="text-sm font-bold text-gray-900">{label}</p>
+                    <p className="text-sm font-bold text-[var(--ink)] dark:text-white">{label}</p>
                   </div>
-                  <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">{val?.trim() || <span className="text-gray-400">Nothing recorded</span>}</p>
+                  <p className="text-sm text-[var(--ink)]/80 dark:text-slate-300 whitespace-pre-line leading-relaxed">{val?.trim() || <span className="text-[var(--mute)]">Nothing recorded</span>}</p>
                 </div>
               ))}
             </div>
 
-            <div className="px-7 py-4 border-t border-gray-100 flex justify-end gap-3">
+            <div className="px-7 py-4 border-t border-[var(--line)] dark:border-slate-800 flex justify-end gap-3">
               {editable(viewing) && (
                 <button
                   onClick={() => {
@@ -461,12 +485,13 @@ export default function MyEOD() {
                     setViewing(null);
                     openEdit(r);
                   }}
-                  className="px-5 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-semibold inline-flex items-center gap-1.5"
+                  className="px-5 py-2.5 rounded-xl text-white text-sm font-bold shadow-md shadow-purple-600/25 transition-all hover:shadow-purple-600/40 hover:scale-[1.01] active:scale-[0.99] inline-flex items-center gap-1.5"
+                  style={{ background: "linear-gradient(135deg, #6d28d9, #c026d3)" }}
                 >
                   <Edit size={14} /> Edit
                 </button>
               )}
-              <button onClick={() => setViewing(null)} className="px-5 py-2.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold">
+              <button onClick={() => setViewing(null)} className="px-5 py-2.5 rounded-xl border border-[var(--line)] bg-[var(--card)] hover:bg-[var(--soft)] text-[var(--ink)] text-sm font-bold transition dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200">
                 Close
               </button>
             </div>

@@ -16,16 +16,31 @@ const SELECT_FIELDS = `
   is_active AS isActive
 `;
 
+// Client employees only read targets; assigning/editing them is a client-admin action.
+const rejectEmployeeWrite = (req, res) => {
+  if (!req.employee) return false;
+  res.status(403).json({
+    success: false,
+    message: "Only the client admin can create, edit or delete work targets",
+  });
+  return true;
+};
+
 export const getWorkTargets = async (req, res) => {
   try {
     const { client_code } = req.client;
     const client_id = await getClientId(client_code);
+    const employeeId = Number(req.employee?.employee_id) || null;
+
+    // Employees see their own targets plus company-wide ones (no employee assigned).
+    const scope = employeeId ? ` AND (employee_id = ? OR employee_id IS NULL)` : ``;
+    const params = employeeId ? [client_id, employeeId] : [client_id];
 
     const [rows] = await db.query(
       `SELECT ${SELECT_FIELDS} FROM client_work_targets
-       WHERE client_id = ?
+       WHERE client_id = ?${scope}
        ORDER BY id DESC`,
-      [client_id]
+      params
     );
 
     res.json({ success: true, data: rows });
@@ -36,6 +51,7 @@ export const getWorkTargets = async (req, res) => {
 };
 
 export const createWorkTarget = async (req, res) => {
+  if (rejectEmployeeWrite(req, res)) return;
   try {
     const { client_code } = req.client;
     const client_id = await getClientId(client_code);
@@ -89,6 +105,7 @@ export const createWorkTarget = async (req, res) => {
 };
 
 export const updateWorkTarget = async (req, res) => {
+  if (rejectEmployeeWrite(req, res)) return;
   try {
     const { client_code } = req.client;
     const client_id = await getClientId(client_code);
@@ -149,6 +166,7 @@ export const updateWorkTarget = async (req, res) => {
 };
 
 export const deleteWorkTarget = async (req, res) => {
+  if (rejectEmployeeWrite(req, res)) return;
   try {
     const { client_code } = req.client;
     const client_id = await getClientId(client_code);

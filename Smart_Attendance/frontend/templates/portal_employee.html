@@ -1,0 +1,1862 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="midnight">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ardhnarishwar 3D • Employee Self-Service Workspace</title>
+  <link rel="icon" type="image/png" href="/static/images/ardhnarishwar_logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/theme.css">
+  <link rel="stylesheet" href="/static/css/ardhnarishwar_3d.css">
+  <style>
+    :root {
+      --portal-brand: #10B981;
+      --portal-brand-glow: rgba(16, 185, 129, 0.35);
+      --portal-indigo: #6366F1;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Portal Navigation */
+    .emp-nav {
+      background: rgba(13, 21, 39, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-medium);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .emp-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    .emp-brand-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--emerald), #059669);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 0 15px var(--portal-brand-glow);
+    }
+
+    .emp-brand-title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+
+    .emp-brand-subtitle {
+      font-size: 11px;
+      color: var(--emerald);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+    }
+
+    .mode-badge {
+      background: rgba(16, 185, 129, 0.2);
+      color: #6EE7B7;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      text-decoration: none;
+    }
+
+    .btn-emerald {
+      background: linear-gradient(135deg, var(--emerald), #059669);
+      color: #FFF;
+      box-shadow: 0 4px 14px var(--portal-brand-glow);
+    }
+    .btn-emerald:hover {
+      background: linear-gradient(135deg, #059669, #047857);
+      transform: translateY(-1px);
+    }
+
+    .btn-indigo {
+      background: linear-gradient(135deg, var(--indigo), #4F46E5);
+      color: #FFF;
+      box-shadow: 0 4px 14px var(--glow-indigo);
+    }
+    .btn-indigo:hover {
+      background: linear-gradient(135deg, #4F46E5, #4338CA);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+    .btn-secondary:hover {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border-color: var(--border-medium);
+    }
+
+    /* Container */
+    .emp-container {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 32px 24px;
+      flex: 1;
+    }
+
+    /* Welcome Card */
+    .welcome-card {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(13, 21, 39, 0.8) 100%);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-xl);
+      padding: 26px 30px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-card::after {
+      content: '';
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 180px;
+      height: 180px;
+      background: radial-gradient(circle, var(--portal-brand-glow), transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Grid Layout */
+    .portal-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow-md);
+      position: relative;
+    }
+
+    .card-col-12 { grid-column: span 12; }
+    .card-col-8 { grid-column: span 8; }
+    .card-col-6 { grid-column: span 6; }
+    .card-col-4 { grid-column: span 4; }
+
+    @media (max-width: 900px) {
+      .card-col-8, .card-col-6, .card-col-4 { grid-column: span 12; }
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 14px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    /* Verification Status Banner */
+    .status-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .status-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 10px var(--emerald);
+    }
+
+    /* Mode Selection Interactive Cards */
+    .mode-select-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .mode-select-grid { grid-template-columns: 1fr; }
+    }
+
+    .mode-option-card {
+      background: var(--bg-surface);
+      border: 2px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-align: center;
+      position: relative;
+    }
+
+    .mode-option-card:hover {
+      border-color: var(--emerald);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px var(--portal-brand-glow);
+    }
+
+    .mode-option-card.selected {
+      border-color: var(--emerald);
+      background: rgba(16, 185, 129, 0.08);
+      box-shadow: 0 0 0 1px var(--emerald), 0 8px 25px var(--portal-brand-glow);
+    }
+
+    .mode-icon {
+      font-size: 36px;
+      margin-bottom: 12px;
+    }
+
+    .mode-name {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--text-primary);
+    }
+
+    .mode-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Tables */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .emp-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    .emp-table th {
+      background: var(--bg-surface);
+      color: var(--text-muted);
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-medium);
+    }
+
+    .emp-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .emp-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-primary);
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-green { background: rgba(16, 185, 129, 0.15); color: #6EE7B7; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-amber { background: rgba(245, 158, 11, 0.15); color: #FCD34D; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-blue { background: rgba(59, 130, 246, 0.15); color: #93C5FD; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .badge-purple { background: rgba(168, 85, 247, 0.15); color: #D8B4FE; border: 1px solid rgba(168, 85, 247, 0.3); }
+    .badge-red { background: rgba(244, 63, 94, 0.15); color: #FDA4AF; border: 1px solid rgba(244, 63, 94, 0.3); }
+
+    /* Modals & Overlays */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(7, 11, 20, 0.88);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 500;
+    }
+
+    .modal-card {
+      max-width: 620px;
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-xl);
+      padding: 32px 28px;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-input {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      color: var(--text-primary);
+      font-size: 13.5px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .form-input:focus {
+      border-color: var(--emerald);
+      box-shadow: 0 0 0 3px var(--portal-brand-glow);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-md);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1000;
+      font-size: 13.5px;
+    }
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
+<link rel="stylesheet" href="/static/css/ardh_logo.css?v=1">
+<style id="emp-portal-grid-v1">
+/* Employee portal: balanced 12-col grid, cards equal & responsive */
+html body .portal-grid {
+  display: grid !important;
+  grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+  gap: 20px !important;
+  align-items: stretch;
+  width: 100%;
+}
+html body .portal-grid > .card { min-width: 0; box-sizing: border-box; height: 100%; }
+html body .portal-grid > .card-col-12 { grid-column: span 12 !important; }
+html body .portal-grid > .card-col-8  { grid-column: span 8 !important; }
+html body .portal-grid > .card-col-7  { grid-column: span 7 !important; }
+html body .portal-grid > .card-col-6  { grid-column: span 6 !important; }
+html body .portal-grid > .card-col-5  { grid-column: span 5 !important; }
+html body .portal-grid > .card-col-4  { grid-column: span 4 !important; }
+
+/* card header: title left, badge/button right, wrap-safe */
+html body .portal-grid .card-header {
+  display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 10px 14px;
+}
+html body .portal-grid .card-header > div:first-child { flex: 1 1 240px; min-width: 0; }
+html body .portal-grid .card-header > .btn,
+html body .portal-grid .card-header > button,
+html body .portal-grid .card-header > .badge-pill { flex: 0 0 auto; white-space: nowrap; }
+html body .portal-grid .card-title { line-height: 1.3; }
+
+/* hero card */
+html body .welcome-card { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+
+/* tablet / mobile: sab cards full width */
+@media (max-width: 1100px) {
+  html body .portal-grid > .card-col-8,
+  html body .portal-grid > .card-col-7,
+  html body .portal-grid > .card-col-6,
+  html body .portal-grid > .card-col-5,
+  html body .portal-grid > .card-col-4 { grid-column: span 12 !important; }
+  html body .portal-grid > .card { height: auto; }
+}
+@media (max-width: 600px) {
+  html body .portal-grid { gap: 14px !important; }
+  html body .welcome-card { padding: 18px !important; }
+}
+</style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="emp-nav">
+    <a href="/landing" class="emp-brand" style="text-decoration:none; color:inherit;">
+      <div class="ardh-medallion-nav" title="Ardhnarishwar 3D Logo">
+        <img src="/static/images/ardhnarishwar_logo_emblem.png" alt="Ardhnarishwar Logo">
+      </div>
+      <div>
+        <div class="emp-brand-title" style="background: linear-gradient(135deg, #FFFFFF 20%, #F59E0B 50%, #C084FC 80%, #38BDF8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Ardhnarishwar SaaS</div>
+        <div class="emp-brand-subtitle" style="color:var(--ardh-gold); letter-spacing:0.8px;">EMPLOYEE SELF-SERVICE WORKSPACE</div>
+      </div>
+    </a>
+    <div class="nav-actions">
+      <!-- 3D Audio FX Toggle -->
+      <button class="btn-sound-fx" title="Toggle Sound FX">
+        <span>🔊</span> <span>Sound</span>
+      </button>
+
+      <!-- Runtime Live Status Indicator -->
+      <div class="runtime-live-pill" title="Runtime Live Engine Active">
+        <span class="pulse-dot"></span> <span>RUNTIME LIVE</span>
+      </div>
+
+      <div class="runtime-last-sync" id="empLastSyncTime">Synced: Just now</div>
+
+      <!-- Master Runtime Refresh Button -->
+      <button class="btn-runtime-refresh" onclick="ArdhnarishwarRuntime.triggerGlobalSync(true)" title="Synchronize All Data in Runtime">
+        <span class="refresh-icon">🔄</span> <span>Refresh Dashboard</span>
+      </button>
+
+      <!-- Auto-Refresh Toggle -->
+      <div class="auto-refresh-toggle" onclick="ArdhnarishwarRuntime.toggleAutoRefresh()" title="Toggle Background Live Polling">
+        <span>⚡ Auto-Sync: <b>ON (15s)</b></span>
+      </div>
+
+      <div id="navUserBadge" class="user-pill" style="display: none;">
+        <span id="empUserName">Loading...</span>
+        <span id="empModeBadge" class="mode-badge">WFO</span>
+      </div>
+      <button id="btnLogout" class="btn btn-secondary" onclick="handleLogout()" style="display: none;">
+        <span>🚪</span> Log Out
+      </button>
+    </div>
+  </nav>
+
+  <!-- Unauthenticated Login Overlay -->
+  <div id="authSection" class="modal-overlay" style="display: none;">
+    <div class="modal-card card-3d" style="max-width: 440px;">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div class="ardh-medallion-nav" style="width:68px; height:68px; margin:0 auto 14px; padding:3.5px; box-shadow:0 0 25px rgba(168,85,247,0.4);" title="Ardhnarishwar 3D">
+          <img src="/static/images/ardhnarishwar_logo_emblem.png" alt="Ardhnarishwar Logo">
+        </div>
+        <h2 style="font-size: 22px; font-weight: 800; letter-spacing: -0.3px;">Employee Self-Service</h2>
+        <p style="font-size: 13px; color: var(--text-secondary); margin-top: 6px;">
+          Log in with your Employee ID or registered email
+        </p>
+      </div>
+
+      <form id="empLoginForm" onsubmit="handleEmpLogin(event)">
+        <div class="form-group">
+          <label class="form-label" for="loginCompId">Organization Code</label>
+          <input type="text" id="loginCompId" class="form-input" placeholder="e.g. ENT_CORP_01" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="loginIdentifier">Employee ID or Email</label>
+          <input type="text" id="loginIdentifier" class="form-input" placeholder="EMP-1001 or staff@enterprise.com" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" class="form-input" placeholder="••••••••••••" required>
+        </div>
+
+        <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+          <input type="checkbox" id="rememberMe" checked style="accent-color: var(--emerald); cursor: pointer;">
+          <label for="rememberMe" style="font-size: 12.5px; color: var(--text-secondary); cursor: pointer;">
+            Persistent 30-day employee session
+          </label>
+        </div>
+
+        <button type="submit" id="btnLoginSubmit" class="btn btn-emerald" style="width: 100%; padding: 12px;">
+          Sign In to Self-Service
+        </button>
+
+        <div id="loginErrorMsg" style="display: none; color: #FDA4AF; font-size: 12px; margin-top: 14px; text-align: center;"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Mandatory First-Time Login Onboarding Modal -->
+  <div id="onboardingModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <span class="badge-pill badge-green" style="margin-bottom: 8px;">First-Time Setup Required</span>
+        <h2 style="font-size: 22px; font-weight: 800; letter-spacing: -0.3px;">Welcome to Your Workspace!</h2>
+        <p style="font-size: 13px; color: var(--text-secondary); margin-top: 6px;">
+          Select your operational work mode to permanently calibrate your attendance verification rules.
+        </p>
+      </div>
+
+      <!-- Mode Cards -->
+      <div class="mode-select-grid">
+        <!-- 1. WFO Card -->
+        <div class="mode-option-card" id="cardWFO" onclick="selectOnboardingMode('WORK_FROM_OFFICE')">
+          <div class="mode-icon">🏢</div>
+          <div class="mode-name">Work From Office</div>
+          <div class="mode-desc">Attendance requires connection to authorized office Wi-Fi and presence within the 100m perimeter.</div>
+        </div>
+
+        <!-- 2. WFH Card -->
+        <div class="mode-option-card" id="cardWFH" onclick="selectOnboardingMode('WORK_FROM_HOME')">
+          <div class="mode-icon">🏠</div>
+          <div class="mode-name">Work From Home</div>
+          <div class="mode-desc">Calibrates your registered home base coordinates (200m radius) and verifies your assigned IP.</div>
+        </div>
+
+        <!-- 3. Sales Field Card -->
+        <div class="mode-option-card" id="cardField" onclick="selectOnboardingMode('SALES_FIELD')">
+          <div class="mode-icon">🚗</div>
+          <div class="mode-name">Sales Field</div>
+          <div class="mode-desc">Captures live high-accuracy GPS with anti-spoofing for check-ins and daytime client visits.</div>
+        </div>
+      </div>
+
+      <!-- Dynamic Mode Notification Box -->
+      <div id="onboardingDynamicNotice" style="margin-top: 20px; padding: 14px; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); font-size: 12.5px; color: var(--text-secondary); display: none;">
+        Notice text
+      </div>
+
+      <div style="margin-top: 24px; display: flex; justify-content: flex-end;">
+        <button type="button" id="btnSubmitOnboarding" class="btn btn-emerald" onclick="submitOnboarding()" disabled style="width: 100%; padding: 12px;">
+          Select a Work Mode Above
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Authenticated Employee Workspace -->
+  <main id="portalMain" class="emp-container" style="display: none;">
+    
+    <!-- Welcome Header -->
+    <header class="welcome-card">
+      <div>
+        <h1 style="font-size: 24px; font-weight: 800; letter-spacing: -0.4px;">Employee Self-Service Portal</h1>
+        <p style="font-size: 13.5px; color: var(--text-secondary); margin-top: 4px;">
+          Welcome back, <span id="welcomeEmpName" style="color: #FFF; font-weight: 700;">Employee</span> • <span id="welcomeEmpId">EMP-00</span>
+        </p>
+      </div>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <div class="status-box" style="margin-bottom: 0; padding: 10px 16px;">
+          <div class="status-indicator"></div>
+          <div>
+            <div style="font-size: 10.5px; color: var(--text-muted); text-transform: uppercase;">Active Mode</div>
+            <div id="activeModeLabel" style="font-size: 13px; font-weight: 700; color: #6EE7B7;">Loading...</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="portal-grid">
+
+      <!-- Section 1: Dynamic Attendance Punch Desk (OTP Dashboard for Attendance) -->
+      <section class="card card-col-7">
+        <div class="card-header">
+          <div>
+            <div class="card-title"><span>⏱️</span> OTP Dashboard for Attendance</div>
+            <div class="card-subtitle" id="punchSubtitle">Unified production workflow: Auto-GPS lock, Router IP, Camera & Approver OTP</div>
+          </div>
+          <span class="badge-pill badge-green" id="punchStatusPill">Ready</span>
+        </div>
+
+        <!-- Mode Selection Tabs (WF-O, WF-H, Sales) -->
+        <div style="display: flex; gap: 8px; margin-bottom: 18px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px; flex-wrap: wrap;">
+          <button type="button" id="tabBtnWFO" class="btn btn-secondary btn-sm" onclick="switchActiveWorkMode('WORK_FROM_OFFICE')">
+            <span>🏢</span> W F O (Work From Office)
+          </button>
+          <button type="button" id="tabBtnWFH" class="btn btn-secondary btn-sm" onclick="switchActiveWorkMode('WORK_FROM_HOME')">
+            <span>🏠</span> W F H (Work From Home)
+          </button>
+          <button type="button" id="tabBtnSales" class="btn btn-secondary btn-sm" onclick="switchActiveWorkMode('SALES_FIELD')">
+            <span>🚗</span> Sales & Field Operations
+          </button>
+        </div>
+
+        <!-- Mode-Specific Requirements Indicator -->
+        <div id="wfoRequirementsBox" class="status-box" style="display: none;">
+          <div>
+            <div style="font-weight: 700; font-size: 13.5px; display: flex; align-items: center; gap: 8px;">
+              <span>📶</span> <strong>W F O Office (Work From Office)</strong>
+            </div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">
+              IP Address: Provided by Organization Router • GPS-Lock: ≤ 100m Office Perimeter
+            </div>
+          </div>
+          <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;" onclick="refreshLiveTelemetry()">
+            Scan Office Status
+          </button>
+        </div>
+
+        <div id="wfhRequirementsBox" class="status-box" style="display: none;">
+          <div>
+            <div style="font-weight: 700; font-size: 13.5px; display: flex; align-items: center; gap: 8px;">
+              <span>🏠</span> <strong>W F H (Work From Home)</strong>
+            </div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">
+              Camera (GPS-lock) • OTP Verification from 4 Executive Approvers (P1, P2, P3, P4)
+            </div>
+          </div>
+          <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;" onclick="openIpChangeModal()">
+            Request IP Change
+          </button>
+        </div>
+
+        <div id="fieldRequirementsBox" class="status-box" style="display: none;">
+          <div>
+            <div style="font-weight: 700; font-size: 13.5px; display: flex; align-items: center; gap: 8px;">
+              <span>🚗</span> <strong>Sales & Field Operations</strong>
+            </div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">
+              Camera (GPS-lock + Anti-Spoofing) • OTP Verification from (P1-P4) • Daytime Client Logger
+            </div>
+          </div>
+          <span class="badge-pill badge-purple">Field Tracking Active</span>
+        </div>
+
+        <!-- Production Telemetry & Geofence Box (Matches User Diagram) -->
+        <div class="telemetry-box" style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-medium); border-radius: var(--radius-md); padding: 16px; margin: 16px 0;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
+            <div style="font-weight: 800; font-size: 12.5px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.6px; display: flex; align-items: center; gap: 6px;">
+              <span>📡</span> Production Telemetry & Geofence Sensor
+            </div>
+            <span class="badge-pill badge-green" id="telemetryGeofenceBadge">GPS-Lock Active ✅</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; font-size: 12px;">
+            <!-- Range -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: 10px 12px; border-radius: var(--radius-sm);">
+              <div style="color: var(--text-muted); font-size: 10.5px; font-weight: 700; text-transform: uppercase;">📍 Range</div>
+              <div style="font-weight: 700; color: var(--text-primary); margin-top: 3px;" id="dispRange">Registration (100m)</div>
+            </div>
+
+            <!-- Latitude -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: 10px 12px; border-radius: var(--radius-sm);">
+              <div style="color: var(--text-muted); font-size: 10.5px; font-weight: 700; text-transform: uppercase;">🌐 Latitude</div>
+              <div style="font-weight: 700; color: #38BDF8; font-family: var(--font-mono); margin-top: 3px;" id="dispLat">Set Automatic</div>
+            </div>
+
+            <!-- Longitude -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: 10px 12px; border-radius: var(--radius-sm);">
+              <div style="color: var(--text-muted); font-size: 10.5px; font-weight: 700; text-transform: uppercase;">🌐 Longitude</div>
+              <div style="font-weight: 700; color: #38BDF8; font-family: var(--font-mono); margin-top: 3px;" id="dispLng">Set Automatic</div>
+            </div>
+
+            <!-- GPS Device Tracking -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: 10px 12px; border-radius: var(--radius-sm);">
+              <div style="color: var(--text-muted); font-size: 10.5px; font-weight: 700; text-transform: uppercase;">🗺️ GPS</div>
+              <div style="font-weight: 700; color: #34D399; margin-top: 3px;" id="dispGps">Automatic</div>
+            </div>
+
+            <!-- Network IP -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: 10px 12px; border-radius: var(--radius-sm);">
+              <div style="color: var(--text-muted); font-size: 10.5px; font-weight: 700; text-transform: uppercase;">📶 IP Address</div>
+              <div style="font-weight: 700; color: #A78BFA; font-family: var(--font-mono); margin-top: 3px;" id="dispIp">Provided by Organization</div>
+            </div>
+
+            <!-- Calculated Distance -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: 10px 12px; border-radius: var(--radius-sm);">
+              <div style="color: var(--text-muted); font-size: 10.5px; font-weight: 700; text-transform: uppercase;">📏 Distance to Base</div>
+              <div style="font-weight: 700; color: #FBBF24; margin-top: 3px;" id="dispDist">Calculating...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Camera Selfie Section (For WF-H & Sales Field) -->
+        <div id="cameraSnapshotSection" style="display: none; margin: 16px 0; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 16px; text-align: center;">
+          <div style="font-weight: 700; font-size: 13px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <span>📷</span> Live Camera Snapshot (GPS-Lock + Anti-Spoofing)
+          </div>
+          <div style="position: relative; width: 260px; height: 195px; margin: 0 auto; border-radius: var(--radius-md); overflow: hidden; background: #000; border: 2px solid var(--border-medium);">
+            <video id="empCameraFeed" autoplay playsinline muted style="width: 100%; height: 100%; object-fit: cover;"></video>
+            <canvas id="empCameraSnapshot" style="display: none;"></canvas>
+            <div id="cameraSnapshotStatus" style="position: absolute; bottom: 8px; left: 8px; right: 8px; background: rgba(0,0,0,0.75); font-size: 11px; padding: 4px; border-radius: 4px; color: #34D399;">
+              Camera feed ready
+            </div>
+          </div>
+          <div style="margin-top: 10px; display: flex; justify-content: center; gap: 10px;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="startCameraFeed()"><span>🔄</span> Start Camera</button>
+            <button type="button" class="btn btn-emerald btn-sm" onclick="captureSnapshot()"><span>📸</span> Take Snapshot</button>
+          </div>
+        </div>
+
+        <!-- Live Punch Button -->
+        <div style="margin: 20px 0; text-align: center;">
+          <div style="display:inline-flex; background:var(--bg-input); padding:4px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle); margin-bottom:14px;">
+            <button type="button" id="portal-punch-in" onclick="setPortalPunchType('IN')" class="btn btn-emerald btn-sm" style="padding:6px 16px;">🟢 Clock-IN</button>
+            <button type="button" id="portal-punch-out" onclick="setPortalPunchType('OUT')" class="btn btn-secondary btn-sm" style="padding:6px 16px;">🔴 Clock-OUT</button>
+          </div>
+          <div>
+            <button id="btnPunchAttendance" class="btn btn-emerald" style="padding: 15px 36px; font-size: 15px; border-radius: var(--radius-md);" onclick="handlePunchAttendance()">
+              <span>⚡</span> Punch Attendance Now
+            </button>
+          </div>
+          <div id="punchFeedback" style="font-size: 12.5px; color: var(--text-muted); margin-top: 10px;">
+            Click to capture live verification data and log attendance.
+          </div>
+        </div>
+
+        <!-- Universal OTP Fallback Option -->
+        <div style="border-top: 1px solid var(--border-subtle); padding-top: 16px; margin-top: 16px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <div style="font-size: 13px; font-weight: 700;">Facing network or perimeter issues?</div>
+              <div style="font-size: 11.5px; color: var(--text-muted);">
+                Dispatch an OTP attendance request to the 4 designated approval members (P1, P2, P3, P4) via Gmail.
+              </div>
+            </div>
+            <button class="btn btn-indigo" style="font-size: 12px;" onclick="handleRequestOtpAttendance()">
+              <span>🛡️</span> Request OTP Attendance
+            </button>
+          </div>
+          <div id="otpPendingNotice" style="display: none; margin-top: 12px; padding: 12px 16px; background: rgba(99, 102, 241, 0.12); border: 1px solid rgba(99, 102, 241, 0.35); border-radius: var(--radius-sm); font-size: 12.5px; color: #C7D2FE;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="pulse-dot"></span>
+              <strong>OTP Request Dispatched:</strong> Awaiting approval from Person 1, 2, 3, or 4 via Gmail.
+            </div>
+            <div style="margin-top: 4px; font-size: 11.5px; color: #A5B4FC;">
+              ⚡ Once approved, your portal will update automatically (WF Home / Sales → Portal Update).
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 2: Daytime Client Visit Logger (For Sales Field) or Profile Details -->
+      <section class="card card-col-5">
+        <div class="card-header">
+          <div>
+            <div class="card-title"><span>📍</span> Client Visit Logger</div>
+            <div class="card-subtitle">Daytime field tracking & client meeting verification</div>
+          </div>
+          <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;" onclick="openLogVisitModal()">
+            + Log Visit
+          </button>
+        </div>
+
+        <div id="clientVisitsList" style="max-height: 260px; overflow-y: auto;">
+          <div style="color: var(--text-muted); font-size: 12.5px; text-align: center; padding: 24px;">
+            No client visits logged today.
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: My Check-In & Check-Out Timings -->
+      <section class="card card-col-12" id="myTimingsSection">
+        <div class="card-header">
+          <div>
+            <div class="card-title"><span>🕒</span> My Check-In & Check-Out Timings</div>
+            <div class="card-subtitle">Today's first check-in, last check-out and hours worked, plus the last 7 days</div>
+          </div>
+          <button class="btn btn-secondary btn-sm btn-runtime-refresh" onclick="loadMyTimings()">
+            <span class="refresh-icon">🔄</span> Refresh
+          </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 18px;">
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px 14px;">
+            <div style="font-size: 10.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.4px;">Today Check-In</div>
+            <div id="myTodayIn" style="font-size: 20px; font-weight: 800; font-family: var(--font-mono); color: var(--emerald); margin-top: 4px;">--:--</div>
+          </div>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px 14px;">
+            <div style="font-size: 10.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.4px;">Today Check-Out</div>
+            <div id="myTodayOut" style="font-size: 20px; font-weight: 800; font-family: var(--font-mono); color: var(--indigo); margin-top: 4px;">--:--</div>
+          </div>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px 14px;">
+            <div style="font-size: 10.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.4px;">Hours Worked Today</div>
+            <div id="myTodayWorked" style="font-size: 20px; font-weight: 800; font-family: var(--font-mono); color: var(--cyan); margin-top: 4px;">0h 00m</div>
+          </div>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px 14px;">
+            <div style="font-size: 10.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.4px;">Shift Status</div>
+            <div id="myTodayState" style="margin-top: 8px;"><span class="badge-pill badge-amber">Not Checked In</span></div>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="emp-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Check-In</th>
+                <th>Check-Out</th>
+                <th>Hours Worked</th>
+                <th>Method</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="myTimingsTbody">
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Loading your timings...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section 3: Today's Attendance Logs & Paired Records -->
+      <section class="card card-col-12">
+        <div class="card-header">
+          <div class="card-title"><span>📋</span> Today's Attendance Activity</div>
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <button class="btn btn-secondary btn-sm" onclick="ArdhnarishwarRuntime.exportTableToCSV(document.getElementById('attendanceTbody').closest('table'), 'my_today_attendance.csv')">
+              📥 Export CSV
+            </button>
+            <button class="btn btn-secondary btn-sm btn-runtime-refresh" onclick="ArdhnarishwarRuntime.triggerGlobalSync(true)">
+              <span class="refresh-icon">🔄</span> Refresh Activity
+            </button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="emp-table">
+            <thead>
+              <tr>
+                <th>Check-In Time</th>
+                <th>Verification Method</th>
+                <th>Client IP</th>
+                <th>Distance From Base</th>
+                <th>Approval Authority</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="attendanceTbody">
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">
+                  No check-ins recorded today.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Modal: Log Client Visit -->
+  <div id="visitModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card" style="max-width: 480px;">
+      <div style="margin-bottom: 20px;">
+        <h3 style="font-size: 18px; font-weight: 800;">Log Client Visit</h3>
+        <p style="font-size: 12.5px; color: var(--text-secondary); margin-top: 4px;">
+          Records your current live GPS coordinates with meeting details.
+        </p>
+      </div>
+
+      <form onsubmit="handleSaveClientVisit(event)">
+        <div class="form-group">
+          <label class="form-label">Client / Company Name</label>
+          <input type="text" id="visitClientName" class="form-input" placeholder="e.g. Acme Corporation" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Meeting Notes / Agenda</label>
+          <textarea id="visitNotes" class="form-input" rows="3" placeholder="Discussed contract renewal and deliverables..."></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button type="button" class="btn btn-secondary" onclick="closeLogVisitModal()">Cancel</button>
+          <button type="submit" class="btn btn-emerald">Save Visit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: IP Change Request (WFH Fallback) -->
+  <div id="ipModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card" style="max-width: 480px;">
+      <div style="margin-bottom: 20px;">
+        <h3 style="font-size: 18px; font-weight: 800;">Request Static / Home IP Update</h3>
+        <p style="font-size: 12.5px; color: var(--text-secondary); margin-top: 4px;">
+          Submit your new public IP if your ISP rotated your connection.
+        </p>
+      </div>
+
+      <form onsubmit="handleSubmitIpChange(event)">
+        <div class="form-group">
+          <label class="form-label">New Public IP Address</label>
+          <input type="text" id="reqNewIp" class="form-input" placeholder="e.g. 203.0.113.88" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Reason for Request</label>
+          <input type="text" id="reqIpReason" class="form-input" placeholder="ISP rotated dynamic IP this morning" required>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button type="button" class="btn btn-secondary" onclick="closeIpChangeModal()">Cancel</button>
+          <button type="submit" class="btn btn-emerald">Submit Request</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">
+    <span id="toastIcon">ℹ️</span>
+    <span id="toastMessage">Notification message</span>
+  </div>
+
+  <script>
+    let currentEmpUser = null;
+    let selectedMode = null;
+    let calibratedHomeCoords = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      checkSession();
+    });
+
+    function showToast(message, isError = false) {
+      const toast = document.getElementById("toast");
+      const msgEl = document.getElementById("toastMessage");
+      const iconEl = document.getElementById("toastIcon");
+      msgEl.textContent = message;
+      iconEl.textContent = isError ? "⚠️" : "✅";
+      toast.style.borderColor = isError ? "rgba(244, 63, 94, 0.4)" : "rgba(16, 185, 129, 0.4)";
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 4000);
+    }
+
+    async function checkSession() {
+      try {
+        const res = await fetch("/api/me", { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.authenticated && data.user) {
+            currentEmpUser = data.user;
+            renderAuthenticatedView();
+            return;
+          }
+        }
+      } catch (err) {
+        console.error("Session check error", err);
+      }
+      renderUnauthenticatedView();
+    }
+
+    function renderUnauthenticatedView() {
+      document.getElementById("authSection").style.display = "flex";
+      document.getElementById("portalMain").style.display = "none";
+      document.getElementById("navUserBadge").style.display = "none";
+      document.getElementById("btnLogout").style.display = "none";
+      document.getElementById("onboardingModal").style.display = "none";
+    }
+
+    function renderAuthenticatedView() {
+      document.getElementById("authSection").style.display = "none";
+      document.getElementById("portalMain").style.display = "block";
+      document.getElementById("navUserBadge").style.display = "flex";
+      document.getElementById("btnLogout").style.display = "inline-flex";
+
+      const name = currentEmpUser.name || "Employee";
+      const empId = currentEmpUser.emp_id || currentEmpUser.id || "";
+      document.getElementById("empUserName").textContent = name;
+      document.getElementById("welcomeEmpName").textContent = name;
+      document.getElementById("welcomeEmpId").textContent = empId;
+
+      // Check first login or missing work mode
+      if (currentEmpUser.is_first_login || !currentEmpUser.work_mode) {
+        showOnboardingModal();
+      } else {
+        document.getElementById("onboardingModal").style.display = "none";
+        setupWorkModeUI(currentEmpUser.work_mode);
+        refreshLiveTelemetry();
+      }
+
+      loadTodayAttendance();
+      loadClientVisits();
+
+      if (window.ArdhnarishwarRuntime) {
+        ArdhnarishwarRuntime.registerTask("emp_attendance", loadTodayAttendance);
+        ArdhnarishwarRuntime.registerTask("emp_visits", loadClientVisits);
+      }
+    }
+
+    async function handleEmpLogin(e) {
+      e.preventDefault();
+      const compId = document.getElementById("loginCompId").value.trim();
+      const identifier = document.getElementById("loginIdentifier").value.trim();
+      const password = document.getElementById("loginPassword").value;
+      const errorMsg = document.getElementById("loginErrorMsg");
+      errorMsg.style.display = "none";
+
+      try {
+        const res = await fetch("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            role: "employee",
+            company_id: compId,
+            identifier: identifier,
+            password: password
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.ok) {
+          showToast("Welcome! Employee session verified");
+          checkSession();
+        } else {
+          errorMsg.textContent = data.error || "Login failed. Check your credentials.";
+          errorMsg.style.display = "block";
+        }
+      } catch (err) {
+        errorMsg.textContent = "Network error during employee sign in.";
+        errorMsg.style.display = "block";
+      }
+    }
+
+    async function handleLogout() {
+      try {
+        await fetch("/api/logout", { method: "POST", credentials: "include" });
+      } catch (e) {}
+      showToast("Signed out");
+      currentEmpUser = null;
+      renderUnauthenticatedView();
+    }
+
+    /* ── First-Time Login Onboarding ──────────────────────────────── */
+    function showOnboardingModal() {
+      document.getElementById("onboardingModal").style.display = "flex";
+    }
+
+    function selectOnboardingMode(mode) {
+      selectedMode = mode;
+      document.getElementById("cardWFO").classList.toggle("selected", mode === "WORK_FROM_OFFICE");
+      document.getElementById("cardWFH").classList.toggle("selected", mode === "WORK_FROM_HOME");
+      document.getElementById("cardField").classList.toggle("selected", mode === "SALES_FIELD");
+
+      const notice = document.getElementById("onboardingDynamicNotice");
+      const btn = document.getElementById("btnSubmitOnboarding");
+      notice.style.display = "block";
+      btn.disabled = false;
+      btn.textContent = `Confirm & Set ${mode.replace(/_/g, " ")}`;
+
+      if (mode === "WORK_FROM_HOME") {
+        notice.innerHTML = "📡 <strong>Calibrating Home Geofence:</strong> Requesting GPS coordinates to permanently establish your home base perimeter (200m radius)...";
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            pos => {
+              calibratedHomeCoords = {
+                latitude: pos.coords.latitude,
+                longitude: pos.coords.longitude
+              };
+              notice.innerHTML = `✅ <strong>Home Base Calibrated:</strong> ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}. Distance limit: 200 meters.`;
+            },
+            err => {
+              notice.innerHTML = `⚠️ <strong>GPS Notice:</strong> Could not acquire coordinates (${err.message}). Default geofence will be established on first check-in.`;
+            },
+            { enableHighAccuracy: true }
+          );
+        }
+      } else if (mode === "WORK_FROM_OFFICE") {
+        notice.innerHTML = "🏢 <strong>WFO Policy:</strong> Attendance requires connection to the office Wi-Fi network and presence within the 100m office perimeter.";
+      } else {
+        notice.innerHTML = "🚗 <strong>Sales Field Policy:</strong> Attendance and client meetings will log live GPS location with anti-spoofing enabled.";
+      }
+    }
+
+    async function submitOnboarding() {
+      if (!selectedMode) return;
+      const payload = {
+        work_mode: selectedMode,
+        home_radius: 200
+      };
+      if (calibratedHomeCoords) {
+        payload.latitude = calibratedHomeCoords.latitude;
+        payload.longitude = calibratedHomeCoords.longitude;
+      }
+
+      try {
+        const res = await fetch("/api/employee/onboarding", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok && data.ok) {
+          showToast(`Onboarding complete! Mode set to ${selectedMode}`);
+          document.getElementById("onboardingModal").style.display = "none";
+          currentEmpUser.is_first_login = false;
+          currentEmpUser.work_mode = selectedMode;
+          setupWorkModeUI(selectedMode);
+        } else {
+          showToast(data.error || "Onboarding failed", true);
+        }
+      } catch (err) {
+        showToast("Error completing onboarding", true);
+      }
+    }
+
+    let currentMediaStream = null;
+    let capturedSnapshotB64 = null;
+    let approvalPollingInterval = null;
+    let cachedClientIp = null;
+    let cachedCoords = null;
+
+    /* ── Setup UI per Work Mode ───────────────────────────────────── */
+    function switchActiveWorkMode(mode) {
+      if (!currentEmpUser) return;
+      currentEmpUser.work_mode = mode;
+      setupWorkModeUI(mode);
+      refreshLiveTelemetry();
+    }
+
+    function setupWorkModeUI(mode) {
+      const modeLabel = document.getElementById("activeModeLabel");
+      const navBadge = document.getElementById("empModeBadge");
+      const wfoBox = document.getElementById("wfoRequirementsBox");
+      const wfhBox = document.getElementById("wfhRequirementsBox");
+      const fieldBox = document.getElementById("fieldRequirementsBox");
+      const punchBtn = document.getElementById("btnPunchAttendance");
+      const cameraSection = document.getElementById("cameraSnapshotSection");
+
+      const tabWFO = document.getElementById("tabBtnWFO");
+      const tabWFH = document.getElementById("tabBtnWFH");
+      const tabSales = document.getElementById("tabBtnSales");
+
+      wfoBox.style.display = "none";
+      wfhBox.style.display = "none";
+      fieldBox.style.display = "none";
+
+      if (tabWFO) tabWFO.className = mode === "WORK_FROM_OFFICE" ? "btn btn-emerald btn-sm" : "btn btn-secondary btn-sm";
+      if (tabWFH) tabWFH.className = mode === "WORK_FROM_HOME" ? "btn btn-emerald btn-sm" : "btn btn-secondary btn-sm";
+      if (tabSales) tabSales.className = mode === "SALES_FIELD" ? "btn btn-emerald btn-sm" : "btn btn-secondary btn-sm";
+
+      const dispRange = document.getElementById("dispRange");
+
+      if (mode === "WORK_FROM_OFFICE") {
+        modeLabel.textContent = "Work From Office (WFO)";
+        navBadge.textContent = "WFO";
+        navBadge.className = "mode-badge";
+        wfoBox.style.display = "flex";
+        punchBtn.innerHTML = "<span>🏢</span> Punch In (Office Wi-Fi & GPS)";
+        cameraSection.style.display = "none";
+        stopCameraFeed();
+        if (dispRange) dispRange.textContent = "Registration (100m Office)";
+      } else if (mode === "WORK_FROM_HOME") {
+        modeLabel.textContent = "Work From Home (WFH)";
+        navBadge.textContent = "WFH";
+        navBadge.className = "mode-badge badge-green";
+        wfhBox.style.display = "flex";
+        punchBtn.innerHTML = "<span>🏠</span> Punch In (Home GPS & Camera OTP)";
+        cameraSection.style.display = "block";
+        startCameraFeed();
+        if (dispRange) dispRange.textContent = "Registration (200m Home)";
+      } else if (mode === "SALES_FIELD") {
+        modeLabel.textContent = "Sales & Field Operations";
+        navBadge.textContent = "Sales Field";
+        navBadge.className = "mode-badge badge-purple";
+        fieldBox.style.display = "flex";
+        punchBtn.innerHTML = "<span>🚗</span> Punch In (Field GPS & Camera OTP)";
+        cameraSection.style.display = "block";
+        startCameraFeed();
+        if (dispRange) dispRange.textContent = "Dynamic Field Radar (Anti-Spoofing)";
+      }
+    }
+
+    /* ── Live Telemetry & Geofence Sensor ────────────────────────── */
+    async function refreshLiveTelemetry() {
+      // Auto-detect public router IP
+      if (!cachedClientIp) {
+        try {
+          const res = await fetch("https://api.ipify.org?format=json");
+          const d = await res.json();
+          if (d.ip) cachedClientIp = d.ip;
+        } catch (e) {
+          cachedClientIp = "Auto-detected Router IP";
+        }
+      }
+      const dispIp = document.getElementById("dispIp");
+      if (dispIp) dispIp.textContent = cachedClientIp || "Auto-detected";
+
+      if (!navigator.geolocation) {
+        document.getElementById("dispGps").textContent = "GPS Not Supported";
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          cachedCoords = {
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+            accuracy: pos.coords.accuracy
+          };
+          const latEl = document.getElementById("dispLat");
+          const lngEl = document.getElementById("dispLng");
+          const gpsEl = document.getElementById("dispGps");
+          const distEl = document.getElementById("dispDist");
+          const badgeEl = document.getElementById("telemetryGeofenceBadge");
+
+          if (latEl) latEl.textContent = pos.coords.latitude.toFixed(6);
+          if (lngEl) lngEl.textContent = pos.coords.longitude.toFixed(6);
+          if (gpsEl) gpsEl.textContent = `Automatic (±${Math.round(pos.coords.accuracy)}m Lock ✅)`;
+
+          // Haversine distance to Office (default: 28.6260, 77.3780)
+          const officeLat = 28.626000;
+          const officeLng = 77.378000;
+          const distM = calcHaversineMeters(pos.coords.latitude, pos.coords.longitude, officeLat, officeLng);
+
+          if (distEl) {
+            const isWfo = (!currentEmpUser || currentEmpUser.work_mode === "WORK_FROM_OFFICE");
+            const allowed = isWfo ? 100 : 200;
+            if (distM <= allowed) {
+              distEl.innerHTML = `<span style="color:#34D399;">${Math.round(distM)}m (≤ ${allowed}m APPROVED ✅)</span>`;
+              if (badgeEl) {
+                badgeEl.textContent = "Within Range (APPROVED ✅)";
+                badgeEl.className = "badge-pill badge-green";
+              }
+            } else {
+              distEl.innerHTML = `<span style="color:#F87171;">${Math.round(distM)}m (> ${allowed}m REJECTED ❌)</span>`;
+              if (badgeEl) {
+                badgeEl.textContent = "Outside Range (REJECTED ❌)";
+                badgeEl.className = "badge-pill badge-red";
+              }
+            }
+          }
+        },
+        err => {
+          const gpsEl = document.getElementById("dispGps");
+          if (gpsEl) gpsEl.textContent = `GPS Warning: ${err.message}`;
+        },
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+      );
+    }
+
+    function calcHaversineMeters(lat1, lon1, lat2, lon2) {
+      const R = 6371000;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+
+    /* ── Camera Capture Functions ────────────────────────────────── */
+    async function startCameraFeed() {
+      try {
+        const video = document.getElementById("empCameraFeed");
+        const statusEl = document.getElementById("cameraSnapshotStatus");
+        if (currentMediaStream) stopCameraFeed();
+
+        currentMediaStream = await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" }
+        });
+        video.srcObject = currentMediaStream;
+        if (statusEl) statusEl.textContent = "Live Camera Active (GPS-Lock Ready)";
+      } catch (err) {
+        const statusEl = document.getElementById("cameraSnapshotStatus");
+        if (statusEl) statusEl.textContent = "Camera access unavailable: " + err.message;
+      }
+    }
+
+    function stopCameraFeed() {
+      if (currentMediaStream) {
+        currentMediaStream.getTracks().forEach(t => t.stop());
+        currentMediaStream = null;
+      }
+    }
+
+    function captureSnapshot() {
+      const video = document.getElementById("empCameraFeed");
+      const canvas = document.getElementById("empCameraSnapshot");
+      const statusEl = document.getElementById("cameraSnapshotStatus");
+
+      if (!video || !video.videoWidth) {
+        showToast("Camera feed not ready", true);
+        return;
+      }
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      capturedSnapshotB64 = canvas.toDataURL("image/jpeg", 0.85);
+
+      if (statusEl) statusEl.textContent = "📸 Snapshot Captured & GPS-Locked ✅";
+      showToast("Camera snapshot captured with GPS stamp ✅");
+    }
+
+    /* ── Punch Attendance (Work Mode Check-In) ────────────────────── */
+    async function handlePunchAttendance() {
+      const feedback = document.getElementById("punchFeedback");
+      const btn = document.getElementById("btnPunchAttendance");
+      btn.disabled = true;
+      feedback.textContent = "Acquiring live GPS coordinates & verifying policy...";
+
+      if (!navigator.geolocation) {
+        submitPunchWithCoords(null, null, null);
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          submitPunchWithCoords(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy);
+        },
+        err => {
+          feedback.textContent = `GPS Warning: ${err.message}. Proceeding with network verification...`;
+          submitPunchWithCoords(null, null, null);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    }
+
+    let currentPortalPunchType = "IN";
+
+    function setPortalPunchType(type) {
+      currentPortalPunchType = type;
+      const inBtn = document.getElementById("portal-punch-in");
+      const outBtn = document.getElementById("portal-punch-out");
+      const punchBtn = document.getElementById("btnPunchAttendance");
+      if (type === "OUT") {
+        if (inBtn) inBtn.className = "btn btn-secondary btn-sm";
+        if (outBtn) outBtn.className = "btn btn-danger btn-sm";
+        if (punchBtn) {
+          punchBtn.className = "btn btn-danger";
+          punchBtn.innerHTML = "<span>🛑</span> Punch Clock-OUT Now";
+        }
+      } else {
+        if (inBtn) inBtn.className = "btn btn-emerald btn-sm";
+        if (outBtn) outBtn.className = "btn btn-secondary btn-sm";
+        if (punchBtn) {
+          punchBtn.className = "btn btn-emerald";
+          punchBtn.innerHTML = "<span>⚡</span> Punch Clock-IN Now";
+        }
+      }
+    }
+
+    async function submitPunchWithCoords(lat, lng, accuracy) {
+      const feedback = document.getElementById("punchFeedback");
+      const btn = document.getElementById("btnPunchAttendance");
+
+      const mode = currentEmpUser ? currentEmpUser.work_mode : "WORK_FROM_OFFICE";
+      const payload = {
+        work_mode: mode,
+        employee_id: currentEmpUser ? currentEmpUser.emp_id : null,
+        check_type: currentPortalPunchType,
+        lat: lat,
+        lng: lng,
+        accuracy: accuracy,
+        is_mock: false
+      };
+
+      if (capturedSnapshotB64) {
+        payload.image = capturedSnapshotB64;
+      }
+
+      try {
+        const res = await fetch("/attendance/check-in", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        btn.disabled = false;
+
+        if (res.ok && data.ok) {
+          const verifMsg = data.message || `Attendance Marked Successfully ✅ (${data.verification_method || 'PRESENT'})`;
+          showToast(verifMsg);
+          feedback.innerHTML = `<span style="color:#34D399; font-weight:700;">✅ ${escapeHtml(verifMsg)}</span>`;
+          loadTodayAttendance();
+          refreshLiveTelemetry();
+        } else {
+          showToast(data.error || "Attendance verification failed", true);
+          feedback.innerHTML = `<span style="color:#F87171; font-weight:700;">❌ ${escapeHtml(data.error || 'Verification failed')}</span>`;
+        }
+      } catch (err) {
+        btn.disabled = false;
+        showToast("Network error submitting attendance", true);
+        feedback.textContent = "Network error. Try again.";
+      }
+    }
+
+    /* ── OTP Attendance Request ──────────────────────────────────── */
+    async function handleRequestOtpAttendance() {
+      if (!confirm("Request OTP attendance authorization from the 4 designated approval members (P1, P2, P3, P4) via Gmail?")) return;
+      try {
+        const res = await fetch("/api/attendance/otp-request", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json", "Accept": "application/json" },
+          body: JSON.stringify({})
+        });
+        const data = await res.json();
+        if (res.ok && data.ok) {
+          showToast("OTP attendance request dispatched to P1, P2, P3, P4 via Gmail");
+          document.getElementById("otpPendingNotice").style.display = "block";
+          loadTodayAttendance();
+          startApprovalStatusPolling();
+        } else {
+          showToast(data.error || "Failed to request OTP attendance", true);
+        }
+      } catch (err) {
+        showToast("Error requesting OTP", true);
+      }
+    }
+
+    /* ── Real-Time Approval Polling (WF Home / Sales -> Portal Update) */
+    function startApprovalStatusPolling() {
+      if (approvalPollingInterval) clearInterval(approvalPollingInterval);
+      approvalPollingInterval = setInterval(async () => {
+        try {
+          const res = await fetch("/api/attendance/logs", { credentials: "include" });
+          if (res.ok) {
+            const data = await res.json();
+            const logs = data.logs || data.attendance || [];
+            const hasPending = logs.some(l => l.status === "PENDING_APPROVAL");
+            const justApproved = logs.some(l => l.status === "APPROVED" || l.status === "PRESENT");
+
+            if (!hasPending && justApproved) {
+              clearInterval(approvalPollingInterval);
+              approvalPollingInterval = null;
+              document.getElementById("otpPendingNotice").style.display = "none";
+              showToast("🎉 Attendance Approved by Executive Approvers (P1-P4)! Portal Updated ✅");
+              renderAttendanceTable(logs);
+            }
+          }
+        } catch (e) {}
+      }, 5000);
+    }
+
+    /* ── Daytime Client Visits ────────────────────────────────────── */
+    function openLogVisitModal() {
+      document.getElementById("visitModal").style.display = "flex";
+    }
+
+    function closeLogVisitModal() {
+      document.getElementById("visitModal").style.display = "none";
+    }
+
+    async function handleSaveClientVisit(e) {
+      e.preventDefault();
+      const clientName = document.getElementById("visitClientName").value.trim();
+      const notes = document.getElementById("visitNotes").value.trim();
+
+      navigator.geolocation.getCurrentPosition(
+        async pos => {
+          await postClientVisit(clientName, notes, pos.coords.latitude, pos.coords.longitude);
+        },
+        async () => {
+          await postClientVisit(clientName, notes, null, null);
+        },
+        { enableHighAccuracy: true }
+      );
+    }
+
+    async function postClientVisit(clientName, notes, lat, lng) {
+      try {
+        const res = await fetch("/api/employee/field-visit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            client_name: clientName,
+            notes: notes,
+            latitude: lat,
+            longitude: lng
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.ok) {
+          showToast("Client visit logged successfully");
+          closeLogVisitModal();
+          document.getElementById("visitClientName").value = "";
+          document.getElementById("visitNotes").value = "";
+          loadClientVisits();
+        } else {
+          showToast(data.error || "Failed to log visit", true);
+        }
+      } catch (err) {
+        showToast("Error logging client visit", true);
+      }
+    }
+
+    async function loadClientVisits() {
+      try {
+        const res = await fetch("/api/employee/field-visits", { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          renderClientVisits(data.visits || []);
+        }
+      } catch (err) {
+        console.error("Failed to load client visits", err);
+      }
+    }
+
+    function renderClientVisits(visits) {
+      const listEl = document.getElementById("clientVisitsList");
+      if (!visits || visits.length === 0) {
+        listEl.innerHTML = `<div style="color: var(--text-muted); font-size: 12.5px; text-align: center; padding: 24px;">
+          No client visits recorded today.
+        </div>`;
+        return;
+      }
+
+      listEl.innerHTML = visits.map(v => `
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong style="font-size: 13.5px;">${escapeHtml(v.client_name)}</strong>
+            <span style="font-size: 11px; color: var(--text-muted);">${escapeHtml(v.timestamp ? new Date(v.timestamp).toLocaleTimeString() : '')}</span>
+          </div>
+          <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+            ${escapeHtml(v.notes || 'No notes added')}
+          </div>
+          ${(v.latitude && v.longitude) ? `
+            <div style="font-size: 11px; color: var(--emerald); margin-top: 6px;">
+              📍 GPS: ${v.latitude.toFixed(4)}, ${v.longitude.toFixed(4)}
+            </div>
+          ` : ''}
+        </div>
+      `).join("");
+    }
+
+    /* ── IP Change Request (WFH Fallback) ─────────────────────────── */
+    function openIpChangeModal() {
+      document.getElementById("ipModal").style.display = "flex";
+      fetch("https://api.ipify.org?format=json")
+        .then(r => r.json())
+        .then(d => { if (d.ip) document.getElementById("reqNewIp").value = d.ip; })
+        .catch(() => {});
+    }
+
+    function closeIpChangeModal() {
+      document.getElementById("ipModal").style.display = "none";
+    }
+
+    async function handleSubmitIpChange(e) {
+      e.preventDefault();
+      const ip = document.getElementById("reqNewIp").value.trim();
+      const reason = document.getElementById("reqIpReason").value.trim();
+
+      try {
+        const res = await fetch("/api/employee/ip-change-request", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ requested_ip: ip, reason: reason })
+        });
+        const data = await res.json();
+        if (res.ok && data.ok) {
+          showToast("IP change request submitted for admin review");
+          closeIpChangeModal();
+        } else {
+          showToast(data.error || "Submission failed", true);
+        }
+      } catch (err) {
+        showToast("Error submitting IP change request", true);
+      }
+    }
+
+    /* ── Attendance Log History ──────────────────────────────────── */
+    async function loadTodayAttendance() {
+      try {
+        const res = await fetch("/api/attendance/logs", { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          renderAttendanceTable(data.logs || data.attendance || []);
+        }
+      } catch (err) {
+        console.error("Failed to load attendance logs", err);
+      }
+      loadMyTimings();
+    }
+
+    /* ── My Check-In / Check-Out Timings ─────────────────────────── */
+    const MY_STATE_BADGES = {
+      CHECKED_IN: ["badge-green", "Checked In (On Duty)"],
+      PENDING_APPROVAL: ["badge-amber", "Awaiting Approval"],
+      CHECKED_OUT: ["badge-blue", "Checked Out"],
+      MISSED_CHECK_OUT: ["badge-red", "Missed Check-Out"],
+      MISSING_CHECK_IN: ["badge-red", "Missing Check-In"],
+      REJECTED: ["badge-red", "Rejected"],
+      NOT_CHECKED_IN: ["badge-amber", "Not Checked In"]
+    };
+
+    function fmtClock12(t) {
+      if (window.CheckinCheckoutPanel) return CheckinCheckoutPanel.fmtClock(t);
+      return t || "";
+    }
+
+    async function loadMyTimings() {
+      const tbody = document.getElementById("myTimingsTbody");
+      if (!tbody) return;
+      try {
+        const res = await fetch("/api/employee/daily-records?limit=7", { credentials: "include" });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.ok) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #FDA4AF; padding: 20px;">${escapeHtml(data.error || "Could not load your timings")}</td></tr>`;
+          return;
+        }
+        const records = data.records || [];
+        const today = records.find(r => r.is_today);
+        const st = today ? today.state : "NOT_CHECKED_IN";
+        const [badgeCls, badgeTxt] = MY_STATE_BADGES[st] || ["badge-blue", st];
+        document.getElementById("myTodayIn").textContent = today && today.check_in ? fmtClock12(today.check_in) : "--:--";
+        document.getElementById("myTodayOut").textContent = today && today.check_out ? fmtClock12(today.check_out) : (st === "CHECKED_IN" ? "On duty" : "--:--");
+        document.getElementById("myTodayWorked").textContent = today && today.worked ? today.worked + (today.is_live ? " (so far)" : "") : "0h 00m";
+        document.getElementById("myTodayState").innerHTML = `<span class="badge-pill ${badgeCls}">${escapeHtml(badgeTxt)}</span>`;
+
+        if (records.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">No check-ins recorded yet.</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = records.map(r => {
+          const [cls, txt] = MY_STATE_BADGES[r.state] || ["badge-blue", r.state_label || r.state];
+          const outCell = r.check_out
+            ? `<strong style="color: var(--indigo); font-family: var(--font-mono);">${escapeHtml(fmtClock12(r.check_out))}</strong>`
+            : (r.state === "CHECKED_IN" ? '<span style="color: var(--text-muted);">In progress</span>' : '<span style="color: #FDA4AF;">Not punched</span>');
+          return `
+            <tr>
+              <td style="font-family: var(--font-mono);">${escapeHtml(r.date)}</td>
+              <td><strong style="color: var(--emerald); font-family: var(--font-mono);">${r.check_in ? escapeHtml(fmtClock12(r.check_in)) : "-"}</strong></td>
+              <td>${outCell}</td>
+              <td style="font-family: var(--font-mono);">${r.worked ? escapeHtml(r.worked) + (r.is_live ? " (so far)" : "") : "-"}</td>
+              <td><span class="badge-pill badge-blue">${escapeHtml((r.methods || []).join(" / ") || "Direct")}</span></td>
+              <td><span class="badge-pill ${cls}">${escapeHtml(txt)}</span></td>
+            </tr>
+          `;
+        }).join("");
+      } catch (err) {
+        console.error("Failed to load my timings", err);
+      }
+    }
+
+    function renderAttendanceTable(logs) {
+      const tbody = document.getElementById("attendanceTbody");
+      if (!logs || logs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">
+          No attendance records for today.
+        </td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = logs.map(l => {
+        const status = l.status || "PRESENT";
+        const statusClass = status === "PRESENT" || status === "APPROVED" ? "badge-green" :
+                            status === "PENDING_APPROVAL" ? "badge-amber" : "badge-red";
+
+        return `
+          <tr>
+            <td><strong>${escapeHtml(l.checkInTime || l.time || "-")}</strong></td>
+            <td><span class="badge-pill badge-blue">${escapeHtml(l.verificationMethod || l.work_type || "Direct")}</span></td>
+            <td><code style="font-family: var(--font-mono);">${escapeHtml(l.clientIp || l.client_ip || "-")}</code></td>
+            <td>${l.distanceFromBaseM !== undefined && l.distanceFromBaseM !== null ? `${Math.round(l.distanceFromBaseM)}m` : '-'}</td>
+            <td>${escapeHtml(l.approvedByEmail || l.approved_by || "-")}</td>
+            <td><span class="badge-pill ${statusClass}">${escapeHtml(status)}</span></td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function verifyLiveEnvironment() {
+      showToast("Scanning office perimeter and Wi-Fi...");
+      navigator.geolocation.getCurrentPosition(
+        pos => showToast(`Location scanned: ±${Math.round(pos.coords.accuracy)}m accuracy`),
+        err => showToast("GPS scan error: " + err.message, true)
+      );
+    }
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+  <script src="/static/js/checkin_checkout.js"></script>
+  <script src="/static/js/theme.js"></script>
+  <script src="/static/js/ardhnarishwar_runtime.js"></script>
+<script src="/static/js/ardh_logo.js?v=1"></script>
+<script id="home-setup-hook-v1">
+/* HOME_COORDS_MISSING aaye to "Set Home Location" popup kholo */
+(function () {
+  if (window.__homeSetupHook) return; window.__homeSetupHook = true;
+  var origFetch = window.fetch.bind(window), asking = false;
+
+  window.fetch = async function () {
+    var res = await origFetch.apply(null, arguments);
+    try {
+      if (!asking && !res.ok) {
+        var data = await res.clone().json().catch(function () { return null; });
+        if (data && data.code === 'HOME_COORDS_MISSING') {
+          asking = true;
+          setTimeout(function () { openHomeSetup(); }, 200);
+        }
+      }
+    } catch (e) {}
+    return res;
+  };
+
+  function toast(msg, isErr) { if (typeof showToast === 'function') showToast(msg, !!isErr); else alert(msg); }
+
+  function openHomeSetup() {
+    var old = document.getElementById('home-setup-modal'); if (old) old.remove();
+    var ov = document.createElement('div');
+    ov.id = 'home-setup-modal';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(2,6,23,.75);display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);';
+    ov.innerHTML =
+      '<div style="width:100%;max-width:440px;max-height:92vh;overflow:auto;background:var(--bg-card,#0f172a);border:1px solid var(--border-subtle,#334155);border-radius:16px;padding:22px;color:var(--text-primary,#e2e8f0);box-shadow:0 20px 60px rgba(0,0,0,.6);">' +
+      '<h3 style="margin:0 0 6px;font-size:17px;font-weight:800;">🏠 Set Your Home Location</h3>' +
+      '<p style="font-size:13px;color:var(--text-secondary,#cbd5e1);margin:0 0 14px;line-height:1.5;">WFH attendance ke liye aapka Home base zaroori hai. <b>Sirf ghar par hote hue</b> save karein. Ye ek hi baar hota hai, baad me sirf admin badal sakta hai.</p>' +
+      '<div id="hs-status" style="font-size:13px;padding:12px;border-radius:10px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.35);margin-bottom:14px;">📡 GPS location mil rahi hai...</div>' +
+      '<div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">' +
+      '<button type="button" id="hs-cancel" style="background:transparent;border:1px solid var(--border-subtle,#334155);color:var(--text-secondary,#cbd5e1);border-radius:10px;padding:9px 16px;cursor:pointer;font-weight:700;">Cancel</button>' +
+      '<button type="button" id="hs-retry" style="background:transparent;border:1px solid rgba(99,102,241,.5);color:#A5B4FC;border-radius:10px;padding:9px 16px;cursor:pointer;font-weight:700;">🔄 Retry GPS</button>' +
+      '<button type="button" id="hs-save" disabled style="background:linear-gradient(135deg,#10B981,#059669);border:none;color:#fff;border-radius:10px;padding:9px 18px;cursor:pointer;font-weight:800;opacity:.5;">Save as Home</button>' +
+      '</div></div>';
+    document.body.appendChild(ov);
+
+    var pos = null;
+    var st = document.getElementById('hs-status'), saveBtn = document.getElementById('hs-save');
+    function close() { ov.remove(); asking = false; }
+    document.getElementById('hs-cancel').onclick = close;
+
+    function locate() {
+      pos = null; saveBtn.disabled = true; saveBtn.style.opacity = '.5';
+      st.textContent = '📡 GPS location mil rahi hai...';
+      if (!navigator.geolocation) { st.textContent = '❌ Is browser me GPS support nahi hai.'; return; }
+      navigator.geolocation.getCurrentPosition(function (p) {
+        pos = { latitude: p.coords.latitude, longitude: p.coords.longitude, accuracy: p.coords.accuracy };
+        var good = p.coords.accuracy <= 300;
+        st.textContent = (good ? '✅ ' : '⚠️ ') + 'Location mili: ' + pos.latitude.toFixed(5) + ', ' + pos.longitude.toFixed(5) +
+          '  (±' + Math.round(p.coords.accuracy) + ' m)' + (good ? '' : ' - accuracy kam hai, Retry GPS dabayein ya khuli jagah jayein.');
+        if (good) { saveBtn.disabled = false; saveBtn.style.opacity = '1'; }
+      }, function (e) {
+        st.textContent = '❌ GPS nahi mila (' + (e && e.message ? e.message : 'permission denied') + '). Browser me Location allow karke Retry GPS dabayein.';
+      }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
+    }
+    document.getElementById('hs-retry').onclick = locate;
+
+    saveBtn.onclick = async function () {
+      if (!pos) return;
+      saveBtn.disabled = true; saveBtn.textContent = 'Saving...';
+      try {
+        var res = await origFetch('/api/employee/home-location', {
+          method: 'POST', credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(pos)
+        });
+        var data = await res.json().catch(function () { return {}; });
+        if (!res.ok || !data.ok) {
+          toast(data.error || ('Save failed (HTTP ' + res.status + ')'), true);
+          saveBtn.disabled = false; saveBtn.textContent = 'Save as Home';
+          return;
+        }
+        toast('Home location saved. Ab dobara Punch In dabayein.');
+        close();
+      } catch (e) {
+        toast('Save failed: ' + e.message, true);
+        saveBtn.disabled = false; saveBtn.textContent = 'Save as Home';
+      }
+    };
+    locate();
+  }
+})();
+</script>
+</body>
+</html>

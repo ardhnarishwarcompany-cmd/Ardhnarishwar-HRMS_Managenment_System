@@ -13,6 +13,9 @@ import {
   XCircle,
   Award,
   Calendar,
+  X,
+  UserCheck,
+  MessageSquareText,
 } from "lucide-react";
 
 const STATUS_CONFIG = {
@@ -126,6 +129,13 @@ export default function MyPerformance() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const selectedConfig = selectedRecord
+    ? STATUS_CONFIG[selectedRecord.status] || STATUS_CONFIG.needs_improvement
+    : null;
+  const SelectedStatusIcon = selectedConfig?.icon;
+
+  const overallScore = Number(selectedRecord?.avgScore ?? 0);
 
   return (
     <div className="p-4">
@@ -247,138 +257,166 @@ export default function MyPerformance() {
       )}
 
       {/* VIEW MODAL */}
-      {viewModal &&
-        selectedRecord && (
-          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white rounded-[32px] w-full max-w-4xl max-h-[92vh] overflow-hidden shadow-2xl">
-              
-              {/* HEADER */}
-              <div className="bg-black text-white p-7">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h2 className="text-3xl font-bold">
-                      Performance Review
-                    </h2>
-
-                    <p className="text-gray-300 mt-2">
-                      {
-                        selectedRecord.employeeName
-                      }
-                    </p>
-                  </div>
-
-                  <button
-                    onClick={() =>
-                      setViewModal(
-                        false
-                      )
-                    }
-                    className="w-10 h-10 rounded-xl bg-white/10"
+      {viewModal && selectedRecord && (
+        <div
+          className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="performance-review-title"
+        >
+          {/* flex-col + min-h-0 on the body keeps the scroll area inside the
+              rounded shell at any viewport height (the old fixed 70vh body
+              could outgrow the 92vh shell and get clipped). */}
+          <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[92vh] overflow-hidden shadow-2xl flex flex-col">
+            {/* HEADER */}
+            <div className="shrink-0 px-6 md:px-7 py-6 text-white bg-gradient-to-r from-indigo-700 via-violet-700 to-fuchsia-600 flex items-start justify-between gap-4">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-11 h-11 shrink-0 rounded-xl bg-white/15 grid place-items-center">
+                  <Award size={22} />
+                </div>
+                <div className="min-w-0">
+                  <h2
+                    id="performance-review-title"
+                    className="text-2xl font-extrabold leading-tight"
                   >
-                    ✕
-                  </button>
-                </div>
-              </div>
-
-              {/* BODY */}
-              <div className="p-7 overflow-y-auto max-h-[70vh]">
-                
-                {/* SCORE */}
-                <div className="bg-gray-50 rounded-3xl p-6 mb-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-gray-500 mb-2">
-                        Overall Score
-                      </p>
-
-                      <div className="flex items-end gap-1">
-                        <span className="text-5xl font-extrabold">
-                          {
-                            selectedRecord.avgScore
-                          }
-                        </span>
-
-                        <span className="text-gray-400 mb-2">
-                          /10
-                        </span>
-                      </div>
-                    </div>
-
-                    <Award
-                      size={60}
-                    />
-                  </div>
-                </div>
-
-                {/* CRITERIA */}
-                <div className="space-y-4">
-                  {PERFORMANCE_CRITERIA.map(
-                    (
-                      criteria
-                    ) => {
-                      const value =
-                        selectedRecord
-                          .scores?.[
-                          criteria.id
-                        ] || 0;
-
-                      return (
-                        <div
-                          key={
-                            criteria.id
-                          }
-                          className="bg-gray-50 rounded-2xl p-4"
-                        >
-                          <div className="flex justify-between mb-2">
-                            <p className="font-medium">
-                              {
-                                criteria.name
-                              }
-                            </p>
-
-                            <p className="font-bold">
-                              {value}
-                              /10
-                            </p>
-                          </div>
-
-                          <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className={`h-full ${
-                                value >= 8
-                                  ? "bg-green-500"
-                                  : value >=
-                                      6
-                                    ? "bg-yellow-500"
-                                    : "bg-red-500"
-                              }`}
-                              style={{
-                                width: `${value * 10}%`,
-                              }}
-                            />
-                          </div>
-                        </div>
-                      );
-                    }
-                  )}
-                </div>
-
-                {/* REMARKS */}
-                <div className="mt-6 bg-gray-50 rounded-3xl p-6">
-                  <h3 className="font-bold text-lg mb-3">
-                    Remarks
-                  </h3>
-
-                  <p className="text-gray-700 whitespace-pre-wrap">
-                    {
-                      selectedRecord.remarks
-                    }
+                    Performance Review
+                  </h2>
+                  <p className="text-xs text-white/70 mt-1 truncate">
+                    {selectedRecord.employeeName}
+                    {selectedRecord.period
+                      ? ` · ${dayjs(selectedRecord.period).format("MMMM YYYY")}`
+                      : ""}
                   </p>
                 </div>
               </div>
+
+              <button
+                type="button"
+                onClick={() => setViewModal(false)}
+                aria-label="Close performance review"
+                className="w-10 h-10 shrink-0 rounded-xl bg-white/10 hover:bg-white/20 grid place-items-center transition"
+              >
+                <X size={19} />
+              </button>
+            </div>
+
+            {/* BODY */}
+            <div className="flex-1 min-h-0 overflow-y-auto p-6 md:p-7 grid gap-5">
+              {/* SCORE */}
+              <section className="rounded-2xl border border-slate-200 bg-slate-50/70 p-6 flex items-center justify-between gap-6">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wide text-slate-500 mb-2">
+                    Overall Score
+                  </p>
+                  <div className="flex items-end gap-1.5">
+                    <span className="text-5xl font-extrabold leading-none text-slate-900">
+                      {overallScore.toFixed(2)}
+                    </span>
+                    <span className="text-slate-400 font-semibold pb-1">/10</span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-2">
+                    Average across {PERFORMANCE_CRITERIA.length} criteria
+                  </p>
+                </div>
+
+                <div className="flex flex-col items-end gap-3 shrink-0">
+                  {selectedConfig && (
+                    <span
+                      className={`inline-flex items-center gap-1 px-3 py-1 rounded-xl text-xs font-bold ${selectedConfig.color}`}
+                    >
+                      {SelectedStatusIcon && <SelectedStatusIcon size={12} />}
+                      {selectedConfig.label}
+                    </span>
+                  )}
+                  <div className="w-14 h-14 rounded-2xl bg-indigo-100 text-indigo-600 grid place-items-center">
+                    <Award size={28} />
+                  </div>
+                </div>
+              </section>
+
+              {/* CRITERIA */}
+              <div className="grid gap-4 md:grid-cols-2">
+                {PERFORMANCE_CRITERIA.map((criteria) => {
+                  const value = Number(selectedRecord.scores?.[criteria.id]) || 0;
+                  const barColor =
+                    value >= 8
+                      ? "bg-emerald-500"
+                      : value >= 6
+                        ? "bg-amber-500"
+                        : "bg-rose-500";
+
+                  return (
+                    <div
+                      key={criteria.id}
+                      className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4"
+                    >
+                      <div className="flex justify-between items-center gap-3 mb-2.5">
+                        <p className="font-semibold text-slate-800 text-sm">
+                          {criteria.name}
+                        </p>
+                        <p className="font-extrabold text-slate-900 text-sm tabular-nums">
+                          {value}
+                          <span className="text-slate-400 font-semibold">/10</span>
+                        </p>
+                      </div>
+
+                      <div
+                        className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden"
+                        role="progressbar"
+                        aria-label={criteria.name}
+                        aria-valuemin={0}
+                        aria-valuemax={10}
+                        aria-valuenow={value}
+                      >
+                        <div
+                          className={`h-full rounded-full ${barColor} transition-[width] duration-500`}
+                          style={{ width: `${Math.min(100, Math.max(0, value * 10))}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* REMARKS */}
+              <section className="rounded-2xl border border-slate-200 bg-slate-50/70 p-5">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 grid place-items-center">
+                    <MessageSquareText size={20} />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-slate-900">Remarks</h3>
+                    <p className="text-[10px] text-slate-400">Reviewer feedback</p>
+                  </div>
+                </div>
+                <p className="text-sm leading-7 text-slate-600 whitespace-pre-wrap">
+                  {selectedRecord.remarks || "No remarks provided."}
+                </p>
+              </section>
+            </div>
+
+            {/* FOOTER */}
+            <div className="shrink-0 px-6 py-4 border-t bg-gray-50 flex flex-wrap items-center justify-between gap-3">
+              <p className="text-xs text-slate-500 inline-flex items-center gap-1.5">
+                <UserCheck size={14} />
+                {selectedRecord.reviewedBy
+                  ? `Reviewed by ${selectedRecord.reviewedBy}`
+                  : "Reviewed by management"}
+                {selectedRecord.reviewedAt
+                  ? ` · ${dayjs(selectedRecord.reviewedAt).format("D MMM YYYY")}`
+                  : ""}
+              </p>
+              <button
+                type="button"
+                onClick={() => setViewModal(false)}
+                className="px-5 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 font-semibold hover:bg-gray-50 transition active:scale-[0.98]"
+              >
+                Close
+              </button>
             </div>
           </div>
-        )}
+        </div>
+      )}
     </div>
   );
 }

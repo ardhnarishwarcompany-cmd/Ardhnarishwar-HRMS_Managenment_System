@@ -1,234 +1,139 @@
-import { useEffect, useState } from "react";
-import {
-  Bell,
-  LogOut,
-  TrendingUp,
-  ChevronRight,
-  X,
-  ClipboardList,
-  CalendarCheck,
-  Timer,
-  GitPullRequest,
-  Flag,
-  BarChart3,
-  Bug,
-  Rocket,
-  BookOpen,
-  Video,
-  FileBarChart,
-  Code2,
-  MessageSquare,
-  Fingerprint,
-  Award,
-  ScrollText,
-  Target,
-  Briefcase,
-  FileText,
-  MessageCircleWarning,
-  Cake,
-} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  getTodayBirthdays,
-  markNotificationsRead,
-} from "../../services/notificationService";
+  TrendingUp, ArrowRight,
+  LayoutGrid, AlertTriangle, Layers, Award
+} from "lucide-react";
+import { IT_MODULES } from "./ITShell";
+import { getTodayBirthdays } from "../../services/notificationService";
+import { useHrAuth } from "../../context/HrAuthContext";
+
+const CATEGORIES = ["All", "Work", "Quality", "Delivery", "Insights", "Knowledge"];
 
 export default function ITDashboard() {
   const navigate = useNavigate();
+  const { employee } = useHrAuth();
+  const [selectedCat, setSelectedCat] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
   const [notifications, setNotifications] = useState([]);
-  const [openDropdown, setOpenDropdown] = useState(false);
 
-  const user = JSON.parse(localStorage.getItem("hrms_it_User") || "{}");
-  const unread = notifications.filter((n) => !n.is_read).length;
-
-  const handleLogout = () => {
-    localStorage.removeItem("hrms_it_Token");
-    localStorage.removeItem("hrms_it_User");
-    window.location.href = "/";
-  };
-
-  const menuItems = [
-    {
-      title: "Task Assignment",
-      path: "/it/tasks",
-      icon: ClipboardList,
-      gradient: "from-purple-500 to-fuchsia-500",
-    },
-    {
-      title: "Daily Work Submission",
-      path: "/it/daily-work",
-      icon: CalendarCheck,
-      gradient: "from-emerald-500 to-teal-500",
-    },
-    {
-      title: "Timesheet",
-      path: "/it/timesheet",
-      icon: Timer,
-      gradient: "from-violet-500 to-purple-600",
-    },
-    {
-      title: "Code Review Status",
-      path: "/it/code-reviews",
-      icon: GitPullRequest,
-      gradient: "from-sky-500 to-blue-600",
-    },
-    {
-      title: "Project Milestone Tracker",
-      path: "/it/milestones",
-      icon: Flag,
-      gradient: "from-orange-500 to-amber-500",
-    },
-    {
-      title: "Performance Reporting",
-      desc: "Your tasks, hours, merged PRs and bugs at a glance",
-      path: "/it/performance-report",
-      icon: BarChart3,
-      gradient: "from-indigo-500 to-purple-600",
-    },
-    {
-      title: "Bug Reporting",
-      path: "/it/bugs",
-      icon: Bug,
-      gradient: "from-rose-500 to-red-500",
-    },
-    {
-      title: "Feature Deployment Log",
-      path: "/it/deployments",
-      icon: Rocket,
-      gradient: "from-pink-500 to-fuchsia-600",
-    },
-    {
-      title: "SOP Management",
-      path: "/it/sop",
-      icon: BookOpen,
-      gradient: "from-blue-500 to-indigo-600",
-    },
-    {
-      title: "Video Documentation",
-      path: "/it/videos",
-      icon: Video,
-      gradient: "from-rose-500 to-pink-600",
-    },
-    {
-      title: "Project Reports",
-      path: "/it/project-reports",
-      icon: FileBarChart,
-      gradient: "from-emerald-500 to-green-600",
-    },
-    {
-      title: "Source Code",
-      path: "/it/source-code",
-      icon: Code2,
-      gradient: "from-slate-600 to-slate-800",
-    },
-    {
-      title: "Chat",
-      path: "/chat",
-      icon: MessageSquare,
-      gradient: "from-cyan-500 to-sky-600",
-    },
-    {
-      title: "Automated Attendance",
-      path: "/attendance",
-      icon: Fingerprint,
-      gradient: "from-teal-500 to-emerald-600",
-    },
-    {
-      title: "Performance",
-      desc: "Your HR performance reviews and ratings",
-      path: "/my-performance",
-      icon: Award,
-      gradient: "from-amber-500 to-orange-600",
-    },
-    {
-      title: "Work Policy",
-      path: "/work-policy",
-      icon: ScrollText,
-      gradient: "from-indigo-500 to-blue-600",
-    },
-    {
-      title: "My Targets",
-      path: "/my-targets",
-      icon: Target,
-      gradient: "from-fuchsia-500 to-purple-600",
-    },
-    {
-      title: "My assignments",
-      path: "/my-assignments",
-      icon: Briefcase,
-      gradient: "from-blue-500 to-cyan-500",
-    },
-    {
-      title: "EOD",
-      path: "/my-eod",
-      icon: FileText,
-      gradient: "from-emerald-500 to-lime-600",
-    },
-    {
-      title: "Complaint box",
-      path: "/complaint",
-      icon: MessageCircleWarning,
-      gradient: "from-red-500 to-rose-600",
-    },
-  ];
-
-  const fetchNotifications = async () => {
-    try {
-      const res = await getTodayBirthdays();
-      setNotifications(res?.data?.data || []);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  const stored = useMemo(() => {
+    try { return JSON.parse(localStorage.getItem("hrms_it_User") || "{}"); } catch { return {}; }
+  }, []);
+  const user = employee || stored || {};
+  const displayName = user.name || user.fullName || user.employee_name || user.first_name || (user.email ? user.email.split("@")[0] : "") || "User";
 
   useEffect(() => {
-    fetchNotifications();
+    getTodayBirthdays()
+      .then((res) => setNotifications(res?.data?.data || []))
+      .catch(() => {});
   }, []);
 
-  const openNotifications = async () => {
-    setOpenDropdown(!openDropdown);
-    try {
-      await markNotificationsRead();
-      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: 1 })));
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  const filteredModules = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return IT_MODULES.filter((m) => {
+      const matchesCat = selectedCat === "All" || m.category === selectedCat;
+      const matchesQuery =
+        !q ||
+        m.title.toLowerCase().includes(q) ||
+        m.desc.toLowerCase().includes(q) ||
+        m.category.toLowerCase().includes(q);
+      return matchesCat && matchesQuery;
+    });
+  }, [selectedCat, searchQuery]);
 
-  const today = new Date().toLocaleDateString("en-IN", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  const todayStr = useMemo(() => {
+    return new Date()
+      .toLocaleDateString("en-GB", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+      .toUpperCase();
+  }, []);
 
   return (
-    <div className="it-dashboard-page">
-      <section className="it-overview-hero">
-        <div className="it-hero-grid" />
-        <div className="it-hero-content">
-          <div>
-            <p className="it-hero-date">{today}</p>
-            <h2>Welcome back, {user.name || "User"}</h2>
-            <p>Here&apos;s what&apos;s happening in your IT workspace today.</p>
-            <div className="it-hero-badges">
-              <span>⌘ {menuItems.length} Modules</span><span>♧ {unread} Alerts</span>
-            </div>
-          </div>
-          <button onClick={() => navigate("/it/performance-report")} className="it-hero-action"><TrendingUp size={16}/> Performance</button>
+    <div className="flex flex-col gap-6">
+      {/* Welcome Hero */}
+      <section className="welcome">
+        <div>
+          <div className="date">{todayStr}</div>
+          <h1>
+            Welcome back, <span>{displayName}</span>
+          </h1>
+          <p>Here&apos;s what&apos;s happening in your IT workspace today.</p>
         </div>
+        <button
+          className="pbtn"
+          onClick={() => navigate("/it/performance-report")}
+        >
+          <TrendingUp size={18} />
+          <span>Performance</span>
+        </button>
       </section>
 
-      <section className="it-section-head"><div><h2>IT Features</h2><p>Manage your IT workspace from the available modules.</p></div><span>{menuItems.length} of {menuItems.length}</span></section>
-      <main className="it-feature-grid">
-        {menuItems.map((item) => { const Icon = item.icon; return (
-          <button key={item.path} onClick={() => navigate(item.path)} className="it-feature-card">
-            <ChevronRight size={16} className="it-card-arrow"/>
-            <div className={`it-feature-icon bg-gradient-to-br ${item.gradient}`}><Icon size={22}/></div>
-            <div><h3>{item.title}</h3><p>{item.desc || `Manage your ${item.title.toLowerCase()} easily`}</p></div>
+      {/* IT Features Section */}
+      <div className="sech">
+        <div>
+          <h2>IT Features</h2>
+          <p>Manage your IT workspace from the available modules.</p>
+        </div>
+        <span className="cnt">
+          {filteredModules.length} of {IT_MODULES.length}
+        </span>
+      </div>
+
+      {/* Tabs */}
+      <div className="tabs" role="tablist">
+        {CATEGORIES.map((cat) => (
+          <button
+            key={cat}
+            role="tab"
+            aria-selected={cat === selectedCat}
+            className={cat === selectedCat ? "on" : ""}
+            onClick={() => setSelectedCat(cat)}
+          >
+            {cat}
           </button>
-        ); })}
-      </main>
+        ))}
+      </div>
+
+      {/* All Filtered Modules */}
+      {filteredModules.length === 0 ? (
+        <div className="empty">
+          No modules match &ldquo;{searchQuery}&rdquo;. Try a different keyword or category.
+        </div>
+      ) : (
+        <div className="it-mod-grid">
+          {filteredModules.map((m) => {
+            const Icon = m.icon;
+            return (
+              <div
+                key={m.path}
+                className="mc"
+                tabIndex={0}
+                role="button"
+                onClick={() => navigate(m.path)}
+              >
+                <div className="t">
+                  <div className="ic">
+                    <Icon size={24} />
+                  </div>
+                  <h3>{m.title}</h3>
+                </div>
+                <p>{m.desc}</p>
+                <div className="ft">
+                  <span className="tag">{m.category}</span>
+                  <span className="go">
+                    Open <ArrowRight size={14} />
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

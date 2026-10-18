@@ -68,13 +68,12 @@ export default function LeadDetails() {
   };
 
   return (
-    <div className="p-6">
+    <div className="py-1">
       {/* <HRNavbar /> */}
       <PageHeader
-        title="Assigned Leads"
-        desc="Your all Leads is here"
+        title="Lead Details"
+        desc="Full record and activity for this lead"
       />
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Lead Management</h1>
       <div className="bg-white rounded-2xl shadow border overflow-hidden">
         <div className="overflow-x-auto"><table className="w-full text-sm">
           {/* HEADER */}

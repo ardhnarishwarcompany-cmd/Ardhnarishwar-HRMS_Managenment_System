@@ -13,7 +13,7 @@ import {
   Calendar,
 } from "lucide-react";
 
-import HRNavbar from "../../components/hr/HRNavbar";
+import ITShell from "../it/ITShell";
 
 const PRIORITY_CONFIG = {
   high: {
@@ -137,22 +137,12 @@ export default function MyAssignments() {
   };
 
   return (
-    <div className="p-4">
-      <HRNavbar />
-
-      <div className="flex items-center gap-3 mb-6">
-        <div className="p-3 rounded-2xl bg-black text-white">
-          <Briefcase size={22} />
-        </div>
-
-        <div>
-          <h1 className="text-2xl font-bold">My Work Assignments</h1>
-
-          <p className="text-sm text-gray-500">
-            Track and update your assigned work
-          </p>
-        </div>
-      </div>
+    <ITShell
+      title="My Work Assignments"
+      subtitle="Track and update your assigned work"
+      icon={Briefcase}
+    >
+      <div className="flex flex-col gap-6">
 
       {loading ? (
         <div className="text-center py-10">Loading...</div>
@@ -422,6 +412,7 @@ export default function MyAssignments() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </ITShell>
   );
 }

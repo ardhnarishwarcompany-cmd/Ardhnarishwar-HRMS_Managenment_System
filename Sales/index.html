@@ -34,21 +34,17 @@
     <meta name="robots" content="noindex, nofollow" />
 
     <!-- Theme color -->
-    <meta name="theme-color" content="#4f46e5" />
-    <script>
-      // Apply saved theme before React loads to prevent white flash
-      (function () {
-        try {
-          var t = localStorage.getItem("hrms-theme") || "system";
-          var dark =
-            t === "dark" ||
-            (t === "system" &&
-              window.matchMedia("(prefers-color-scheme: dark)").matches);
-          if (dark) document.documentElement.classList.add("dark");
-        } catch (e) {}
-      })();
-    </script>
-  </head>
+    <meta name="theme-color" content="#7c3aed" />
+
+    <!-- Typeface -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/logo-3d-bounce.css?v=1">
+</head>
 
   <body>
     <div id="root"></div>

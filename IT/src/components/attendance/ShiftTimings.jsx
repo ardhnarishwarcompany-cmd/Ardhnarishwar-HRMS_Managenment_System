@@ -2,6 +2,16 @@ import { useState, useEffect } from "react";
 import { Clock, Save, Plus, Trash2, Edit2, Sun, Moon, SunMoon } from "lucide-react";
 import toast from "react-hot-toast";
 
+// "13:05" / "13:05:00" -> "1:05 PM"
+const to12h = (value) => {
+  const match = String(value || "").match(/(\d{2}):(\d{2})/);
+  if (!match) return value || "-";
+  let hour = Number(match[1]);
+  const suffix = hour >= 12 ? "PM" : "AM";
+  hour = hour % 12 || 12;
+  return `${hour}:${match[2]} ${suffix}`;
+};
+
 export default function ShiftTimings({ onSave, initialShifts = [] }) {
   const [shifts, setShifts] = useState(initialShifts);
 
@@ -113,20 +123,20 @@ export default function ShiftTimings({ onSave, initialShifts = [] }) {
   };
 
   return (
-    <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl p-6 shadow-lg">
+    <div className="it-card">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-indigo-100 rounded-lg">
-            <Clock className="w-5 h-5 text-indigo-600" />
+          <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-[var(--p)]">
+            <Clock className="w-5 h-5 text-[var(--p)]" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-800">Shift Timings</h3>
-            <p className="text-sm text-gray-500">Set login and logout times for shifts</p>
+            <h3 className="text-base font-bold text-[var(--ink)]">Shift Timings</h3>
+            <p className="text-xs text-[var(--mute)]">Set login and logout times for shifts</p>
           </div>
         </div>
         <button
           onClick={() => setIsAdding(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white font-semibold text-sm shadow-md shadow-purple-500/25 transition hover:shadow-purple-500/40 hover:-translate-y-0.5 active:translate-y-0"
         >
           <Plus className="w-4 h-4" />
           Add Shift
@@ -134,13 +144,13 @@ export default function ShiftTimings({ onSave, initialShifts = [] }) {
       </div>
 
       {(isAdding || editingId) && (
-        <div className="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
-          <h4 className="font-medium text-gray-800 mb-4">
+        <div className="mb-6 p-5 bg-[var(--soft)]/50 rounded-2xl border border-[var(--line)]">
+          <h4 className="font-bold text-sm text-[var(--ink)] mb-4">
             {editingId ? "Edit Shift Timing" : "Add New Shift Timing"}
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-bold text-[var(--mute)] uppercase tracking-wider mb-1.5">
                 Shift Name *
               </label>
               <input
@@ -149,11 +159,11 @@ export default function ShiftTimings({ onSave, initialShifts = [] }) {
                 value={formData.name}
                 onChange={handleInputChange}
                 placeholder="e.g., General Shift"
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3.5 py-2.5 border border-[var(--line)] bg-white rounded-xl text-sm text-[var(--ink)] focus:outline-none focus:border-[var(--p)] focus:ring-2 focus:ring-purple-500/20 transition"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-bold text-[var(--mute)] uppercase tracking-wider mb-1.5">
                 Login Start Time
               </label>
               <input
@@ -161,11 +171,11 @@ export default function ShiftTimings({ onSave, initialShifts = [] }) {
                 name="checkInStart"
                 value={formData.checkInStart}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3.5 py-2.5 border border-[var(--line)] bg-white rounded-xl text-sm text-[var(--ink)] focus:outline-none focus:border-[var(--p)] focus:ring-2 focus:ring-purple-500/20 transition"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-bold text-[var(--mute)] uppercase tracking-wider mb-1.5">
                 Login End Time
               </label>
               <input
@@ -173,11 +183,11 @@ export default function ShiftTimings({ onSave, initialShifts = [] }) {
                 name="checkInEnd"
                 value={formData.checkInEnd}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3.5 py-2.5 border border-[var(--line)] bg-white rounded-xl text-sm text-[var(--ink)] focus:outline-none focus:border-[var(--p)] focus:ring-2 focus:ring-purple-500/20 transition"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-bold text-[var(--mute)] uppercase tracking-wider mb-1.5">
                 Logout Start Time
               </label>
               <input
@@ -185,11 +195,11 @@ export default function ShiftTimings({ onSave, initialShifts = [] }) {
                 name="checkOutStart"
                 value={formData.checkOutStart}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3.5 py-2.5 border border-[var(--line)] bg-white rounded-xl text-sm text-[var(--ink)] focus:outline-none focus:border-[var(--p)] focus:ring-2 focus:ring-purple-500/20 transition"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-bold text-[var(--mute)] uppercase tracking-wider mb-1.5">
                 Logout End Time
               </label>
               <input
@@ -197,11 +207,11 @@ export default function ShiftTimings({ onSave, initialShifts = [] }) {
                 name="checkOutEnd"
                 value={formData.checkOutEnd}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3.5 py-2.5 border border-[var(--line)] bg-white rounded-xl text-sm text-[var(--ink)] focus:outline-none focus:border-[var(--p)] focus:ring-2 focus:ring-purple-500/20 transition"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-bold text-[var(--mute)] uppercase tracking-wider mb-1.5">
                 Grace Period (minutes)
               </label>
               <input
@@ -211,20 +221,20 @@ export default function ShiftTimings({ onSave, initialShifts = [] }) {
                 onChange={handleInputChange}
                 min="0"
                 max="60"
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3.5 py-2.5 border border-[var(--line)] bg-white rounded-xl text-sm text-[var(--ink)] focus:outline-none focus:border-[var(--p)] focus:ring-2 focus:ring-purple-500/20 transition"
               />
             </div>
           </div>
-          <div className="flex justify-end gap-3 mt-4">
+          <div className="flex justify-end gap-3 mt-5 pt-4 border-t border-[var(--line)]">
             <button
               onClick={resetForm}
-              className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition"
+              className="px-4 py-2 text-sm font-semibold rounded-xl border border-[var(--line)] text-[var(--mute)] hover:bg-white hover:text-[var(--ink)] transition"
             >
               Cancel
             </button>
             <button
               onClick={editingId ? handleUpdate : handleAdd}
-              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white font-semibold text-sm shadow-md shadow-purple-500/20 transition hover:shadow-purple-500/35 hover:-translate-y-0.5"
             >
               <Save className="w-4 h-4" />
               {editingId ? "Update" : "Add"}
@@ -235,16 +245,16 @@ export default function ShiftTimings({ onSave, initialShifts = [] }) {
 
       <div className="space-y-3">
         {shifts.length === 0 && !isAdding ? (
-          <div className="text-center py-12 text-gray-500">
-            <Clock className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p>No shift timings configured</p>
-            <p className="text-sm">Add shifts to set work hours</p>
+          <div className="text-center py-12 text-[var(--mute)]">
+            <Clock className="w-12 h-12 mx-auto mb-3 opacity-40 text-[var(--p)]" />
+            <p className="font-semibold text-sm text-[var(--ink)]">No shift timings configured</p>
+            <p className="text-xs text-[var(--mute)] mt-1">Add shifts to set work hours</p>
           </div>
         ) : (
           shifts.map((shift) => (
             <div
               key={shift.id}
-              className="p-4 bg-gray-50 rounded-xl border border-gray-100"
+              className="p-4 rounded-2xl border border-[var(--line)] bg-[var(--soft)]/30 hover:bg-white hover:shadow-sm transition"
             >
               {editingId === shift.id ? (
                 <div className="space-y-4">
@@ -253,7 +263,7 @@ export default function ShiftTimings({ onSave, initialShifts = [] }) {
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border border-[var(--line)] bg-white rounded-xl text-sm focus:outline-none focus:border-[var(--p)]"
                   />
                   <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                     <input
@@ -261,47 +271,47 @@ export default function ShiftTimings({ onSave, initialShifts = [] }) {
                       name="checkInStart"
                       value={formData.checkInStart}
                       onChange={handleInputChange}
-                      className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                      className="px-3 py-2 border border-[var(--line)] bg-white rounded-xl text-sm"
                     />
                     <input
                       type="time"
                       name="checkInEnd"
                       value={formData.checkInEnd}
                       onChange={handleInputChange}
-                      className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                      className="px-3 py-2 border border-[var(--line)] bg-white rounded-xl text-sm"
                     />
                     <input
                       type="time"
                       name="checkOutStart"
                       value={formData.checkOutStart}
                       onChange={handleInputChange}
-                      className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                      className="px-3 py-2 border border-[var(--line)] bg-white rounded-xl text-sm"
                     />
                     <input
                       type="time"
                       name="checkOutEnd"
                       value={formData.checkOutEnd}
                       onChange={handleInputChange}
-                      className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                      className="px-3 py-2 border border-[var(--line)] bg-white rounded-xl text-sm"
                     />
                     <input
                       type="number"
                       name="graceMinutes"
                       value={formData.graceMinutes}
                       onChange={handleInputChange}
-                      className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                      className="px-3 py-2 border border-[var(--line)] bg-white rounded-xl text-sm"
                     />
                   </div>
                   <div className="flex justify-end gap-2">
                     <button
                       onClick={resetForm}
-                      className="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg"
+                      className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-[var(--line)] text-[var(--mute)] hover:bg-gray-100"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleUpdate}
-                      className="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                      className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white"
                     >
                       Update
                     </button>
@@ -309,36 +319,38 @@ export default function ShiftTimings({ onSave, initialShifts = [] }) {
                 </div>
               ) : (
                 <div className="flex items-center gap-4">
-                  <div className="p-2 bg-white rounded-lg">
+                  <div className="w-10 h-10 rounded-xl bg-white border border-[var(--line)] flex items-center justify-center shrink-0">
                     {getShiftIcon(shift.name)}
                   </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-gray-800">{shift.name}</p>
-                    <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-600">
-                      <div className="flex items-center gap-1">
-                        <span className="text-emerald-500 font-medium">Login:</span>
-                        <span>{shift.checkInStart} - {shift.checkInEnd}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-sm text-[var(--ink)]">{shift.name}</p>
+                    <div className="flex flex-wrap items-center gap-4 mt-1.5 text-xs text-[var(--mute)]">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-emerald-600 font-semibold">Login:</span>
+                        <span className="font-medium text-[var(--ink)]">{to12h(shift.checkInStart)} - {to12h(shift.checkInEnd)}</span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <span className="text-red-500 font-medium">Logout:</span>
-                        <span>{shift.checkOutStart} - {shift.checkOutEnd}</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-rose-600 font-semibold">Logout:</span>
+                        <span className="font-medium text-[var(--ink)]">{to12h(shift.checkOutStart)} - {to12h(shift.checkOutEnd)}</span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <span className="text-gray-400">Grace:</span>
-                        <span>{shift.graceMinutes} min</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[var(--mute)] font-medium">Grace:</span>
+                        <span className="font-semibold text-[var(--ink)]">{shift.graceMinutes} min</span>
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 shrink-0">
                     <button
                       onClick={() => handleEdit(shift)}
-                      className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition"
+                      className="p-2 text-[var(--p)] hover:bg-purple-50 rounded-xl transition"
+                      title="Edit shift"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(shift.id)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                      className="p-2 text-rose-500 hover:bg-rose-50 rounded-xl transition"
+                      title="Delete shift"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -351,15 +363,15 @@ export default function ShiftTimings({ onSave, initialShifts = [] }) {
       </div>
 
       {shifts.length > 0 && (
-        <div className="mt-6 pt-6 border-t border-gray-100">
+        <div className="mt-6 pt-6 border-t border-[var(--line)]">
           <button
             onClick={handleSaveAll}
             disabled={saving}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 disabled:opacity-50 transition font-medium"
+            className="w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white font-bold text-sm shadow-lg shadow-purple-500/25 transition hover:shadow-purple-500/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-60 disabled:hover:translate-y-0"
           >
             {saving ? "Saving..." : (
               <>
-                <Save className="w-5 h-5" />
+                <Save className="w-4 h-4" />
                 Save All Shift Timings
               </>
             )}

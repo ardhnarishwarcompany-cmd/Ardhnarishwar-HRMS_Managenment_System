@@ -153,26 +153,25 @@ export default function MyEOD() {
   };
 
   return (
-    <div className="space-y-6 p-4">
-      {/* HEADER */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <PageHeader
-          title="My EOD Reports"
-          desc="Submit and manage your daily reports"
-        />
-
-        <button
-          onClick={() => {
-            resetForm();
-
-            setOpenModal(true);
-          }}
-          className="flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-300"
-        >
-          <Plus size={15} aria-hidden="true" />
-          Submit EOD
-        </button>
-      </div>
+    <div className="space-y-6">
+      {/* HEADER — the action lives inside the hero so the banner spans the full width */}
+      <PageHeader
+        title="My EOD Reports"
+        desc="Submit and manage your daily reports"
+        actions={
+          <button
+            type="button"
+            onClick={() => {
+              resetForm();
+              setOpenModal(true);
+            }}
+            className="btn-on-brand"
+          >
+            <Plus size={15} aria-hidden="true" />
+            Submit EOD
+          </button>
+        }
+      />
 
       {/* CARDS */}
       {loading ? (
@@ -181,7 +180,7 @@ export default function MyEOD() {
           <span className="text-sm font-medium">Loading reports...</span>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div className={`grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3 ${!reports.length ? "hidden" : ""}`}>
           {reports.map((report) => {
             const status = STATUS_CONFIG[report.status];
 
@@ -196,7 +195,7 @@ export default function MyEOD() {
                   {/* TOP */}
                   <div className="mb-4 flex items-start justify-between gap-2">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
                         <FileText size={17} aria-hidden="true" />
                       </div>
                       <div>
@@ -259,7 +258,7 @@ export default function MyEOD() {
                       report.status !== "rejected" && (
                         <button
                           onClick={() => handleEdit(report)}
-                          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-indigo-100 bg-indigo-50 py-2 text-sm font-semibold text-indigo-600 transition-all hover:border-indigo-200 hover:bg-indigo-100"
+                          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-brand-100 bg-brand-50 py-2 text-sm font-semibold text-brand-700 transition-all hover:border-brand-200 hover:bg-brand-100"
                         >
                           <Edit size={14} aria-hidden="true" />
                           Edit
@@ -274,9 +273,9 @@ export default function MyEOD() {
       )}
 
       {!reports.length && !loading && (
-        <div className="rounded-2xl border border-slate-200 bg-white py-16 shadow-sm">
+        <div className="sp-card py-16">
           <div className="flex flex-col items-center gap-3 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-500">
               <Inbox size={24} aria-hidden="true" />
             </div>
             <div>
@@ -369,14 +368,14 @@ export default function MyEOD() {
 
                     resetForm();
                   }}
-                  className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 transition-all hover:border-slate-300 hover:bg-slate-50"
+                  className="btn-secondary px-5"
                 >
                   Cancel
                 </button>
 
                 <button
                   type="submit"
-                  className="rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-indigo-200 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-300"
+                  className="btn-primary px-6"
                 >
                   {editId ? "Update" : "Submit"}
                 </button>

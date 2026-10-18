@@ -4,7 +4,12 @@ import API from "../api/axios";
 
 export default function ChatPage() {
   const [messages, setMessages] = useState([
-    { role: "bot", content: "Hello! I am your Sales Assistant. How can I help you today?", time: new Date() },
+    {
+      role: "bot",
+      content:
+        "Hello! I am your Sales Assistant. Ask me about your clients, follow-ups, proposals, invoices, targets, leads or EOD reports - or say \"summary\" for today's snapshot.",
+      time: new Date(),
+    },
   ]);
   const [sessionId, setSessionId] = useState(null);
   const [text, setText] = useState("");
@@ -46,7 +51,7 @@ export default function ChatPage() {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing && e.keyCode !== 229) {
       e.preventDefault();
       sendMessage();
     }
@@ -57,15 +62,15 @@ export default function ChatPage() {
 
   return (
     <section className="flex h-full min-h-0 flex-col">
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <header className="flex shrink-0 items-center gap-3 bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 px-5 py-4">
+      <div className="sp-card flex min-h-0 flex-1 flex-col overflow-hidden">
+        <header className="flex shrink-0 items-center gap-3 bg-brand-gradient px-5 py-4">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/20">
             <Bot className="text-white" size={23} />
           </div>
           <div className="min-w-0">
             <h2 className="truncate text-base font-bold text-white">Sales Assistant</h2>
-            <p className="mt-0.5 flex items-center gap-1.5 text-xs text-emerald-50">
-              <span className="h-2 w-2 rounded-full bg-emerald-200" /> Online · Powered by AI
+            <p className="mt-0.5 flex items-center gap-1.5 text-xs text-white/80">
+              <span className="h-2 w-2 rounded-full bg-emerald-300" /> Online · Answers from your live sales data
             </p>
           </div>
         </header>
@@ -75,12 +80,12 @@ export default function ChatPage() {
             {messages.map((msg, i) => (
               <div key={`${msg.time}-${i}`} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div className={`flex max-w-[88%] items-end gap-2 sm:max-w-[76%] ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
-                  <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full shadow-sm ${msg.role === "user" ? "bg-indigo-600" : "bg-emerald-600"}`}>
+                  <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full shadow-sm ${msg.role === "user" ? "bg-slate-700" : "bg-brand-gradient"}`}>
                     {msg.role === "user" ? <User className="text-white" size={15} /> : <Bot className="text-white" size={15} />}
                   </div>
-                  <div className={`rounded-2xl px-4 py-3 ${msg.role === "user" ? "rounded-br-md bg-indigo-600 text-white" : "rounded-bl-md border border-slate-200 bg-white text-slate-800 shadow-sm"}`}>
+                  <div className={`rounded-2xl px-4 py-3 ${msg.role === "user" ? "rounded-br-md bg-brand-gradient text-white shadow-brand" : "rounded-bl-md border border-slate-200 bg-white text-slate-800 shadow-sm"}`}>
                     <p className="whitespace-pre-line text-sm leading-6">{msg.content}</p>
-                    <p className={`mt-1.5 text-[10px] ${msg.role === "user" ? "text-indigo-100" : "text-slate-400"}`}>{fmt(msg.time)}</p>
+                    <p className={`mt-1.5 text-[10px] ${msg.role === "user" ? "text-white/75" : "text-slate-400"}`}>{fmt(msg.time)}</p>
                   </div>
                 </div>
               </div>
@@ -89,7 +94,7 @@ export default function ChatPage() {
             {loading && (
               <div className="flex justify-start">
                 <div className="flex items-end gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-gradient">
                     <Bot className="text-white" size={15} />
                   </div>
                   <div className="flex items-center gap-1 rounded-2xl rounded-bl-md border border-slate-200 bg-white px-4 py-3 shadow-sm">
@@ -106,7 +111,7 @@ export default function ChatPage() {
 
         <footer className="shrink-0 border-t border-slate-200 bg-white p-4 sm:p-5">
           <div className="mx-auto w-full max-w-4xl">
-            <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-1.5 focus-within:border-indigo-300 focus-within:ring-2 focus-within:ring-indigo-100">
+            <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-1.5 focus-within:border-brand-300 focus-within:ring-4 focus-within:ring-brand-100">
               <input
                 value={text}
                 onChange={(e) => setText(e.target.value)}
@@ -120,7 +125,7 @@ export default function ChatPage() {
                 onClick={sendMessage}
                 disabled={!text.trim() || loading}
                 aria-label="Send message"
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-sm transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-gradient text-white shadow-brand transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
               >
                 {loading ? <Loader2 className="animate-spin" size={19} /> : <Send size={19} />}
               </button>

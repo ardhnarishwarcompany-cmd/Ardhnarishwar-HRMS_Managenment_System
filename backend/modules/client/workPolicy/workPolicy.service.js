@@ -119,38 +119,110 @@ export const getAllPolicies = async (clientId) => {
   return rows;
 };
 
+const POLICY_TYPES = ["attendance", "leave", "behavior", "meal_management", "general"];
+
+const toFlag = (v, fallback = 1) => {
+  if (v === undefined || v === null || v === "") return fallback;
+  return v === true || v === 1 || v === "1" || v === "true" ? 1 : 0;
+};
+
+// Normalises the camelCase payload from the client portal into the exact
+// column values work_policies accepts (ENUM-safe type, INT departmentId,
+// TINYINT flags, nullable autoDeduction).
+const normalisePolicyInput = (data = {}) => {
+  const departmentId = Number(data.departmentId ?? data.department_id ?? 0);
+  const autoDeduction = String(data.autoDeduction ?? data.auto_deduction ?? "").trim();
+
+  return {
+    title: String(data.title ?? "").trim(),
+    type: POLICY_TYPES.includes(data.type) ? data.type : "general",
+    departmentId: Number.isInteger(departmentId) && departmentId > 0 ? departmentId : 0,
+    description: data.description ?? "",
+    isActive: toFlag(data.isActive ?? data.is_active),
+    isAutomated: toFlag(data.isAutomated ?? data.is_automated),
+    autoDeduction: autoDeduction || null,
+    autoApply: toFlag(data.autoApply ?? data.auto_apply),
+  };
+};
+
+const getPolicyById = async (id) => {
+  const [rows] = await db.query(
+    `SELECT * FROM work_policies WHERE id = ? LIMIT 1`,
+    [id]
+  );
+  return rows[0] || null;
+};
+
 // ✅ CREATE
 export const createPolicy = async (data) => {
-  const { client_id, title, description } = data;
+  const p = normalisePolicyInput(data);
 
   const [result] = await db.query(
-    `INSERT INTO work_policies (client_id, title, description)
-     VALUES (?, ?, ?)`,
-    [client_id, title, description]
+    `INSERT INTO work_policies
+       (client_id, title, type, departmentId, description,
+        isActive, isAutomated, autoDeduction, autoApply)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      data.client_id,
+      p.title,
+      p.type,
+      p.departmentId,
+      p.description,
+      p.isActive,
+      p.isAutomated,
+      p.autoDeduction,
+      p.autoApply,
+    ]
   );
 
-  return { id: result.insertId, ...data };
+  return getPolicyById(result.insertId);
 };
 
-// ✅ UPDATE (SECURE)
+// Client admins can manage every row they can see: their own policies plus the
+// company-wide ones HR/IT create with client_id = 0 (those tokens carry no tenant).
+// Mirrors the WHERE clause in getAllPolicies.
+const OWNED_OR_COMPANY_WIDE = "id = ? AND client_id IN (?, 0)";
+
+// ✅ UPDATE (SECURE) — returns null when no visible row matched
 export const updatePolicy = async (id, clientId, data) => {
-  const { title, description } = data;
+  const policyId = Number(id);
+  if (!Number.isInteger(policyId) || policyId <= 0) return null;
 
-  await db.query(
-    `UPDATE work_policies 
-     SET title = ?, description = ?
-     WHERE id = ? AND client_id = ?`,
-    [title, description, id, clientId]
+  const p = normalisePolicyInput(data);
+
+  const [result] = await db.query(
+    `UPDATE work_policies
+     SET title = ?, type = ?, departmentId = ?, description = ?,
+         isActive = ?, isAutomated = ?, autoDeduction = ?, autoApply = ?
+     WHERE ${OWNED_OR_COMPANY_WIDE}`,
+    [
+      p.title,
+      p.type,
+      p.departmentId,
+      p.description,
+      p.isActive,
+      p.isAutomated,
+      p.autoDeduction,
+      p.autoApply,
+      policyId,
+      clientId,
+    ]
   );
 
-  return { id, ...data };
+  if (!result.affectedRows) return null;
+
+  return getPolicyById(policyId);
 };
 
-// ✅ DELETE (SECURE)
+// ✅ DELETE (SECURE) — resolves to the number of rows removed (0 = nothing visible matched)
 export const deletePolicy = async (id, clientId) => {
-  await db.query(
-    `DELETE FROM work_policies 
-     WHERE id = ? AND client_id = ?`,
-    [id, clientId]
+  const policyId = Number(id);
+  if (!Number.isInteger(policyId) || policyId <= 0) return 0;
+
+  const [result] = await db.query(
+    `DELETE FROM work_policies WHERE ${OWNED_OR_COMPANY_WIDE}`,
+    [policyId, clientId]
   );
+
+  return result.affectedRows;
 };

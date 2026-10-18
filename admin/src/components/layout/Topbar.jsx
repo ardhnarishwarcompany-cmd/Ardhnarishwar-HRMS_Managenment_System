@@ -1,8 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { useTheme } from "../../context/ThemeContext";
-import { LogOut, Menu, Bell, Sun, Moon, Monitor, Check } from "lucide-react";
+import {
+  LogOut,
+  Bell,
+  PanelLeftClose,
+  PanelLeftOpen,
+  X,
+  Cake,
+} from "lucide-react";
 import {
   getTodayBirthdays,
   markNotificationsRead,
@@ -13,7 +19,7 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
   "/api";
 
-export default function Topbar({ setOpen }) {
+export default function Topbar({ onToggleSidebar, sidebarCollapsed = false }) {
   const navigate = useNavigate();
   const { auth, logout } = useAuth();
 
@@ -24,26 +30,6 @@ export default function Topbar({ setOpen }) {
   const [slides, setSlides] = useState([]);
 
   const [openDropdown, setOpenDropdown] = useState(false);
-
-  const { theme, resolved, setTheme } = useTheme();
-  const [themeOpen, setThemeOpen] = useState(false);
-
-  const pickTheme = (t) => {
-    // brief global transition so colors cross-fade instead of snapping
-    document.documentElement.classList.add("theme-transition");
-    setTheme(t);
-    setThemeOpen(false);
-    setTimeout(
-      () => document.documentElement.classList.remove("theme-transition"),
-      300,
-    );
-  };
-
-  const THEME_OPTIONS = [
-    { value: "light", label: "Light", icon: Sun },
-    { value: "dark", label: "Dark", icon: Moon },
-    { value: "system", label: "System", icon: Monitor },
-  ];
 
   // const unreadCount = notifications.filter((n) => !n.is_read).length;
   const handleLogout = () => {
@@ -162,184 +148,58 @@ export default function Topbar({ setOpen }) {
 
   return (
     <>
-      <header className="h-16 px-4 sm:px-6 flex items-center justify-between bg-white border-b border-gray-200">
-        {/* Left */}
-        <div className="flex items-center gap-3">
-          {/* Mobile Menu Button */}
-          <img
-            src="/logo.jpeg"
-            alt="logo"
-            className="w-8 h-8 object-contain lg:hidden"
-          />
+      <header className="adm-top">
+        <button
+          type="button"
+          onClick={onToggleSidebar}
+          className="adm-ib"
+          aria-label={sidebarCollapsed ? "Show sidebar" : "Hide sidebar"}
+          title={sidebarCollapsed ? "Show sidebar" : "Hide sidebar"}
+        >
+          {sidebarCollapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
+        </button>
 
-          <button onClick={() => setOpen(true)} className="lg:hidden">
-            <Menu size={22} />
-          </button>
-
-          <div>
-            <h2 className="text-gray-900 font-bold tracking-wide text-sm sm:text-base">
-              Admin Dashboard
-            </h2>
-            <p className="text-gray-500 text-xs hidden sm:block">
-              HRMS Control Center
-            </p>
-          </div>
+        <div className="adm-title">
+          <b>Admin Dashboard</b>
+          <span>HRMS Control Center</span>
         </div>
 
-        {/* Right */}
-        <div className="flex items-center gap-3 sm:gap-4">
-          {/* Theme toggle */}
-          <div className="relative">
-            <button
-              onClick={() => setThemeOpen((v) => !v)}
-              aria-label="Change theme"
-              title="Change theme"
-              className="relative p-2 rounded-full hover:bg-gray-100 text-gray-600 transition-colors"
-            >
-              <span className="relative block w-5 h-5">
-                <Sun
-                  size={20}
-                  className={`absolute inset-0 transition-all duration-300 ${
-                    resolved === "dark"
-                      ? "opacity-0 -rotate-90 scale-50"
-                      : "opacity-100 rotate-0 scale-100"
-                  }`}
-                />
-                <Moon
-                  size={20}
-                  className={`absolute inset-0 transition-all duration-300 ${
-                    resolved === "dark"
-                      ? "opacity-100 rotate-0 scale-100"
-                      : "opacity-0 rotate-90 scale-50"
-                  }`}
-                />
-              </span>
-            </button>
+        <div className="adm-sp" />
 
-            {themeOpen && (
-              <>
-                <div
-                  className="fixed inset-0 z-40"
-                  onClick={() => setThemeOpen(false)}
-                />
-                <div className="absolute right-0 mt-2 w-44 rounded-xl border border-gray-200 bg-white shadow-xl z-50 overflow-hidden py-1">
-                  {THEME_OPTIONS.map((opt) => {
-                    const Icon = opt.icon;
-                    const active = theme === opt.value;
-                    return (
-                      <button
-                        key={opt.value}
-                        onClick={() => pickTheme(opt.value)}
-                        className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors ${
-                          active
-                            ? "bg-blue-50 text-blue-600 font-semibold"
-                            : "text-gray-700 hover:bg-gray-50"
-                        }`}
-                      >
-                        <Icon size={16} />
-                        <span className="flex-1 text-left">{opt.label}</span>
-                        {active && <Check size={14} />}
-                      </button>
-                    );
-                  })}
-                </div>
-              </>
-            )}
-          </div>
+        {/* Notifications */}
+        <button
+          type="button"
+          onClick={handleBellClick}
+          className="adm-ib"
+          aria-label={unread > 0 ? `Notifications, ${unread} unread` : "Notifications"}
+        >
+          <Bell size={20} />
+          {unread > 0 && <span className="adm-badge">{unread}</span>}
+        </button>
 
-          <div className="relative">
-            <button
-              onClick={handleBellClick}
-              className="relative p-2 rounded-full hover:bg-gray-100"
-            >
-              <Bell size={20} />
-              {unread > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
-                  {unread}
-                </span>
-              )}
-            </button>
-
-            <div
-              className={`fixed top-0 left-0 h-full w-80 bg-white shadow-xl z-50 transform transition-transform duration-300 
-            ${openDropdown ? "translate-x-0" : "-translate-x-full"}`}
-            >
-              <div className="p-4 border-b flex justify-between items-center">
-                <h3 className="font-bold text-sm">🎂 Birthdays</h3>
-                <button onClick={() => setOpenDropdown(false)}>✕</button>
-              </div>
-
-              <div className="p-4 space-y-3 overflow-y-auto h-full">
-                {sysNotifs.length > 0 && (
-                  <div className="space-y-2 mb-4">
-                    <h4 className="font-bold text-xs text-gray-400 uppercase">System</h4>
-                    {sysNotifs.slice(0, 30).map((n) => (
-                      <button
-                        key={`sys-${n.id}`}
-                        onClick={() => {
-                          setOpenDropdown(false);
-                          if (n.link) navigate(n.link);
-                        }}
-                        className={`w-full text-left p-3 rounded-lg border text-sm ${
-                          n.is_read ? "bg-gray-50" : "bg-blue-50 border-blue-100"
-                        }`}
-                      >
-                        <p className="font-semibold text-gray-800">{n.title}</p>
-                        {n.body && (
-                          <p className="text-xs text-gray-500 mt-0.5">{n.body}</p>
-                        )}
-                        <p className="text-[10px] text-gray-400 mt-1">
-                          {new Date(n.created_at).toLocaleString()}
-                        </p>
-                      </button>
-                    ))}
-                  </div>
-                )}
-                {notifications.length === 0 ? (
-                  <p className="text-sm text-gray-500">No birthdays today</p>
-                ) : (
-                  notifications.map((n) => (
-                    <div
-                      key={n.id}
-                      className="p-3 rounded-lg bg-gray-50 border text-sm"
-                    >
-                      🎉 {n.name || "No Name"}
-                      <div className="text-xs text-gray-500">
-                        {n.email || "No Email"}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="text-right leading-tight hidden sm:block">
-            <p className="text-sm font-semibold text-gray-900">
-              {auth?.user?.name || "Admin"}
-            </p>
-            <p className="text-xs text-gray-500">
-              {auth?.user?.email || "admin@hrms.com"}
-            </p>
-          </div>
-
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold
-                     bg-gradient-to-r from-[#3B82F6] to-[#A855F7]
-                     text-white"
-          >
-            <LogOut size={16} />
-            <span className="hidden sm:inline">Logout</span>
-          </button>
+        <div className="adm-who">
+          <b>{auth?.user?.name || "Admin"}</b>
+          <small>{auth?.user?.email || "admin@hrms.com"}</small>
         </div>
-        <div className="fixed top-20 left-0 w-full pointer-events-none z-50">
+
+        <button type="button" onClick={handleLogout} className="adm-lo">
+          <LogOut size={18} />
+          <span>Logout</span>
+        </button>
+
+        {/* Birthday slide-across banners */}
+        <div className="pointer-events-none fixed left-0 top-24 z-50 w-full">
           {slides.map((s, index) => (
             <div
               key={s.id}
-              className="absolute left-0 bg-white border shadow-lg rounded-lg px-4 py-3 text-sm font-medium animate-slide-across"
+              className="animate-slide-across absolute left-0 rounded-2xl border px-4 py-3 text-sm font-semibold"
               style={{
                 top: `${index * 60}px`,
                 animationDelay: `${index * 1.5}s`,
+                background: "var(--card)",
+                borderColor: "var(--line)",
+                boxShadow: "var(--shadow-lg)",
+                color: "var(--ink)",
               }}
             >
               {s.message}
@@ -348,11 +208,70 @@ export default function Topbar({ setOpen }) {
         </div>
       </header>
 
+      {/* Notifications drawer */}
+      <aside
+        className={`adm-drawer ${openDropdown ? "is-open" : ""}`}
+        aria-label="Notifications"
+        aria-hidden={!openDropdown}
+      >
+        <div className="adm-drawer-h">
+          <div className="flex items-center gap-3">
+            <span className="adm-card-ic" style={{ width: 40, height: 40, borderRadius: 12 }}>
+              <Cake size={18} />
+            </span>
+            <b>Notifications</b>
+          </div>
+          <button
+            type="button"
+            onClick={() => setOpenDropdown(false)}
+            className="adm-ib"
+            style={{ width: 40, height: 40, borderRadius: 12, boxShadow: "none", background: "var(--soft)" }}
+            aria-label="Close notifications"
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="adm-drawer-b">
+          {sysNotifs.length > 0 && (
+            <>
+              <p className="adm-eyebrow">System</p>
+              {sysNotifs.slice(0, 30).map((n) => (
+                <button
+                  key={`sys-${n.id}`}
+                  type="button"
+                  onClick={() => {
+                    setOpenDropdown(false);
+                    if (n.link) navigate(n.link);
+                  }}
+                  className={`adm-note ${n.is_read ? "" : "is-unread"}`}
+                >
+                  <span className="block font-bold">{n.title}</span>
+                  {n.body && <small>{n.body}</small>}
+                  <small>{new Date(n.created_at).toLocaleString()}</small>
+                </button>
+              ))}
+            </>
+          )}
+
+          <p className="adm-eyebrow mt-2">Birthdays today</p>
+          {notifications.length === 0 ? (
+            <p className="text-sm" style={{ color: "var(--mute)" }}>
+              No birthdays today
+            </p>
+          ) : (
+            notifications.map((n) => (
+              <div key={n.id} className="adm-note">
+                <span className="block font-bold">{n.name || "No Name"}</span>
+                <small>{n.email || "No Email"}</small>
+              </div>
+            ))
+          )}
+        </div>
+      </aside>
+
       {openDropdown && (
-        <div
-          className="fixed inset-0 bg-black/30 z-40"
-          onClick={() => setOpenDropdown(false)}
-        />
+        <div className="adm-overlay" onClick={() => setOpenDropdown(false)} aria-hidden="true" />
       )}
     </>
   );

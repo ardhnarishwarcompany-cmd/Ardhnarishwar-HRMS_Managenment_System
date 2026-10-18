@@ -1,24 +1,133 @@
 import path from "path";
+import fs from "fs";
 import { db } from "../../../config/db.js";
 
 /* =========================================
-GET ASSIGNMENTS (HR specific)
+   SHARED FILE RULES
+   Client "task files" (attachments) and employee deliverables
+   share one allow-list so both sides accept the same formats.
+========================================= */
+export const FILE_TYPES = {
+  video: [".mp4", ".mov", ".avi", ".mkv", ".webm", ".m4v"],
+  document: [".pdf", ".txt", ".rtf", ".odt"],
+  word: [".doc", ".docx"],
+  excel: [".xls", ".xlsx", ".csv"],
+  code: [".js", ".jsx", ".ts", ".tsx", ".py", ".java", ".c", ".cpp", ".cs", ".php", ".html", ".css", ".json", ".xml", ".sql", ".sh", ".yml", ".yaml", ".md", ".zip"],
+  other: [],
+};
+
+export const ATTACHMENTS_DIR = "uploads/assignment-attachments";
+export const DELIVERABLES_DIR = "uploads/assignment-deliverables";
+
+const ATTACHMENTS_DDL = `CREATE TABLE IF NOT EXISTS client_assignment_attachments (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  client_id INT NOT NULL,
+  assignment_id INT NOT NULL,
+  type VARCHAR(40) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  description TEXT NULL,
+  file_path VARCHAR(500) NOT NULL,
+  file_name VARCHAR(255) NOT NULL,
+  file_size BIGINT DEFAULT 0,
+  uploaded_by INT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_caa_assignment(assignment_id),
+  INDEX idx_caa_client(client_id)
+)`;
+
+const DELIVERABLES_DDL = `CREATE TABLE IF NOT EXISTS client_assignment_deliverables (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  client_id INT NOT NULL,
+  assignment_id INT NOT NULL,
+  employee_id INT NOT NULL,
+  type VARCHAR(40) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  description TEXT NULL,
+  file_path VARCHAR(500) NOT NULL,
+  file_name VARCHAR(255) NOT NULL,
+  file_size BIGINT DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_assignment(assignment_id),
+  INDEX idx_employee(employee_id)
+)`;
+
+let fileTablesReady = false;
+const ensureFileTables = async () => {
+  if (fileTablesReady) return;
+  await db.query(ATTACHMENTS_DDL);
+  await db.query(DELIVERABLES_DDL);
+  fileTablesReady = true;
+};
+
+const resolveClientId = async (req) => {
+  if (req.client?.id) return Number(req.client.id);
+  if (req.employee?.client_id) return Number(req.employee.client_id);
+  const clientCode = req.client?.client_code || req.employee?.client_code;
+  if (!clientCode) return null;
+  const [rows] = await db.query(
+    `SELECT id FROM clients WHERE client_code = ? LIMIT 1`,
+    [clientCode],
+  );
+  return rows[0]?.id ? Number(rows[0].id) : null;
+};
+
+const validateUpload = (file, type) => {
+  const allowed = FILE_TYPES[type];
+  if (!allowed) return "Invalid file type";
+  const ext = path.extname(file.originalname).toLowerCase();
+  if (allowed.length && !allowed.includes(ext)) {
+    return `Invalid file for ${type}. Allowed: ${allowed.join(", ")}`;
+  }
+  return null;
+};
+
+const publicUrl = (folder, filePath) =>
+  `/${folder}/${String(filePath).split(/[\\/]/).pop()}`;
+
+const removeFileQuietly = (filePath) => {
+  if (!filePath) return;
+  fs.unlink(filePath, () => {});
+};
+
+const loadAssignmentForRequest = async (req, res) => {
+  const clientId = await resolveClientId(req);
+  const assignmentId = Number(req.params.id);
+  if (!clientId || !assignmentId) {
+    res.status(400).json({ success: false, message: "Invalid assignment" });
+    return null;
+  }
+  const [[assignment]] = await db.query(
+    `SELECT id, employee_id, title FROM client_work_assignments WHERE id = ? AND client_id = ?`,
+    [assignmentId, clientId],
+  );
+  if (!assignment) {
+    res.status(404).json({ success: false, message: "Assignment not found" });
+    return null;
+  }
+  if (
+    req.employee &&
+    Number(assignment.employee_id) !== Number(req.employee.employee_id)
+  ) {
+    res.status(403).json({
+      success: false,
+      message: "This assignment is not assigned to you",
+    });
+    return null;
+  }
+  return { clientId, assignmentId, assignment };
+};
+
+/* =========================================
+GET ASSIGNMENTS (client admin: all, employee: own)
 ========================================= */
 export const getAssignments = async (req, res) => {
   try {
-    const clientCode =
-      req.client?.client_code || req.employee?.client_code;
-
-    if (!clientCode) {
+    const clientId = await resolveClientId(req);
+    if (!clientId) {
       return res.status(401).json({ success: false });
     }
 
-    const [clientRows] = await db.query(
-      `SELECT id FROM clients WHERE client_code = ? LIMIT 1`,
-      [clientCode]
-    );
-
-    const clientId = clientRows[0].id;
+    await ensureFileTables();
 
     const { status, priority } = req.query;
 
@@ -27,7 +136,9 @@ export const getAssignments = async (req, res) => {
         t.*,
         e.name AS employee_name,
         e.employeeCode,
-        d.name AS department_name
+        d.name AS department_name,
+        (SELECT COUNT(*) FROM client_assignment_attachments a WHERE a.assignment_id = t.id) AS attachment_count,
+        (SELECT COUNT(*) FROM client_assignment_deliverables dv WHERE dv.assignment_id = t.id) AS deliverable_count
       FROM client_work_assignments t
       JOIN client_employees e ON e.id = t.employee_id
       LEFT JOIN departments d ON d.id = e.departmentId
@@ -36,7 +147,6 @@ export const getAssignments = async (req, res) => {
 
     const params = [clientId];
 
-    // ✅ employee → only own data
     if (req.employee) {
       query += " AND t.employee_id = ?";
       params.push(req.employee.employee_id);
@@ -64,35 +174,51 @@ export const getAssignments = async (req, res) => {
 };
 
 /* =========================================
-CREATE ASSIGNMENT
+CREATE ASSIGNMENT (client admin)
 ========================================= */
 export const createAssignment = async (req, res) => {
   try {
-    if (req.employee) return res.status(403).json({success:false,message:"Only client administrators can manage assignments"});
-    const clientCode = req.client?.client_code;
-
-    if (!clientCode) {
+    if (req.employee) {
+      return res.status(403).json({
+        success: false,
+        message: "Only client administrators can manage assignments",
+      });
+    }
+    const clientId = await resolveClientId(req);
+    if (!clientId) {
       return res.status(403).json({ success: false });
     }
 
-    const [clientRows] = await db.query(
-      `SELECT id FROM clients WHERE client_code = ? LIMIT 1`,
-      [clientCode],
-    );
-
-    const clientId = clientRows[0].id;
-
-    const { title, employeeId, targetValue, unit, deadline, priority } =
+    const { title, description, employeeId, targetValue, unit, deadline, priority } =
       req.body;
 
-    await db.query(
+    if (!String(title || "").trim() || !employeeId) {
+      return res.status(400).json({
+        success: false,
+        message: "Title and employee are required",
+      });
+    }
+
+    const [[employee]] = await db.query(
+      `SELECT id FROM client_employees WHERE id = ? AND client_id = ? LIMIT 1`,
+      [employeeId, clientId],
+    );
+    if (!employee) {
+      return res.status(400).json({
+        success: false,
+        message: "Selected employee does not belong to this client",
+      });
+    }
+
+    const [result] = await db.query(
       `INSERT INTO client_work_assignments
-      (client_id, employee_id, title, target_value, unit, deadline, priority, created_by)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      (client_id, employee_id, title, description, target_value, unit, deadline, priority, created_by)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         clientId,
         employeeId,
-        title,
+        String(title).trim(),
+        String(description || "").trim() || null,
         targetValue || 0,
         unit || "",
         deadline || null,
@@ -100,9 +226,8 @@ export const createAssignment = async (req, res) => {
         clientId,
       ],
     );
-  
 
-    res.json({ success: true });
+    res.status(201).json({ success: true, id: result.insertId });
   } catch (err) {
     console.error("CREATE ERROR:", err);
     res.status(500).json({ success: false });
@@ -110,39 +235,46 @@ export const createAssignment = async (req, res) => {
 };
 
 /* =========================================
-UPDATE ASSIGNMENT
+UPDATE ASSIGNMENT (client admin)
 ========================================= */
 export const updateAssignment = async (req, res) => {
   try {
-    if (req.employee) return res.status(403).json({success:false,message:"Only client administrators can manage assignments"});
-    const clientCode = req.client?.client_code;
-
-    if (!clientCode) {
+    if (req.employee) {
+      return res.status(403).json({
+        success: false,
+        message: "Only client administrators can manage assignments",
+      });
+    }
+    const clientId = await resolveClientId(req);
+    if (!clientId) {
       return res.status(403).json({
         success: false,
         message: "Admin access required",
       });
     }
 
-    const [clientRows] = await db.query(
-      `SELECT id FROM clients WHERE client_code = ? LIMIT 1`,
-      [clientCode],
-    );
-
-    const clientId = clientRows[0].id;
-
     const { id } = req.params;
-    const { title, targetValue, unit, deadline, priority } = req.body;
+    const { title, description, targetValue, unit, deadline, priority } = req.body;
 
     await db.query(
       `UPDATE client_work_assignments SET
         title = ?,
+        description = ?,
         target_value = ?,
         unit = ?,
         deadline = ?,
         priority = ?
       WHERE id = ? AND client_id = ?`,
-      [title, targetValue, unit, deadline, priority, id, clientId],
+      [
+        title,
+        String(description || "").trim() || null,
+        targetValue || 0,
+        unit || "",
+        deadline || null,
+        priority || "medium",
+        id,
+        clientId,
+      ],
     );
 
     res.json({ success: true });
@@ -153,7 +285,7 @@ export const updateAssignment = async (req, res) => {
 };
 
 /* =========================================
-UPDATE STATUS
+UPDATE STATUS (assigned employee)
 ========================================= */
 export const updateStatus = async (req, res) => {
   try {
@@ -176,7 +308,7 @@ export const updateStatus = async (req, res) => {
         status || "in_progress",
         id,
         req.employee.employee_id,
-      ]
+      ],
     );
 
     res.json({ success: true });
@@ -185,35 +317,51 @@ export const updateStatus = async (req, res) => {
     res.status(500).json({ success: false });
   }
 };
+
 /* =========================================
-DELETE
+DELETE (client admin)
 ========================================= */
 export const deleteAssignment = async (req, res) => {
   try {
-    if (req.employee) return res.status(403).json({success:false,message:"Only client administrators can manage assignments"});
-    const clientCode = req.client?.client_code;
-
-    if (!clientCode) {
+    if (req.employee) {
+      return res.status(403).json({
+        success: false,
+        message: "Only client administrators can manage assignments",
+      });
+    }
+    const clientId = await resolveClientId(req);
+    if (!clientId) {
       return res.status(403).json({
         success: false,
         message: "Admin access required",
       });
     }
 
-    const [clientRows] = await db.query(
-      `SELECT id FROM clients WHERE client_code = ? LIMIT 1`,
-      [clientCode],
-    );
-
-    const clientId = clientRows[0].id;
-
     const { id } = req.params;
 
+    await ensureFileTables();
+    const [files] = await db.query(
+      `SELECT file_path FROM client_assignment_attachments WHERE assignment_id = ? AND client_id = ?
+       UNION ALL
+       SELECT file_path FROM client_assignment_deliverables WHERE assignment_id = ? AND client_id = ?`,
+      [id, clientId, id, clientId],
+    );
+
+    await db.query(
+      `DELETE FROM client_assignment_attachments WHERE assignment_id = ? AND client_id = ?`,
+      [id, clientId],
+    );
+    await db.query(
+      `DELETE FROM client_assignment_deliverables WHERE assignment_id = ? AND client_id = ?`,
+      [id, clientId],
+    );
     await db.query(
       `DELETE FROM client_work_assignments 
        WHERE id = ? AND client_id = ?`,
       [id, clientId],
     );
+
+    files.forEach((f) => removeFileQuietly(f.file_path));
 
     res.json({ success: true });
   } catch (err) {
@@ -223,43 +371,196 @@ export const deleteAssignment = async (req, res) => {
 };
 
 /* =========================================
-   ASSIGNMENT DELIVERABLES
+   TASK ATTACHMENTS (uploaded by the CLIENT when assigning work:
+   briefs, reference videos, project files, documents)
 ========================================= */
-export const listAssignmentDeliverables = async (req,res) => {
+export const listAssignmentAttachments = async (req, res) => {
   try {
-    const clientId = Number(req.client?.id || req.employee?.client_id);
-    const assignmentId = Number(req.params.id);
-    const [[assignment]] = await db.query(`SELECT id,employee_id FROM client_work_assignments WHERE id=? AND client_id=?`,[assignmentId,clientId]);
-    if(!assignment) return res.status(404).json({success:false,message:"Assignment not found"});
-    if(req.employee && Number(assignment.employee_id)!==Number(req.employee.employee_id)) return res.status(403).json({success:false,message:"You can only view deliverables for your own assignment"});
-    await db.query(`CREATE TABLE IF NOT EXISTS client_assignment_deliverables (id INT AUTO_INCREMENT PRIMARY KEY, client_id INT NOT NULL, assignment_id INT NOT NULL, employee_id INT NOT NULL, type VARCHAR(40) NOT NULL, title VARCHAR(255) NOT NULL, description TEXT NULL, file_path VARCHAR(500) NOT NULL, file_name VARCHAR(255) NOT NULL, file_size BIGINT DEFAULT 0, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, INDEX idx_assignment(assignment_id), INDEX idx_employee(employee_id))`);
-    const [rows] = await db.query(`SELECT * FROM client_assignment_deliverables WHERE assignment_id=? AND client_id=? ORDER BY created_at DESC`,[assignmentId,clientId]);
-    res.json({success:true,data:rows.map(r=>({...r,file_url:`/uploads/assignment-deliverables/${r.file_path.split(/[\\/]/).pop()}`}))});
-  } catch(e){console.error(e);res.status(500).json({success:false,message:e.message})}
+    const ctx = await loadAssignmentForRequest(req, res);
+    if (!ctx) return;
+    await ensureFileTables();
+    const [rows] = await db.query(
+      `SELECT * FROM client_assignment_attachments WHERE assignment_id = ? AND client_id = ? ORDER BY created_at DESC`,
+      [ctx.assignmentId, ctx.clientId],
+    );
+    res.json({
+      success: true,
+      data: rows.map((r) => ({ ...r, file_url: publicUrl(ATTACHMENTS_DIR, r.file_path) })),
+    });
+  } catch (e) {
+    console.error("LIST ATTACHMENTS ERROR:", e);
+    res.status(500).json({ success: false, message: e.message });
+  }
 };
 
-export const createAssignmentDeliverable = async (req,res) => {
+export const createAssignmentAttachment = async (req, res) => {
   try {
-    if(!req.employee?.employee_id) return res.status(403).json({success:false,message:"Only assigned employees can upload deliverables"});
-    const clientId=Number(req.employee.client_id), assignmentId=Number(req.params.id);
-    const [[assignment]]=await db.query(`SELECT id,employee_id,title FROM client_work_assignments WHERE id=? AND client_id=?`,[assignmentId,clientId]);
-    if(!assignment || Number(assignment.employee_id)!==Number(req.employee.employee_id)) return res.status(403).json({success:false,message:"This assignment is not assigned to you"});
-    if(!req.file)return res.status(400).json({success:false,message:"Please select a file"});
-    const type=String(req.body.type||'document').toLowerCase();
-    const allowed = {
-      video: ['.mp4','.mov','.avi','.mkv','.webm','.m4v'],
-      document: ['.pdf','.txt','.rtf','.odt'],
-      word: ['.doc','.docx'],
-      excel: ['.xls','.xlsx','.csv'],
-      code: ['.js','.jsx','.ts','.tsx','.py','.java','.c','.cpp','.cs','.php','.html','.css','.json','.xml','.sql','.sh','.yml','.yaml','.md','.zip'],
-      other: []
-    };
-    if (!allowed[type]) return res.status(400).json({success:false,message:'Invalid deliverable type'});
-    const ext=path.extname(req.file.originalname).toLowerCase();
-    if (allowed[type].length && !allowed[type].includes(ext)) return res.status(400).json({success:false,message:`Invalid file for ${type}. Allowed: ${allowed[type].join(', ')}`});
-    const title=String(req.body.title||req.file.originalname).trim(); if(!title)return res.status(400).json({success:false,message:"Deliverable title is required"});
-    await db.query(`CREATE TABLE IF NOT EXISTS client_assignment_deliverables (id INT AUTO_INCREMENT PRIMARY KEY, client_id INT NOT NULL, assignment_id INT NOT NULL, employee_id INT NOT NULL, type VARCHAR(40) NOT NULL, title VARCHAR(255) NOT NULL, description TEXT NULL, file_path VARCHAR(500) NOT NULL, file_name VARCHAR(255) NOT NULL, file_size BIGINT DEFAULT 0, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, INDEX idx_assignment(assignment_id), INDEX idx_employee(employee_id))`);
-    const [r]=await db.query(`INSERT INTO client_assignment_deliverables (client_id,assignment_id,employee_id,type,title,description,file_path,file_name,file_size) VALUES (?,?,?,?,?,?,?,?,?)`,[clientId,assignmentId,req.employee.employee_id,type,title,String(req.body.description||'').trim()||null,req.file.path,req.file.originalname,req.file.size]);
-    res.status(201).json({success:true,id:r.insertId,message:"Deliverable uploaded successfully"});
-  }catch(e){console.error(e);res.status(500).json({success:false,message:e.message})}
+    if (req.employee) {
+      removeFileQuietly(req.file?.path);
+      return res.status(403).json({
+        success: false,
+        message: "Only client administrators can attach task files",
+      });
+    }
+    const ctx = await loadAssignmentForRequest(req, res);
+    if (!ctx) {
+      removeFileQuietly(req.file?.path);
+      return;
+    }
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "Please select a file" });
+    }
+
+    const type = String(req.body.type || "document").toLowerCase();
+    const invalid = validateUpload(req.file, type);
+    if (invalid) {
+      removeFileQuietly(req.file.path);
+      return res.status(400).json({ success: false, message: invalid });
+    }
+
+    const title = String(req.body.title || req.file.originalname).trim();
+    if (!title) {
+      removeFileQuietly(req.file.path);
+      return res.status(400).json({ success: false, message: "File title is required" });
+    }
+
+    await ensureFileTables();
+    const [r] = await db.query(
+      `INSERT INTO client_assignment_attachments
+       (client_id, assignment_id, type, title, description, file_path, file_name, file_size, uploaded_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        ctx.clientId,
+        ctx.assignmentId,
+        type,
+        title,
+        String(req.body.description || "").trim() || null,
+        req.file.path,
+        req.file.originalname,
+        req.file.size,
+        ctx.clientId,
+      ],
+    );
+
+    res.status(201).json({
+      success: true,
+      id: r.insertId,
+      message: "Task file attached successfully",
+    });
+  } catch (e) {
+    console.error("CREATE ATTACHMENT ERROR:", e);
+    removeFileQuietly(req.file?.path);
+    res.status(500).json({ success: false, message: e.message });
+  }
+};
+
+export const deleteAssignmentAttachment = async (req, res) => {
+  try {
+    if (req.employee) {
+      return res.status(403).json({
+        success: false,
+        message: "Only client administrators can remove task files",
+      });
+    }
+    const ctx = await loadAssignmentForRequest(req, res);
+    if (!ctx) return;
+    const attachmentId = Number(req.params.attachmentId);
+    await ensureFileTables();
+    const [[row]] = await db.query(
+      `SELECT id, file_path FROM client_assignment_attachments WHERE id = ? AND assignment_id = ? AND client_id = ?`,
+      [attachmentId, ctx.assignmentId, ctx.clientId],
+    );
+    if (!row) {
+      return res.status(404).json({ success: false, message: "File not found" });
+    }
+    await db.query(`DELETE FROM client_assignment_attachments WHERE id = ?`, [row.id]);
+    removeFileQuietly(row.file_path);
+    res.json({ success: true });
+  } catch (e) {
+    console.error("DELETE ATTACHMENT ERROR:", e);
+    res.status(500).json({ success: false, message: e.message });
+  }
+};
+
+/* =========================================
+   DELIVERABLES (uploaded by the assigned EMPLOYEE)
+========================================= */
+export const listAssignmentDeliverables = async (req, res) => {
+  try {
+    const ctx = await loadAssignmentForRequest(req, res);
+    if (!ctx) return;
+    await ensureFileTables();
+    const [rows] = await db.query(
+      `SELECT * FROM client_assignment_deliverables WHERE assignment_id = ? AND client_id = ? ORDER BY created_at DESC`,
+      [ctx.assignmentId, ctx.clientId],
+    );
+    res.json({
+      success: true,
+      data: rows.map((r) => ({ ...r, file_url: publicUrl(DELIVERABLES_DIR, r.file_path) })),
+    });
+  } catch (e) {
+    console.error("LIST DELIVERABLES ERROR:", e);
+    res.status(500).json({ success: false, message: e.message });
+  }
+};
+
+export const createAssignmentDeliverable = async (req, res) => {
+  try {
+    if (!req.employee?.employee_id) {
+      removeFileQuietly(req.file?.path);
+      return res.status(403).json({
+        success: false,
+        message: "Only assigned employees can upload deliverables",
+      });
+    }
+    const ctx = await loadAssignmentForRequest(req, res);
+    if (!ctx) {
+      removeFileQuietly(req.file?.path);
+      return;
+    }
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "Please select a file" });
+    }
+
+    const type = String(req.body.type || "document").toLowerCase();
+    const invalid = validateUpload(req.file, type);
+    if (invalid) {
+      removeFileQuietly(req.file.path);
+      return res.status(400).json({ success: false, message: invalid });
+    }
+
+    const title = String(req.body.title || req.file.originalname).trim();
+    if (!title) {
+      removeFileQuietly(req.file.path);
+      return res.status(400).json({ success: false, message: "Deliverable title is required" });
+    }
+
+    await ensureFileTables();
+    const [r] = await db.query(
+      `INSERT INTO client_assignment_deliverables
+       (client_id, assignment_id, employee_id, type, title, description, file_path, file_name, file_size)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        ctx.clientId,
+        ctx.assignmentId,
+        req.employee.employee_id,
+        type,
+        title,
+        String(req.body.description || "").trim() || null,
+        req.file.path,
+        req.file.originalname,
+        req.file.size,
+      ],
+    );
+
+    res.status(201).json({
+      success: true,
+      id: r.insertId,
+      message: "Deliverable uploaded successfully",
+    });
+  } catch (e) {
+    console.error("CREATE DELIVERABLE ERROR:", e);
+    removeFileQuietly(req.file?.path);
+    res.status(500).json({ success: false, message: e.message });
+  }
 };

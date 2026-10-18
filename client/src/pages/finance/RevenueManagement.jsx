@@ -100,9 +100,14 @@ export default function RevenueManagement() {
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Revenue Management</h1>
-          <p className="text-gray-600 mt-1">Track and manage your income sources</p>
+        <div className="page-header-main">
+          <span className="page-header-icon">
+            <TrendingUp size={26} strokeWidth={1.8} />
+          </span>
+          <div>
+            <h1 className="page-header-title">Revenue Management</h1>
+            <p className="page-header-subtitle">Track and manage your income sources</p>
+          </div>
         </div>
         <button
           onClick={() => {

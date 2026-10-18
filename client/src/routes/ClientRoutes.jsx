@@ -84,7 +84,7 @@ export default function ClientRoutes() {
         <Route path="sales-report" element={<FeatureRoute featureKey="SALES_REPORT"><SalesReports /></FeatureRoute>} />
         <Route path="attendance" element={<FeatureRoute featureKey="ATTENDANCE_TRACKER"><AttendanceTracker /></FeatureRoute>} />
         <Route path="interviews" element={<FeatureRoute featureKey="INTERVIEW_TRACKER" adminOnly><InterviewTracker /></FeatureRoute>} />
-        <Route path="dashboard" element={<FeatureRoute featureKey="FINANCE_DASHBOARD"><ClientDashboard /></FeatureRoute>} />
+        <Route path="dashboard" element={<FeatureRoute featureKey="FINANCE_DASHBOARD" adminOnly><ClientDashboard /></FeatureRoute>} />
         <Route path="overview" element={<Overview />} />
         <Route path="employees" element={<FeatureRoute featureKey="EMPLOYEE_MANAGEMENT" adminOnly><EmployeeManagement /></FeatureRoute>} />
 
@@ -113,7 +113,7 @@ export default function ClientRoutes() {
         <Route path="finance/tax" element={<FeatureRoute featureKey="TAX" adminOnly><TaxManagement /></FeatureRoute>} />
         <Route path="finance/reports" element={<FeatureRoute featureKey="FINANCE_DASHBOARD" adminOnly><FinancialReports /></FeatureRoute>} />
         <Route path="finance/audit-logs" element={<FeatureRoute featureKey="AUDIT_LOGS" adminOnly><AuditLogs /></FeatureRoute>} />
-        <Route path="/services/:id" element={<FeatureRoute featureKey="FINANCE_DASHBOARD"><ServiceTemplate /></FeatureRoute>} />
+        <Route path="/services/:id" element={<FeatureRoute featureKey="FINANCE_DASHBOARD" adminOnly><ServiceTemplate /></FeatureRoute>} />
 
         <Route path="work-assignment" element={<FeatureRoute featureKey="WORK_ASSIGNMENT"><WorkAssignment /></FeatureRoute>} />
 

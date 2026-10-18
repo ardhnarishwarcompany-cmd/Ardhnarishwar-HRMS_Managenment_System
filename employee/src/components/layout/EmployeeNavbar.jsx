@@ -18,7 +18,6 @@ import {
   BarChart3,
   BookOpen,
   MessageSquare,
-  ChevronRight,
   CheckCheck,
 } from "lucide-react";
 import {
@@ -52,21 +51,18 @@ function timeAgo(dateStr) {
   return `${days}d ago`;
 }
 
-export default function EmployeeNavbar() {
+export default function EmployeeNavbar({ children }) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { employee, logout } = useEmployeeAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [sidebarVisible, setSidebarVisible] = useState(true);
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loadingNotifs, setLoadingNotifs] = useState(false);
   const pollRef = useRef(null);
 
-  useEffect(() => {
-    document.body.classList.add("employee-shell-active");
-    return () => document.body.classList.remove("employee-shell-active");
-  }, []);
 
   useEffect(() => {
     setMobileOpen(false);
@@ -134,166 +130,135 @@ export default function EmployeeNavbar() {
     .filter(Boolean)
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase())
-    .join("") || "E";
+    .join("") || "AS";
+
 
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
 
+  const toggleSidebar = () => {
+    if (window.innerWidth > 900) {
+      setSidebarVisible((v) => !v);
+    } else {
+      setMobileOpen((v) => !v);
+    }
+  };
+
   return (
     <>
-      <aside className="employee-sidebar" aria-label="Employee navigation">
-        <div className="employee-brand employee-brand-fixed">
-          <div className="employee-brand-logo employee-brand-logo-fixed">
-            <img
-              src="/logo.jpeg"
-              alt="Ardhnarishwar HRMS"
-            />
-          </div>
-
-          <div className="employee-brand-copy employee-brand-copy-fixed">
-            <div className="employee-brand-name employee-brand-name-fixed">
-              ARDHNARISHWAR
+      {sidebarVisible && (
+        <aside className="employee-sidebar" aria-label="Employee navigation">
+          <div className="brand" onClick={() => navigate("/dashboard")} role="button" tabIndex={0}>
+            <div className="logo">
+              <img src="/logo.jpeg" alt="Ardhnarishwar" className="w-full h-full object-cover" />
             </div>
-
-            <div className="employee-brand-subtitle employee-brand-subtitle-fixed">
-              HRMS Employee<br />
-              Portal
+            <div>
+              <b>ARDHNARISHWAR</b>
+              <small>HRMS EMPLOYEE PORTAL</small>
             </div>
           </div>
-        </div>
 
-        <div className="employee-nav-scroll">
-          <div className="employee-nav-label">WORKSPACE</div>
-          <nav className="employee-nav-list">
+          <div className="lbl">WORKSPACE</div>
+          <nav className="employee-nav">
             {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
               <NavLink
                 key={to}
                 to={to}
-                className={({ isActive }) =>
-                  `employee-nav-link ${isActive ? "is-active" : ""}`
-                }
+                className={({ isActive }) => `employee-nav-link ${isActive ? "is-active on" : ""}`}
               >
-                <Icon size={18} strokeWidth={1.9} />
+                <Icon size={19} />
                 <span>{label}</span>
-                <ChevronRight className="employee-nav-arrow" size={15} />
               </NavLink>
             ))}
           </nav>
-        </div>
 
-        <div className="employee-sidebar-footer">
-          <button className="employee-sidebar-profile" onClick={() => navigate("/profile")}>
-            <span className="employee-avatar employee-avatar-small">{initials}</span>
-            <span className="employee-sidebar-profile-copy">
-              <strong>{employee?.name || "Employee"}</strong>
-              <small>{employee?.department || "Employee"}</small>
-            </span>
-            <ChevronRight size={15} />
-          </button>
-        </div>
-      </aside>
-
-      <div className={`employee-mobile-drawer ${mobileOpen ? "is-open" : ""}`}>
-        <div className="employee-mobile-overlay" onClick={() => setMobileOpen(false)} />
-        <aside className="employee-mobile-panel">
-          <div className="employee-mobile-panel-head">
-            <div className="employee-brand-copy">
-              <div className="employee-brand-name">ARDHNARISHWAR</div>
-              <div className="employee-brand-subtitle">Employee Portal</div>
+          <div className="user" onClick={() => navigate("/profile")} role="button" tabIndex={0}>
+            <div className="av">{initials}</div>
+            <div>
+              <b>{employee?.name || "Aarav Sharma"}</b>
+              <small>{employee?.department || "IT"}</small>
             </div>
-            <button className="employee-icon-btn" onClick={() => setMobileOpen(false)} aria-label="Close menu">
-              <X size={20} />
-            </button>
           </div>
-          <div className="employee-nav-label">WORKSPACE</div>
-          <nav className="employee-nav-list">
-            {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
-              <NavLink
-                key={to}
-                to={to}
-                className={({ isActive }) => `employee-nav-link ${isActive ? "is-active" : ""}`}
-              >
-                <Icon size={18} />
-                <span>{label}</span>
-              </NavLink>
-            ))}
-          </nav>
         </aside>
-      </div>
+      )}
 
-      <header className="employee-topbar">
-        <div className="employee-topbar-left">
-          <button
-            className="employee-mobile-menu employee-icon-btn"
-            onClick={() => setMobileOpen(true)}
-            aria-label="Open menu"
-          >
-            <Menu size={21} />
-          </button>
-          <div>
-            <div className="employee-page-title">{pageTitle}</div>
-            <div className="employee-breadcrumb">Employee Workspace</div>
-          </div>
+      {/* Mobile Drawer */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 flex lg:hidden">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+          <aside className="relative z-10 w-72 bg-[var(--card)] p-5 flex flex-col h-full shadow-2xl">
+            <div className="flex items-center justify-between pb-4 border-b border-[var(--line)]">
+              <div className="brand p-0">
+                <div className="logo">
+                  <img src="/logo.jpeg" alt="Ardhnarishwar" className="w-full h-full object-cover" />
+                </div>
+                <div><b>ARDHNARISHWAR</b><small>EMPLOYEE PORTAL</small></div>
+              </div>
+              <button className="ib w-9 h-9 rounded-xl" onClick={() => setMobileOpen(false)}>
+                <X size={18} />
+              </button>
+            </div>
+            <div className="lbl mt-3">WORKSPACE</div>
+            <nav className="employee-nav flex-1">
+              {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
+                <NavLink
+                  key={to}
+                  to={to}
+                  onClick={() => setMobileOpen(false)}
+                  className={({ isActive }) => `employee-nav-link ${isActive ? "is-active on" : ""}`}
+                >
+                  <Icon size={19} />
+                  <span>{label}</span>
+                </NavLink>
+              ))}
+            </nav>
+            <div className="user mt-auto" onClick={() => { setMobileOpen(false); navigate("/profile"); }}>
+              <div className="av">{initials}</div>
+              <div>
+                <b>{employee?.name || "Aarav Sharma"}</b>
+                <small>{employee?.department || "IT"}</small>
+              </div>
+            </div>
+          </aside>
         </div>
+      )}
 
-        <div className="employee-topbar-right">
-          <div className="employee-notif-wrap" style={{ position: "relative" }}>
-            <button
-              className="employee-icon-btn employee-notification-btn"
-              onClick={handleBellClick}
-              aria-label="Notifications"
-              title="Notifications"
-            >
+      {/* Main app content column */}
+      <main className="employee-app-content">
+        <header className="top">
+          <button className="ib" id="tg" onClick={toggleSidebar} aria-label="Toggle sidebar">
+            <svg className="i" viewBox="0 0 24 24" style={{ width: 19, height: 19, fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round", strokeLinejoin: "round" }}>
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <path d="M9 3v18M15 9l-3 3 3 3" />
+            </svg>
+          </button>
+
+          <div className="wl">
+            <b id="pt">{pageTitle}</b>
+            <span>Employee Workspace</span>
+          </div>
+
+          <div className="sp" />
+
+
+          <div className="relative">
+            <button className="ib" onClick={handleBellClick} aria-label="Notifications" title="Notifications">
               <Bell size={20} />
-              {unreadCount > 0 && (
-                <span className="employee-notification-dot" />
-              )}
+              {unreadCount > 0 && <span className="dot" />}
             </button>
 
             {notifOpen && (
               <>
-                <div className="employee-popover-backdrop" onClick={() => setNotifOpen(false)} />
-                <div
-                  className="employee-notif-panel"
-                  style={{
-                    position: "absolute",
-                    right: 0,
-                    top: "calc(100% + 10px)",
-                    width: "340px",
-                    maxHeight: "420px",
-                    overflowY: "auto",
-                    background: "var(--card-bg, #fff)",
-                    border: "1px solid rgba(0,0,0,0.08)",
-                    borderRadius: "12px",
-                    boxShadow: "0 12px 32px rgba(0,0,0,0.15)",
-                    zIndex: 50,
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      padding: "12px 14px",
-                      borderBottom: "1px solid rgba(0,0,0,0.06)",
-                    }}
-                  >
-                    <strong style={{ fontSize: "14px" }}>Notifications</strong>
+                <div className="fixed inset-0 z-40" onClick={() => setNotifOpen(false)} />
+                <div className="absolute right-0 top-[calc(100%+10px)] w-80 max-h-96 overflow-y-auto bg-[var(--card)] border border-[var(--line)] rounded-2xl shadow-2xl z-50 p-2">
+                  <div className="flex justify-between items-center p-3 border-b border-[var(--line)]">
+                    <strong className="text-sm font-bold text-[var(--ink)]">Notifications</strong>
                     {unreadCount > 0 && (
                       <button
                         onClick={handleMarkAllRead}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "4px",
-                          fontSize: "12px",
-                          background: "none",
-                          border: "none",
-                          cursor: "pointer",
-                          color: "#4f46e5",
-                        }}
+                        className="flex items-center gap-1 text-xs text-[var(--p)] font-bold hover:underline"
                       >
                         <CheckCheck size={14} /> Mark all read
                       </button>
@@ -301,15 +266,11 @@ export default function EmployeeNavbar() {
                   </div>
 
                   {loadingNotifs && (
-                    <div style={{ padding: "16px", fontSize: "13px", opacity: 0.7 }}>
-                      Loading...
-                    </div>
+                    <div className="p-4 text-xs text-[var(--mute)] text-center">Loading...</div>
                   )}
 
                   {!loadingNotifs && notifications.length === 0 && (
-                    <div style={{ padding: "24px 14px", fontSize: "13px", opacity: 0.6, textAlign: "center" }}>
-                      No notifications yet
-                    </div>
+                    <div className="p-6 text-xs text-[var(--mute)] text-center">No notifications yet</div>
                   )}
 
                   {!loadingNotifs &&
@@ -317,36 +278,20 @@ export default function EmployeeNavbar() {
                       <div
                         key={n.id}
                         onClick={() => handleNotifClick(n)}
-                        style={{
-                          padding: "12px 14px",
-                          borderBottom: "1px solid rgba(0,0,0,0.05)",
-                          cursor: "pointer",
-                          background: n.isRead ? "transparent" : "rgba(79,70,229,0.06)",
-                        }}
+                        className={`p-3 rounded-xl border-b border-[var(--line)] last:border-0 cursor-pointer transition ${
+                          n.isRead ? "hover:bg-[var(--soft)]" : "bg-purple-50/50 hover:bg-purple-50"
+                        }`}
                       >
-                        <div style={{ display: "flex", justifyContent: "space-between", gap: "8px" }}>
-                          <strong style={{ fontSize: "13px" }}>{n.title}</strong>
+                        <div className="flex justify-between items-start gap-2">
+                          <strong className="text-xs font-bold text-[var(--ink)]">{n.title}</strong>
                           {!n.isRead && (
-                            <span
-                              style={{
-                                width: "8px",
-                                height: "8px",
-                                borderRadius: "50%",
-                                background: "#4f46e5",
-                                flexShrink: 0,
-                                marginTop: "4px",
-                              }}
-                            />
+                            <span className="w-2 h-2 rounded-full bg-[var(--p)] shrink-0 mt-1" />
                           )}
                         </div>
                         {n.message && (
-                          <div style={{ fontSize: "12.5px", opacity: 0.75, marginTop: "4px" }}>
-                            {n.message}
-                          </div>
+                          <div className="text-xs text-[var(--mute)] mt-1">{n.message}</div>
                         )}
-                        <div style={{ fontSize: "11px", opacity: 0.5, marginTop: "6px" }}>
-                          {timeAgo(n.createdAt)}
-                        </div>
+                        <div className="text-[10px] text-[var(--mute)] mt-1">{timeAgo(n.createdAt)}</div>
                       </div>
                     ))}
                 </div>
@@ -354,20 +299,22 @@ export default function EmployeeNavbar() {
             )}
           </div>
 
-          <button className="employee-user-block" onClick={() => navigate("/profile")}>
-            <span className="employee-avatar">{initials}</span>
-            <span className="employee-user-copy">
-              <strong>{employee?.name || "Employee"}</strong>
-              <small>{employee?.email || employee?.department || "Employee"}</small>
-            </span>
-          </button>
+          <div className="chip-user" onClick={() => navigate("/profile")} role="button" tabIndex={0}>
+            <div className="av">{initials}</div>
+            <div>
+              <b>{employee?.name || "Aarav Sharma"}</b>
+              <small>{employee?.email || "aarav@demo.hrms"}</small>
+            </div>
+          </div>
 
-          <button className="employee-logout-btn" onClick={handleLogout}>
-            <LogOut size={17} />
+          <button className="lo" onClick={handleLogout}>
+            <LogOut size={18} />
             <span>Logout</span>
           </button>
-        </div>
-      </header>
+        </header>
+
+        {children}
+      </main>
     </>
   );
 }

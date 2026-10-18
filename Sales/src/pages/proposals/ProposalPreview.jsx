@@ -117,7 +117,7 @@ export default function ProposalPreview() {
 
   if (loading) {
     return (
-      <div className="space-y-6 p-6">
+      <div className="space-y-6">
         <PageHeader title="Proposals" desc="Draft quotations for your clients and send them for approval" />
         <div className="h-16 animate-pulse rounded-2xl bg-slate-100" />
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
@@ -133,7 +133,7 @@ export default function ProposalPreview() {
 
   if (!p) {
     return (
-      <div className="space-y-6 p-6">
+      <div className="space-y-6">
         <PageHeader title="Proposals" desc="Draft quotations for your clients and send them for approval" />
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
           <h2 className="text-base font-semibold text-slate-900">Proposal not found</h2>
@@ -151,7 +151,7 @@ export default function ProposalPreview() {
   const items = p.items || [];
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6">
       <PageHeader title="Proposals" desc="Draft quotations for your clients and send them for approval" />
 
       <ModuleHeading icon={Handshake} title={p.proposal_number} desc={`${p.client_company || p.client_name} · ${meta.hint}`}>
@@ -315,7 +315,7 @@ function Timeline({ p }) {
             : s.done
               ? "bg-emerald-500 text-white"
               : s.current
-                ? "bg-indigo-600 text-white ring-4 ring-indigo-100"
+                ? "bg-brand-600 text-white ring-4 ring-brand-100"
                 : "bg-slate-100 text-slate-400";
         return (
           <li key={s.key} className="flex gap-3">
@@ -349,9 +349,14 @@ const DOC_STATUS = {
   EXPIRED: "bg-amber-50 text-amber-700 ring-amber-200",
 };
 
+/* Same violet -> magenta ramp as the portal hero, written inline so it survives print/PDF colour stripping. */
+const DOC_GRADIENT = "linear-gradient(135deg, #5b21b6 0%, #7c3aed 48%, #a21caf 100%)";
+const DOC_SOLID = "#6d28d9";
+
 function ProposalDocument({ p, items }) {
   const badge = DOC_STATUS[p.status] || DOC_STATUS.DRAFT;
   const exact = { WebkitPrintColorAdjust: "exact", printColorAdjust: "exact" };
+  const brandBg = { ...exact, backgroundImage: DOC_GRADIENT };
   const mrpSavings = items.reduce((sum, it) => {
     const mrp = Number(it.mrp) || 0;
     const rate = Number(it.rate) || 0;
@@ -362,43 +367,45 @@ function ProposalDocument({ p, items }) {
   return (
     <div
       id="proposal-document"
-      className="proposal-paper overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-slate-200"
+      className="proposal-paper overflow-hidden rounded-3xl bg-white shadow-float ring-1 ring-white/70"
       style={{ backgroundColor: "#ffffff" }}
     >
       {/* letterhead */}
-      <div className="relative bg-gradient-to-br from-[#5347E8] via-[#4534DA] to-[#3526BD] px-8 py-8 sm:px-12 sm:py-10" style={exact}>
+      <div className="relative overflow-hidden px-8 py-8 text-white sm:px-12 sm:py-10" style={brandBg}>
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.07]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px)",
-            backgroundSize: "36px 36px",
-          }}
+          className="pointer-events-none absolute -right-24 -top-40 h-[420px] w-[420px] rounded-full"
+          style={{ background: "rgba(255,255,255,0.10)" }}
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute -bottom-48 right-28 h-[300px] w-[300px] rounded-full"
+          style={{ background: "rgba(255,255,255,0.08)" }}
+          aria-hidden="true"
         />
         <div className="relative flex flex-wrap items-start justify-between gap-6">
           <div>
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-lg font-black tracking-tight text-[#4534DA] shadow-lg shadow-indigo-950/40" style={{ backgroundColor: "#fff" }}>
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-lg font-black tracking-tight text-brand-700 shadow-lg shadow-black/20" style={{ backgroundColor: "#fff" }}>
                 R
               </div>
               <div>
                 <h1 className="text-2xl font-black tracking-tight text-white">RECRUWEB</h1>
-                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-indigo-200/80">Ardhnarishwar HRMS</p>
+                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/75">Ardhnarishwar HRMS</p>
               </div>
             </div>
-            <p className="mt-4 max-w-xs text-xs leading-relaxed text-indigo-100/70">
+            <p className="mt-4 max-w-xs text-xs leading-relaxed text-white/75">
               Recruitment &middot; Background Verification &middot; HR Services &middot; Payroll
             </p>
           </div>
           <div className="text-right">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-indigo-200">Business Proposal</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/75">Business Proposal</p>
             <p className="mt-1 font-mono text-lg font-bold tracking-wide text-white">{p.proposal_number}</p>
             <span className={`mt-3 inline-flex items-center rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider ring-1 ring-inset ${badge}`}>
               {p.status.replace("_", " ")}
             </span>
           </div>
         </div>
-        <div className="relative mt-8 grid grid-cols-2 gap-4 border-t border-white/10 pt-6 sm:grid-cols-4">
+        <div className="relative mt-8 grid grid-cols-2 gap-4 border-t border-white/15 pt-6 sm:grid-cols-4">
           {[
             ["Issued", fmtDate(p.sent_at || p.created_at)],
             ["Valid until", fmtDate(p.valid_until)],
@@ -406,7 +413,7 @@ function ProposalDocument({ p, items }) {
             ["Total value", money(p.total, p.currency)],
           ].map(([label, value]) => (
             <div key={label}>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-indigo-200/90">{label}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/75">{label}</p>
               <p className="mt-1 text-sm font-bold text-white">{value}</p>
             </div>
           ))}
@@ -416,7 +423,7 @@ function ProposalDocument({ p, items }) {
       <div className="px-8 py-8 sm:px-12 sm:py-10">
         <div className="grid gap-8 sm:grid-cols-2">
           <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-5">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-600">Prepared for</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-600">Prepared for</p>
             <p className="mt-2 text-lg font-bold text-slate-900">{p.client_name}</p>
             {p.client_company ? <p className="text-sm font-medium text-slate-600">{p.client_company}</p> : null}
             <div className="mt-3 space-y-1">
@@ -447,7 +454,7 @@ function ProposalDocument({ p, items }) {
         </div>
 
         {p.intro ? (
-          <div className="mt-8 rounded-r-xl border-l-4 border-indigo-500 bg-indigo-50/50 px-5 py-4">
+          <div className="mt-8 rounded-r-xl border-l-4 border-brand-500 bg-brand-50/60 px-5 py-4">
             <p className="whitespace-pre-line text-sm leading-relaxed text-slate-700">{p.intro}</p>
           </div>
         ) : null}
@@ -457,7 +464,7 @@ function ProposalDocument({ p, items }) {
           <div className="overflow-hidden rounded-xl ring-1 ring-slate-200">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-[#4534DA] text-left text-[11px] font-semibold uppercase tracking-wider text-indigo-100" style={exact}>
+                <tr className="text-left text-[11px] font-semibold uppercase tracking-wider text-white" style={{ ...exact, backgroundColor: DOC_SOLID }}>
                   <th className="w-10 px-4 py-3">#</th>
                   <th className="px-4 py-3">Service</th>
                   <th className="px-4 py-3 text-right">Qty</th>
@@ -520,8 +527,8 @@ function ProposalDocument({ p, items }) {
                 </div>
               ) : null}
             </div>
-            <div className="mt-3 flex items-center justify-between rounded-xl bg-gradient-to-r from-[#5347E8] to-[#3526BD] px-5 py-4 shadow-lg shadow-indigo-600/25" style={exact}>
-              <span className="text-sm font-semibold uppercase tracking-wider text-indigo-100">Grand Total</span>
+            <div className="mt-3 flex items-center justify-between rounded-xl px-5 py-4 shadow-brand" style={brandBg}>
+              <span className="text-sm font-semibold uppercase tracking-wider text-white/85">Grand Total</span>
               <span className="text-xl font-black tabular-nums text-white">{money(p.total, p.currency)}</span>
             </div>
           </div>
@@ -566,7 +573,7 @@ function ProposalDocument({ p, items }) {
           </div>
         </div>
       </div>
-      <div className="h-2 bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-600" style={exact} />
+      <div className="h-2" style={brandBg} />
     </div>
   );
 }

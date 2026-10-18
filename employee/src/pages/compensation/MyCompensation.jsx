@@ -92,19 +92,7 @@ export default function MyCompensation() {
     .reduce((s, w) => s + Number(w.amount || 0), 0);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 pb-24">
-        <header className="flex items-center gap-3">
-          <div className="rounded-xl bg-gray-900 p-2.5 text-white">
-            <Wallet size={20} />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">My Compensation</h1>
-            <p className="text-sm text-gray-500">
-              Reimbursements, incentives &amp; bonuses
-            </p>
-          </div>
-        </header>
+    <div className="w-full space-y-6 pb-12">
 
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
           {/* Reimbursement form */}
@@ -154,7 +142,11 @@ export default function MyCompensation() {
             />
             <button
               type="submit"
-              className="w-full rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-gray-800"
+              className="w-full rounded-xl text-white px-4 py-2.5 text-sm font-bold shadow-md hover:opacity-95 transition active:scale-[0.98]"
+              style={{
+                background: "linear-gradient(135deg, #6d28d9, #c026d3)",
+                boxShadow: "0 8px 18px rgba(124, 58, 237, 0.25)",
+              }}
             >
               Submit Request
             </button>
@@ -312,7 +304,6 @@ export default function MyCompensation() {
             </table>
           </div>
         </div>
-      </main>
     </div>
   );
 }

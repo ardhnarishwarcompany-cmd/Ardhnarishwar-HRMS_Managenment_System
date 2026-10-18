@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import PageHeader from "../../components/common/PageHeader";
 import {
   ArrowLeft,
   FileText,
@@ -103,36 +104,19 @@ export default function CreateInvoice() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-slate-100 px-4 py-8">
-      {/* ambient glow */}
-      <div className="pointer-events-none absolute -top-32 left-1/3 h-80 w-80 rounded-full bg-indigo-200/50 blur-3xl" />
-      <div className="pointer-events-none absolute bottom-0 right-1/4 h-80 w-80 rounded-full bg-purple-200/40 blur-3xl" />
-
-      <div className="relative mx-auto max-w-4xl">
-        {/* top bar */}
-        <div className="mb-6 flex items-center gap-4">
-          <button
-            onClick={() => navigate("/invoices")}
-            className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white/80 px-4 py-2.5 text-sm font-semibold text-slate-600 shadow-sm backdrop-blur transition-all hover:border-slate-300 hover:text-slate-900"
-          >
+    <div className="space-y-6">
+      <PageHeader
+        title="Create Invoice"
+        desc="GST invoice with automatic 18% tax calculation"
+        actions={
+          <button type="button" onClick={() => navigate("/invoices")} className="btn-on-brand-ghost">
             <ArrowLeft size={15} aria-hidden="true" />
             Back
           </button>
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-200">
-              <FileText size={19} aria-hidden="true" />
-            </div>
-            <div>
-              <h1 className="text-xl font-extrabold tracking-tight text-slate-900">
-                Create Invoice
-              </h1>
-              <p className="text-xs text-slate-500">
-                GST invoice with automatic 18% tax calculation
-              </p>
-            </div>
-          </div>
-        </div>
+        }
+      />
 
+      <div className="mx-auto max-w-4xl">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* ============ FORM CARD ============ */}
           <div className="rounded-3xl border border-white/60 bg-white/70 p-6 shadow-xl shadow-slate-200/60 backdrop-blur-xl lg:col-span-2 md:p-8">

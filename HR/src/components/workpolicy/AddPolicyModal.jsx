@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { X, ScrollText } from "lucide-react";
 
 const categories = ["Work Arrangements", "Leave Management", "Performance", "Ethics", "Project Management", "Sales", "Marketing", "IT Security"];
-const departments = ["All", "Engineering", "Marketing", "Sales", "HR", "Finance", "Operations"];
+const departments = ["All", "HR", "Sales", "IT", "Marketing", "Frontend", "Quality Assurance", "Others"];
 const statuses = ["active", "draft", "under_review", "archived"];
 
 const fieldCls =
@@ -65,10 +65,8 @@ export default function AddPolicyModal({ open, onClose, onSuccess, editData }) {
       }
       onSuccess();
       onClose();
-    } catch {
-      toast.success(editData ? "Policy updated (mock mode)" : "Policy created (mock mode)");
-      onSuccess();
-      onClose();
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Failed to save policy");
     } finally {
       setLoading(false);
     }

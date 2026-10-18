@@ -1,54 +1,35 @@
-/* Premium KPI card — clean white surface, ink typography,
-   accent-tinted icon tile, soft depth on hover. */
-const TILE_STYLES = [
-  { bg: "#eef0fe", fg: "#4f63f0" }, // indigo
-  { bg: "#e7f5f0", fg: "#148662" }, // green
-  { bg: "#fdf3e3", fg: "#b45309" }, // amber
-  { bg: "#fdeef0", fg: "#c73e4c" }, // red
-];
+/* KPI card — white 26px surface, uppercase label, gradient icon tile,
+   big tabular number and a soft lavender disc in the corner. */
+const TONES = {
+  indigo: { tile: "var(--grad-tile)", fg: "#fff", shadow: "0 8px 18px rgba(124,58,237,.3)" },
+  green: { tile: "linear-gradient(135deg,#059669,#34d399)", fg: "#fff", shadow: "0 8px 18px rgba(5,150,105,.3)" },
+  amber: { tile: "linear-gradient(135deg,#d97706,#fbbf24)", fg: "#fff", shadow: "0 8px 18px rgba(217,119,6,.3)" },
+  red: { tile: "linear-gradient(135deg,#e11d48,#fb7185)", fg: "#fff", shadow: "0 8px 18px rgba(225,29,72,.3)" },
+};
 
-function tileFor(gradient = "") {
+function toneFor(gradient = "") {
   const g = gradient.toLowerCase();
-  if (g.includes("green") || g.includes("emerald")) return TILE_STYLES[1];
-  if (g.includes("amber") || g.includes("orange") || g.includes("yellow")) return TILE_STYLES[2];
-  if (g.includes("red") || g.includes("rose") || g.includes("pink")) return TILE_STYLES[3];
-  return TILE_STYLES[0];
+  if (g.includes("green") || g.includes("emerald") || g.includes("teal")) return TONES.green;
+  if (g.includes("amber") || g.includes("orange") || g.includes("yellow")) return TONES.amber;
+  if (g.includes("red") || g.includes("rose") || g.includes("pink")) return TONES.red;
+  return TONES.indigo;
 }
 
 export default function StatCard({ title, value, subText, icon, gradient }) {
-  const tile = tileFor(gradient);
+  const tone = toneFor(gradient);
   return (
-    <div className="card-premium group relative p-4 sm:p-5 overflow-hidden">
-      {/* hairline accent that reveals on hover */}
-      <div
-        className="absolute inset-x-0 top-0 h-[3px] opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-        style={{ background: tile.fg }}
-      />
-
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.08em] text-[#7b8698] truncate">
-            {title}
-          </p>
-
-          <h2 className="num text-2xl sm:text-3xl font-bold text-[#0b1220] mt-1.5 tracking-tight">
-            {value}
-          </h2>
-
-          {subText ? (
-            <p className="text-[#7b8698] text-[10px] sm:text-xs mt-1.5 break-words leading-relaxed">
-              {subText}
-            </p>
-          ) : null}
-        </div>
-
-        <div
-          className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-lg shrink-0 transition-transform duration-200 group-hover:scale-105"
-          style={{ background: tile.bg, color: tile.fg }}
+    <div className="adm-k">
+      <div className="adm-k-top">
+        <p className="adm-k-label">{title}</p>
+        <span
+          className="adm-k-ic"
+          style={{ background: tone.tile, color: tone.fg, boxShadow: tone.shadow }}
         >
           {icon}
-        </div>
+        </span>
       </div>
+      <strong className="adm-k-value">{value}</strong>
+      {subText ? <p className="adm-k-sub">{subText}</p> : null}
     </div>
   );
 }

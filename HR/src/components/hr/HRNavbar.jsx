@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useHrAuth } from "../../context/HrAuthContext";
 import { MessageCircle } from "lucide-react";
-import ThemeToggle from "../common/ThemeToggle";
 
 export default function HRNavbar() {
   const { employee, logout } = useHrAuth();
@@ -26,9 +25,9 @@ export default function HRNavbar() {
         <div className="flex gap-2 ">
 
         <img
-          src="../../logo.jpeg"
+          src="/logo.jpeg"
           alt="logo"
-          className="w-8 h-8 object-contain rounded-lg"
+          className="w-8 h-8 object-cover rounded-lg"
         />
         <h1 className="text-lg font-semibold text-gray-800 tracking-wide">
           HR Dashboard 
@@ -37,7 +36,6 @@ export default function HRNavbar() {
 
         {/* RIGHT */}
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 justify-center sm:justify-end">
-          <ThemeToggle />
           <button
             onClick={() => navigate("/chat")}
             className="p-2 hover:bg-gray-200 rounded"

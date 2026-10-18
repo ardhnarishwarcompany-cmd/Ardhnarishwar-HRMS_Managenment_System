@@ -104,11 +104,11 @@ export function StatusBadge({ status, size = "sm" }) {
 /* Consistent section wrapper used by the builder and preview sidebar. */
 export function SectionCard({ icon: Icon, title, subtitle, action, children, bodyClass = "p-5" }) {
   return (
-    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <section className="sp-card overflow-hidden">
       <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4">
         <div className="flex items-center gap-3">
           {Icon ? (
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
               <Icon size={17} aria-hidden="true" />
             </div>
           ) : null}
@@ -129,7 +129,7 @@ export function ModuleHeading({ icon: Icon, title, desc, children }) {
   return (
     <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
       <div className="flex items-center gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-700 text-white shadow-lg shadow-indigo-200">
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-gradient text-white shadow-brand">
           <Icon size={19} aria-hidden="true" />
         </div>
         <div>
@@ -143,12 +143,11 @@ export function ModuleHeading({ icon: Icon, title, desc, children }) {
 }
 
 export const inputCls =
-  "w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 transition-colors focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:opacity-60";
+  "w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 transition-colors focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100 disabled:cursor-not-allowed disabled:opacity-60";
 export const labelCls = "mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500";
 
-export const btnPrimary =
-  "inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-700 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-300 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none disabled:hover:translate-y-0";
-export const btnSecondary =
-  "inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 disabled:cursor-not-allowed disabled:opacity-50";
+/* Shared portal buttons (index.css) so proposals look like every other Sales page. */
+export const btnPrimary = "btn-primary";
+export const btnSecondary = "btn-secondary";
 export const btnDanger =
-  "inline-flex items-center justify-center gap-2 rounded-xl border border-rose-200 bg-white px-4 py-2.5 text-sm font-semibold text-rose-600 transition-colors hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-2xl border border-rose-200 bg-white px-4 py-2.5 text-sm font-semibold text-rose-600 shadow-sm transition-colors hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-60";

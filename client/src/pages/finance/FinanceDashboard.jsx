@@ -115,13 +115,13 @@ export default function FinanceDashboard() {
   return (
     <div className="p-6 space-y-8">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-500/25 ring-1 ring-white/20">
-          <BarChart3 className="w-6 h-6" />
-        </div>
+      <div className="page-header-main">
+        <span className="page-header-icon">
+          <BarChart3 size={26} strokeWidth={1.8} />
+        </span>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Finance Dashboard</h1>
-          <p className="text-slate-500 mt-0.5">Overview of your financial performance</p>
+          <h1 className="page-header-title">Finance Dashboard</h1>
+          <p className="page-header-subtitle">Overview of your financial performance</p>
         </div>
       </div>
 

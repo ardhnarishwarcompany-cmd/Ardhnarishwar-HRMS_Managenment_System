@@ -1,10 +1,76 @@
-import { RefreshCw, CheckCircle, XCircle, Clock, Coffee } from "lucide-react";
+import {
+  RefreshCw,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Coffee,
+  ShieldCheck,
+  Building2,
+  UserCog,
+  MapPin,
+} from "lucide-react";
 
 export default function AttendanceTable({ rows, loading, onRefresh = [] }) {
 
   const formatTime = (time) => {
     if (!time || time === "-") return "-";
-    return time;
+    // "13:05:00" -> "1:05 PM"
+    const match = String(time).match(/(\d{2}):(\d{2})/);
+    if (!match) return String(time);
+    let hour = Number(match[1]);
+    const suffix = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12 || 12;
+    return `${hour}:${match[2]} ${suffix}`;
+  };
+
+  const formatDate = (value) => {
+    if (!value) return "-";
+    const [year, month, day] = String(value).slice(0, 10).split("-");
+    return year && month && day ? `${day}/${month}/${year}` : String(value);
+  };
+
+  const formatMarkedAt = (value) => {
+    if (!value) return null;
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return null;
+    return d.toLocaleString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const getRecordedVia = (row) => {
+    if (String(row.markedByRole || "").toUpperCase() === "SUPER_ADMIN") {
+      return {
+        label: "Super Admin",
+        detail: row.markedByName,
+        sub: formatMarkedAt(row.markedByAt),
+        icon: <ShieldCheck className="w-3.5 h-3.5" />,
+        className: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      };
+    }
+    if (String(row.source || "").toUpperCase() === "CLIENT") {
+      return {
+        label: "Client Portal",
+        icon: <Building2 className="w-3.5 h-3.5" />,
+        className: "bg-violet-50 text-violet-700 border-violet-200",
+      };
+    }
+    if (String(row.method || "").toUpperCase() === "GEO") {
+      return {
+        label: "GPS / Geo",
+        sub: row.geoStatus ? `GPS: ${row.geoStatus}` : null,
+        icon: <MapPin className="w-3.5 h-3.5" />,
+        className: "bg-sky-50 text-sky-700 border-sky-200",
+      };
+    }
+    return {
+      label: "System / Manual",
+      icon: <UserCog className="w-3.5 h-3.5" />,
+      className: "bg-gray-100 text-gray-700 border-gray-200",
+    };
   };
 
 const getTimeStatus = (actualTime, expectedTime, isLogin = true) => {
@@ -90,86 +156,118 @@ const getTimeStatus = (actualTime, expectedTime, isLogin = true) => {
   };
 
   return (
-    <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl shadow-lg overflow-hidden">
-      <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-800">Attendance Records</h3>
+    <div className="it-card p-0 overflow-hidden">
+      <div className="px-6 py-4 border-b border-[var(--line)] flex items-center justify-between">
+        <h3 className="text-base font-bold text-[var(--ink)]">Attendance Records</h3>
         <button
           onClick={onRefresh}
           disabled={loading}
-          className="flex items-center gap-2 px-3 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold text-[var(--p)] hover:bg-purple-50 rounded-xl transition"
         >
-          <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+          <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
           Refresh
         </button>
       </div>
 
       <div className="overflow-auto max-h-[60vh] scrollbar-hide">
         <table className="w-full">
-          <thead className="sticky top-0 z-10 bg-gray-50/50">
+          <thead className="sticky top-0 z-10 bg-[var(--soft)]/90 backdrop-blur-md">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+              <th className="px-5 py-3.5 text-left text-xs font-bold text-[var(--mute)] uppercase tracking-wider">
+                Date
+              </th>
+              <th className="px-5 py-3.5 text-left text-xs font-bold text-[var(--mute)] uppercase tracking-wider">
                 Employee
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+              <th className="px-5 py-3.5 text-left text-xs font-bold text-[var(--mute)] uppercase tracking-wider">
                 Department
               </th>
-              <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+              <th className="px-5 py-3.5 text-left text-xs font-bold text-[var(--mute)] uppercase tracking-wider">
+                Shift
+              </th>
+              <th className="px-5 py-3.5 text-center text-xs font-bold text-[var(--mute)] uppercase tracking-wider">
                 Expected Login
               </th>
-              <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+              <th className="px-5 py-3.5 text-center text-xs font-bold text-[var(--mute)] uppercase tracking-wider">
                 Actual Login
               </th>
-              <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+              <th className="px-5 py-3.5 text-center text-xs font-bold text-[var(--mute)] uppercase tracking-wider">
                 Expected Logout
               </th>
-              <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+              <th className="px-5 py-3.5 text-center text-xs font-bold text-[var(--mute)] uppercase tracking-wider">
                 Actual Logout
               </th>
-              <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Hours
+              <th className="px-5 py-3.5 text-left text-xs font-bold text-[var(--mute)] uppercase tracking-wider">
+                Recorded Via
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+              <th className="px-5 py-3.5 text-left text-xs font-bold text-[var(--mute)] uppercase tracking-wider">
                 Status
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-[var(--line)]">
             {loading ? (
               <tr>
-                <td colSpan={8} className="px-4 py-12 text-center text-gray-500">
-                  <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-2" />
+                <td colSpan={10} className="px-4 py-12 text-center text-[var(--mute)]">
+                  <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-2 text-[var(--p)]" />
                   Loading attendance data...
                 </td>
               </tr>
             ) : rows.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-4 py-12 text-center text-gray-500">
+                <td colSpan={10} className="px-4 py-12 text-center text-[var(--mute)]">
                   No attendance records found for the selected filters.
                 </td>
               </tr>
             ) : (
               rows.map((row) => {
-                const loginStatus = getTimeStatus(row.actualLogin, row.actualLogin, true);
-                const logoutStatus = getTimeStatus(row.actualLogout, row.actualLogout, false);
+                const loginStatus = getTimeStatus(row.actualLogin, row.expectedLogin, true);
+                const logoutStatus = getTimeStatus(row.actualLogout, row.expectedLogout, false);
+                const recordedVia = getRecordedVia(row);
 
                 return (
-                  <tr key={row.id} className="hover:bg-gray-50/50 transition">
-                    <td className="px-4 py-4">
+                  <tr key={row.id} className="hover:bg-purple-50/30 transition">
+                    <td className="px-5 py-4 whitespace-nowrap text-sm font-semibold text-[var(--ink)]">
+                      {formatDate(row.attendanceDate)}
+                    </td>
+                    <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-semibold text-xs">
+                        <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-600 to-fuchsia-600 flex items-center justify-center text-white font-bold text-xs shadow-sm shadow-purple-500/20">
                           {(row.employee || "").split(" ").map((n) => n[0]).join("")}
                         </div>
                         <div>
-                          <p className="font-medium text-gray-800 text-sm">{row.employee}</p>
-                          <p className="text-xs text-gray-500">{row.employeeCode}</p>
+                          <p className="font-bold text-[var(--ink)] text-sm">{row.employee}</p>
+                          <p className="text-xs text-[var(--mute)]">{row.employeeCode}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                       {row.department}
                     </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      {row.shiftName ? (
+                        <div className="flex items-start gap-2">
+                          <Clock className="w-4 h-4 mt-0.5 text-indigo-500 shrink-0" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-800">{row.shiftName}</p>
+                            <p className="text-xs text-gray-500">
+                              {formatTime(row.shiftStart)} – {formatTime(row.shiftEnd)}
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div>
+                          <p className="text-xs text-gray-400">Default timing</p>
+                          {row.expectedLogin && row.expectedLogout && (
+                            <p className="text-xs text-gray-500">
+                              {formatTime(row.expectedLogin)} – {formatTime(row.expectedLogout)} IST
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-center text-gray-500">
-                      {row.expectedLogin}
+                      {formatTime(row.expectedLogin)}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-center">
                       <div>
@@ -182,7 +280,7 @@ const getTimeStatus = (actualTime, expectedTime, isLogin = true) => {
                       </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-center text-gray-500">
-                      {row.expectedLogout}
+                      {formatTime(row.expectedLogout)}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-center">
                       <div>
@@ -194,8 +292,21 @@ const getTimeStatus = (actualTime, expectedTime, isLogin = true) => {
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-center text-gray-600">
-                      {row.hours >= 0 ? `${row.hours}h` : "-"}
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="flex flex-col gap-1">
+                        <span
+                          className={`inline-flex w-fit items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border ${recordedVia.className}`}
+                        >
+                          {recordedVia.icon}
+                          {recordedVia.label}
+                        </span>
+                        {recordedVia.detail && (
+                          <span className="text-xs font-medium text-gray-600">{recordedVia.detail}</span>
+                        )}
+                        {recordedVia.sub && (
+                          <span className="text-[11px] text-gray-400">{recordedVia.sub}</span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">{getStatusBadge(row.status)}</td>
                   </tr>
@@ -207,16 +318,16 @@ const getTimeStatus = (actualTime, expectedTime, isLogin = true) => {
       </div>
 
       {!loading && rows.length > 0 && (
-        <div className="px-6 py-3 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between text-sm text-gray-500">
-          <span>Showing {rows.length} record{rows.length !== 1 ? "s" : ""}</span>
+        <div className="px-6 py-3 bg-[var(--soft)]/50 border-t border-[var(--line)] flex items-center justify-between text-xs text-[var(--mute)]">
+          <span className="font-semibold">Showing {rows.length} record{rows.length !== 1 ? "s" : ""}</span>
           <div className="flex items-center gap-4 text-xs">
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-500"></span> On Time
             </span>
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-amber-500"></span> Late/Early
             </span>
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-red-500"></span> Very Late/Early
             </span>
           </div>

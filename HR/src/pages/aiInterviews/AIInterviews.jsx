@@ -7,6 +7,7 @@ import {
   ShieldAlert,
   Inbox,
 } from "lucide-react";
+import PageHeader from "../../components/common/PageHeader";
 
 /* HR Robo now lives inside the unified HRMS backend at /api/hr-robo */
 const ROBO_URL =
@@ -63,58 +64,25 @@ export default function AIInterviews() {
   return (
     <div className="min-h-screen bg-slate-100 p-3 sm:p-4 lg:p-6">
 <div className="mx-auto mt-6 max-w-6xl space-y-6 pb-10">
-        {/* ── HERO BAND ─────────────────────────────────────── */}
-        <div className="relative overflow-hidden rounded-3xl bg-slate-900 px-8 py-9 md:px-12">
-          <div
-            className="absolute inset-0 opacity-[0.06]"
-            style={{
-              backgroundImage:
-                "linear-gradient(to right, #818cf8 1px, transparent 1px), linear-gradient(to bottom, #818cf8 1px, transparent 1px)",
-              backgroundSize: "44px 44px",
-            }}
-          />
-          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-violet-600/25 blur-3xl" />
-          <div className="absolute -bottom-24 -left-12 h-56 w-56 rounded-full bg-indigo-600/20 blur-3xl" />
-
-          <div className="relative flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-            <div className="flex items-start gap-4">
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-500/20 text-indigo-300 ring-1 ring-indigo-400/30">
-                <Bot size={24} aria-hidden="true" />
-              </span>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-indigo-300">
-                  Automation
-                </p>
-                <h2 className="mt-1 text-2xl font-bold text-white md:text-3xl text-balance">
-                  AI Robot Interviews
-                </h2>
-                <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-400">
-                  Candidate scores, assessments &amp; hire recommendations from
-                  the AI Interview Portal
-                  {data?.synced_at &&
-                    ` · synced ${new Date(data.synced_at).toLocaleString()}`}
-                </p>
-              </div>
-            </div>
-            <div className="flex shrink-0 gap-2">
-              <button
-                onClick={load}
-                className="inline-flex items-center gap-2 rounded-xl border border-slate-600 bg-slate-800/60 px-4 py-2.5 text-sm font-medium text-slate-200 transition-colors hover:bg-slate-700"
-              >
-                <RefreshCw size={15} aria-hidden="true" /> Refresh
-              </button>
-              <a
-                href={PORTAL_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/40 transition-colors hover:bg-indigo-500"
-              >
-                <ExternalLink size={15} aria-hidden="true" /> Open Interview
-                Portal
-              </a>
-            </div>
-          </div>
-        </div>
+        <PageHeader
+          icon={Bot}
+          title="AI Robot Interviews"
+          subtitle={
+            <>
+              Candidate scores, assessments &amp; hire recommendations from the AI
+              Interview Portal
+              {data?.synced_at &&
+                ` \u00b7 synced ${new Date(data.synced_at).toLocaleString()}`}
+            </>
+          }
+        >
+          <button type="button" onClick={load} className="hr-btn-ghost">
+            <RefreshCw size={15} aria-hidden="true" /> Refresh
+          </button>
+          <a href={PORTAL_URL} target="_blank" rel="noreferrer" className="hr-btn">
+            <ExternalLink size={15} aria-hidden="true" /> Open Interview Portal
+          </a>
+        </PageHeader>
 
         {/* ── SUMMARY TILES ─────────────────────────────────── */}
         {summary && (

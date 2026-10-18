@@ -2,19 +2,131 @@
 @tailwind components;
 @tailwind utilities;
 
-.th {
-  @apply px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap;
+/* ============================================================
+   SALES PORTAL DESIGN SYSTEM
+   Light lavender canvas, floating white surfaces, one violet -> magenta
+   brand gradient used for the hero, the active nav pill and primary CTAs.
+   ============================================================ */
+
+@layer base {
+  html {
+    @apply font-sans antialiased;
+  }
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+  html {
+    /* same canvas as .sp-shell so nothing outside the shell can show as a white band */
+    background-color: #f4eefb;
+  }
+  body {
+    @apply text-slate-800;
+    margin: 0;
+    background-image: linear-gradient(135deg, #eef0fc 0%, #f4eefb 48%, #fcedf4 100%);
+    overflow-x: hidden;
+  }
+  ::selection {
+    background: rgba(124, 58, 237, 0.18);
+  }
 }
 
-.td {
-  @apply px-5 py-4 whitespace-nowrap text-gray-700 font-medium;
-}
+@layer components {
+  /* --- surfaces --- */
+  .sp-shell {
+    background: linear-gradient(135deg, #eef0fc 0%, #f4eefb 48%, #fcedf4 100%);
+  }
+  .sp-card {
+    @apply rounded-3xl border border-white/70 bg-white shadow-card;
+  }
 
-.input {
-  @apply w-full px-3 py-2.5 rounded-xl border border-gray-200
-         bg-white text-sm text-gray-800
-         focus:ring-2 focus:ring-black focus:border-black
-         outline-none transition;
+  /* --- hero banner (PageHeader) --- */
+  .sp-hero {
+    @apply relative overflow-hidden rounded-3xl bg-brand-gradient text-white shadow-brand;
+  }
+  .sp-hero::before,
+  .sp-hero::after {
+    content: "";
+    position: absolute;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.1);
+    pointer-events: none;
+  }
+  .sp-hero::before {
+    width: 420px;
+    height: 420px;
+    right: -120px;
+    top: -200px;
+  }
+  .sp-hero::after {
+    width: 300px;
+    height: 300px;
+    right: 120px;
+    bottom: -210px;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  /* --- gradient stat tiles (StatCard) --- */
+  .sp-tile {
+    @apply relative overflow-hidden rounded-3xl text-white shadow-tile;
+  }
+  .sp-tile::before,
+  .sp-tile::after {
+    content: "";
+    position: absolute;
+    border-radius: 9999px;
+    pointer-events: none;
+  }
+  .sp-tile::before {
+    width: 62%;
+    padding-bottom: 62%;
+    right: -14%;
+    bottom: -30%;
+    background: rgba(255, 255, 255, 0.13);
+  }
+  .sp-tile::after {
+    width: 52%;
+    padding-bottom: 52%;
+    right: -4%;
+    bottom: -52%;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  /* --- buttons --- */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-brand-gradient px-4 py-2.5 text-sm font-bold text-white shadow-brand transition-all hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  /* buttons that sit ON the brand gradient (hero actions) */
+  .btn-on-brand {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-4 py-2.5 text-sm font-bold text-brand-700 shadow-lg shadow-black/10 transition-all hover:-translate-y-0.5 hover:bg-brand-50 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .btn-on-brand-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-white/30 bg-white/15 px-4 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/25 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .icon-btn {
+    @apply inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/70 bg-white text-slate-600 shadow-card transition-all hover:-translate-y-0.5 hover:text-brand-700;
+  }
+
+  /* --- table + form primitives (used across pages) --- */
+  .th {
+    @apply whitespace-nowrap px-5 py-3.5 text-left text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500;
+  }
+  .td {
+    @apply whitespace-nowrap px-5 py-4 font-medium text-slate-700;
+  }
+  .label {
+    @apply mb-1 block text-sm font-medium text-slate-600;
+  }
+  .input {
+    @apply w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100;
+  }
+  .sp-pill {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold capitalize;
+  }
 }
 
 @keyframes slideAcross {
@@ -32,12 +144,27 @@
   animation: slideAcross 10s linear forwards;
 }
 
-.label {
-  @apply block text-sm font-medium text-gray-600 mb-1;
+@keyframes spRise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
-
-.input {
-  @apply w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500;
+.sp-rise {
+  /* fill-mode must be `backwards`, not `both`: a retained end-state transform
+     (Chrome keeps an identity matrix) makes .sp-rise the containing block for
+     position:fixed children, so modals centre on the page wrapper instead of
+     the viewport. The end state equals the natural styles, so nothing is lost. */
+  animation: spRise 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sp-rise {
+    animation: none;
+  }
 }
 
 /* ===== Mobile responsive hardening (global) ===== */
@@ -49,7 +176,11 @@ img, video, canvas { max-width: 100%; height: auto; }
   input, select, textarea { font-size: 16px; }
 }
 
-
+/* Thin scrollbars for the sidebar nav and scrollable cards */
+.sidebar-scroll::-webkit-scrollbar { width: 6px; }
+.sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+.sidebar-scroll::-webkit-scrollbar-thumb { background: #ddd6fe; border-radius: 999px; }
+.sidebar-scroll { scrollbar-width: thin; scrollbar-color: #ddd6fe transparent; }
 
 /* ============================================================
    PREMIUM DARK THEME LAYER
@@ -68,14 +199,37 @@ img, video, canvas { max-width: 100%; height: auto; }
   color-scheme: dark;
 }
 
-.dark body {
-  background-color: #0b0f1a;
+.dark,
+.dark body,
+.dark .sp-shell {
+  background: #0b0f1a;
   color: #e2e8f0;
 }
 
 /* --- Core surface overrides --- */
 .dark .bg-white {
   background-color: #111827 !important;
+}
+.dark .sp-card,
+.dark .icon-btn,
+.dark .btn-secondary {
+  background-color: #111827 !important;
+  border-color: #273449 !important;
+  color: #e2e8f0;
+}
+.dark .btn-secondary:hover {
+  background-color: #1f2937 !important;
+  color: #c4b5fd;
+}
+.dark .icon-btn {
+  color: #cbd5e1;
+}
+.dark .icon-btn:hover {
+  color: #c4b5fd;
+}
+.dark .sp-shell .shadow-card,
+.dark .sp-shell .shadow-float {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45) !important;
 }
 
 /* The printable proposal document is always paper-white so the on-screen
@@ -107,7 +261,8 @@ img, video, canvas { max-width: 100%; height: auto; }
 .dark .bg-slate-200 {
   background-color: #273449 !important;
 }
-.dark .bg-indigo-50 {
+.dark .bg-indigo-50,
+.dark .bg-brand-50 {
   background-color: rgba(99, 102, 241, 0.12) !important;
 }
 .dark .bg-blue-50,
@@ -128,7 +283,8 @@ img, video, canvas { max-width: 100%; height: auto; }
   background-color: rgba(245, 158, 11, 0.12) !important;
 }
 .dark .bg-purple-50,
-.dark .bg-violet-50 {
+.dark .bg-violet-50,
+.dark .bg-pink-50 {
   background-color: rgba(139, 92, 246, 0.12) !important;
 }
 
@@ -158,6 +314,22 @@ img, video, canvas { max-width: 100%; height: auto; }
 .dark .text-slate-400 {
   color: #64748b !important;
 }
+.dark .text-brand-700 {
+  color: #c4b5fd !important;
+}
+/* badge / pill foregrounds sit on translucent tints in dark mode */
+.dark .text-indigo-700 { color: #c7d2fe !important; }
+.dark .text-amber-700 { color: #fcd34d !important; }
+.dark .text-emerald-700 { color: #6ee7b7 !important; }
+.dark .text-rose-700 { color: #fda4af !important; }
+.dark .text-sky-700,
+.dark .text-blue-700 { color: #93c5fd !important; }
+.dark .sp-user-card {
+  background: linear-gradient(90deg, rgba(124, 58, 237, 0.18), rgba(217, 70, 239, 0.12)) !important;
+}
+.dark .sp-user-card .hover\:bg-white:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
 
 /* --- Borders / dividers --- */
 .dark .border-gray-100,
@@ -165,7 +337,8 @@ img, video, canvas { max-width: 100%; height: auto; }
 .dark .border-gray-200,
 .dark .border-slate-200,
 .dark .border-gray-300,
-.dark .border-slate-300 {
+.dark .border-slate-300,
+.dark .border-white\/70 {
   border-color: #273449 !important;
 }
 .dark .divide-gray-100 > *,
@@ -182,7 +355,8 @@ img, video, canvas { max-width: 100%; height: auto; }
 .dark .hover\:bg-slate-100:hover {
   background-color: #1f2937 !important;
 }
-.dark .hover\:bg-indigo-50:hover {
+.dark .hover\:bg-indigo-50:hover,
+.dark .hover\:bg-brand-50:hover {
   background-color: rgba(99, 102, 241, 0.18) !important;
 }
 
@@ -244,14 +418,25 @@ img, video, canvas { max-width: 100%; height: auto; }
 .dark ::-webkit-scrollbar-thumb:hover {
   background: #334155;
 }
+.dark .sidebar-scroll::-webkit-scrollbar-thumb { background: #263247; }
+.dark .sidebar-scroll { scrollbar-color: #263247 transparent; }
 
-
-
-/* Sales portal fixed sidebar */
-.sidebar-scroll::-webkit-scrollbar { width: 6px; }
-.sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
-.sidebar-scroll::-webkit-scrollbar-thumb { background: #263247; border-radius: 999px; }
-.sidebar-scroll { scrollbar-width: thin; scrollbar-color: #263247 transparent; }
-@media (min-width: 768px) {
-  .sales-page-content { margin-left: 0; }
+/* Password eye icon always visible */
+input[type="password"] ~ button,
+input[type="text"] ~ button,
+input[type="password"] ~ button svg,
+input[type="text"] ~ button svg,
+button[aria-label*="assword" i],
+button[aria-label*="assword" i] svg,
+.password-toggle, .password-toggle svg,
+.employee-password-toggle, .employee-password-toggle svg {
+  color: #475569 !important;
+  stroke: #475569 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+input[type="password"] ~ button,
+input[type="text"] ~ button {
+  z-index: 10;
+  cursor: pointer;
 }

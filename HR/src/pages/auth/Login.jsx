@@ -331,8 +331,8 @@ export default function Login() {
       {/* ═══ top bar ═══ */}
       <header className="relative z-10 flex items-center justify-between px-6 py-5 sm:px-12 lx-rise">
         <div className="flex items-center gap-3">
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 via-fuchsia-500 to-indigo-500 text-sm font-black shadow-[0_0_30px_rgba(217,70,239,0.5)]">
-            HR
+          <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-violet-500 via-fuchsia-500 to-indigo-500 text-sm font-black shadow-[0_0_30px_rgba(217,70,239,0.5)]">
+            <img src="/logo.jpeg" alt="Ardhnarishwar" className="h-full w-full object-cover" />
             <span
               className="lx-anim absolute inset-0 rounded-xl border border-fuchsia-400/60"
               style={{ animation: "ringPulse 2.6s ease-out infinite" }}
@@ -653,7 +653,7 @@ export default function Login() {
                           Email address
                         </label>
                         <div className="group relative">
-                          <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-white/25 transition-colors duration-300 group-focus-within:text-fuchsia-300">
+                          <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 transition-colors duration-300 group-focus-within:text-fuchsia-300">
                             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
                               <rect x="3" y="5" width="18" height="14" rx="2" />
                               <path d="m3 7 9 6 9-6" />
@@ -668,7 +668,7 @@ export default function Login() {
                             value={form.email}
                             onChange={handleChange}
                             placeholder="you@company.com"
-                            className="w-full rounded-xl border border-white/10 bg-black/40 py-3.5 pl-11 pr-4 text-sm text-white placeholder-white/20 outline-none transition-all duration-300 focus:border-fuchsia-400/60 focus:bg-black/60 focus:shadow-[0_0_0_3px_rgba(217,70,239,0.15),0_8px_30px_-10px_rgba(217,70,239,0.4)]"
+                            className="w-full rounded-xl border border-transparent bg-indigo-50 py-3.5 pl-11 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all duration-300 focus:border-fuchsia-400/60 focus:bg-white focus:shadow-[0_0_0_3px_rgba(217,70,239,0.15),0_8px_30px_-10px_rgba(217,70,239,0.4)]"
                           />
                         </div>
                       </div>
@@ -681,7 +681,7 @@ export default function Login() {
                           Password
                         </label>
                         <div className="group relative">
-                          <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-white/25 transition-colors duration-300 group-focus-within:text-fuchsia-300">
+                          <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 transition-colors duration-300 group-focus-within:text-fuchsia-300">
                             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
                               <rect x="4" y="10" width="16" height="11" rx="2" />
                               <path d="M8 10V7a4 4 0 0 1 8 0v3" />
@@ -696,13 +696,13 @@ export default function Login() {
                             value={form.password}
                             onChange={handleChange}
                             placeholder="Enter your password"
-                            className="w-full rounded-xl border border-white/10 bg-black/40 py-3.5 pl-11 pr-12 text-sm text-white placeholder-white/20 outline-none transition-all duration-300 focus:border-fuchsia-400/60 focus:bg-black/60 focus:shadow-[0_0_0_3px_rgba(217,70,239,0.15),0_8px_30px_-10px_rgba(217,70,239,0.4)]"
+                            className="w-full rounded-xl border border-transparent bg-indigo-50 py-3.5 pl-11 pr-12 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all duration-300 focus:border-fuchsia-400/60 focus:bg-white focus:shadow-[0_0_0_3px_rgba(217,70,239,0.15),0_8px_30px_-10px_rgba(217,70,239,0.4)]"
                           />
                           <button
                             type="button"
                             onClick={() => setShowPass((s) => !s)}
                             aria-label={showPass ? "Hide password" : "Show password"}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-white/35 transition-colors hover:text-white/80 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40"
+                            className="absolute right-3 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg !border-0 !bg-transparent !p-0 !shadow-none text-slate-600 transition-colors hover:text-fuchsia-600 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40"
                           >
                             {showPass ? (
                               <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">

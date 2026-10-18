@@ -60,35 +60,36 @@ export default function InvoicePreview() {
       });
   };
 
-  if (!invoice) return <div className="p-10">Loading...</div>;
+  if (!invoice) {
+    return (
+      <div className="space-y-6">
+        <PageHeader title="Invoice" desc="Preview and download the tax invoice" />
+        <div className="sp-card p-10 text-center text-sm font-medium text-slate-500">Loading invoice...</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-gray-100 p-10 flex flex-col items-center">
+    <div className="space-y-6">
       <PageHeader
-        title="Field Sales"
-        desc="Manage company leads collected by BDM"
+        title={invoice.invoice_no ? `Invoice ${invoice.invoice_no}` : "Invoice"}
+        desc={invoice.client_name ? `Tax invoice for ${invoice.client_name}` : "Preview and download the tax invoice"}
+        actions={
+          <>
+            <button type="button" onClick={() => navigate("/invoices")} className="btn-on-brand-ghost">
+              Back
+            </button>
+            <button type="button" onClick={handleDownload} className="btn-on-brand">
+              Download PDF
+            </button>
+          </>
+        }
       />
-      {/* DOWNLOAD BUTTON */}
-      <div className="w-[800px] mb-4 flex justify-end gap-5">
-        <button
-          onClick={() => navigate("/invoices")}
-          className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
-        >
-          Back
-        </button>
-        <button
-          onClick={handleDownload}
-          className="bg-green-600 text-white px-4 py-2 rounded"
-        >
-          Download PDF
-        </button>
-      </div>
 
-      {/* PDF CONTENT */}
+      {/* PDF CONTENT - .proposal-paper keeps it paper-white in dark mode, matching the PDF */}
       <div
         ref={pdfRef}
-        className="bg-white w-full max-w-[800px] p-6 border mx-auto text-black"
-        style={{ transform: "scale(1)", transformOrigin: "top left" }}
+        className="proposal-paper mx-auto w-full max-w-[800px] rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-card"
       >
         {" "}
         <h1 className="text-center text-xl font-semibold mb-6">Tax Invoice</h1>

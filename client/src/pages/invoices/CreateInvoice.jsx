@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { FileText } from "lucide-react";
+import PageHeader from "../../components/common/PageHeader";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -64,75 +66,114 @@ export default function CreateInvoice() {
     }
   };
 
+  const labelCls = "block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5";
+
   return (
-    <div className="p-8 max-w-2xl">
-      <h1 className="text-xl font-semibold mb-6">Create Invoice</h1>
+    <div className="animate-fadeUp max-w-3xl">
+      <PageHeader
+        icon={FileText}
+        title="Create Invoice"
+        subtitle="Fill in client and service details to generate a GST invoice."
+      />
 
-      <div className="grid gap-4">
-        <input
-          name="client_name"
-          placeholder="Client Name"
-          className="border p-2"
-          onChange={handleChange}
-        />
+      <div className="card-premium p-5 sm:p-6 space-y-6">
+        <section>
+          <h2 className="text-sm font-bold text-slate-900 mb-3">Client details</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+            <label className="block md:col-span-2">
+              <span className={labelCls}>Client Name</span>
+              <input
+                name="client_name"
+                placeholder="Client Name"
+                className="input-premium"
+                onChange={handleChange}
+              />
+            </label>
 
-        <input
-          name="client_address"
-          placeholder="Client Address"
-          className="border p-2"
-          onChange={handleChange}
-        />
+            <label className="block md:col-span-2">
+              <span className={labelCls}>Client Address</span>
+              <input
+                name="client_address"
+                placeholder="Client Address"
+                className="input-premium"
+                onChange={handleChange}
+              />
+            </label>
 
-        <input
-          name="client_gstin"
-          placeholder="Client GSTIN"
-          className="border p-2"
-          onChange={handleChange}
-        />
+            <label className="block">
+              <span className={labelCls}>Client GSTIN</span>
+              <input
+                name="client_gstin"
+                placeholder="Client GSTIN"
+                className="input-premium"
+                onChange={handleChange}
+              />
+            </label>
 
-        <input
-          name="invoice_date"
-          type="date"
-          className="border p-2"
-          onChange={handleChange}
-        />
+            <label className="block">
+              <span className={labelCls}>Invoice Date</span>
+              <input
+                name="invoice_date"
+                type="date"
+                className="input-premium"
+                onChange={handleChange}
+              />
+            </label>
+          </div>
+        </section>
 
-        <input
-          name="description"
-          placeholder="Service Description"
-          className="border p-2"
-          onChange={handleChange}
-        />
+        <section>
+          <h2 className="text-sm font-bold text-slate-900 mb-3">Service line</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+            <label className="block md:col-span-3">
+              <span className={labelCls}>Service Description</span>
+              <input
+                name="description"
+                placeholder="Service Description"
+                className="input-premium"
+                onChange={handleChange}
+              />
+            </label>
 
-        <input
-          name="hsn"
-          placeholder="HSN/SAC"
-          className="border p-2"
-          onChange={handleChange}
-        />
+            <label className="block">
+              <span className={labelCls}>HSN/SAC</span>
+              <input
+                name="hsn"
+                placeholder="HSN/SAC"
+                className="input-premium"
+                onChange={handleChange}
+              />
+            </label>
 
-        <input
-          name="quantity"
-          type="number"
-          placeholder="Quantity"
-          className="border p-2"
-          onChange={handleChange}
-        />
+            <label className="block">
+              <span className={labelCls}>Quantity</span>
+              <input
+                name="quantity"
+                type="number"
+                placeholder="Quantity"
+                className="input-premium"
+                onChange={handleChange}
+              />
+            </label>
 
-        <input
-          name="rate"
-          type="number"
-          placeholder="Rate"
-          className="border p-2"
-          onChange={handleChange}
-        />
+            <label className="block">
+              <span className={labelCls}>Rate</span>
+              <input
+                name="rate"
+                type="number"
+                placeholder="Rate"
+                className="input-premium"
+                onChange={handleChange}
+              />
+            </label>
+          </div>
+        </section>
 
-        <button
-          onClick={handleSubmit}
-          className="bg-blue-600 text-white py-2 rounded"
-        >
-          Generate Invoice
-        </button>
+        <div className="flex justify-end border-t border-slate-100 pt-5">
+          <button onClick={handleSubmit} className="btn-primary">
+            Generate Invoice
+          </button>
+        </div>
       </div>
     </div>
   );

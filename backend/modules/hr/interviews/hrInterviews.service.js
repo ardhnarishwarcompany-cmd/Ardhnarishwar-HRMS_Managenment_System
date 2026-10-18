@@ -203,3 +203,13 @@ export const getLanguagesService = async () => {
   const [rows] = await db.query(`SELECT id, name FROM languages`);
   return rows;
 };
+
+// ================= GET CLIENTS (for the client picker in Add/Edit Interview)
+export const getClientsService = async () => {
+  const [rows] = await db.query(
+    `SELECT id, client_code, company_name, status
+     FROM clients
+     ORDER BY company_name ASC, client_code ASC`,
+  );
+  return rows;
+};

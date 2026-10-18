@@ -212,33 +212,75 @@ useEffect(() => {
   };
 
   const calculateRemainingDays = (exitDate) => {
-    if (!exitDate) return "-";
+    if (!exitDate) return null;
     const exit = new Date(exitDate);
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    exit.setHours(0, 0, 0, 0);
     const diffTime = exit - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays > 0 ? `${diffDays} days` : "Expired";
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "pending": return "bg-yellow-100 text-yellow-700";
-      case "approved": return "bg-blue-100 text-blue-700";
-      case "processing": return "bg-purple-100 text-purple-700";
-      case "completed": return "bg-green-100 text-green-700";
-      case "rejected": return "bg-red-100 text-red-700";
-      default: return "bg-gray-100 text-gray-700";
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "—";
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr.slice(0, 10);
+      return d.toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
+    } catch {
+      return dateStr.slice(0, 10);
     }
   };
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "pending": return <Clock size={14} />;
-      case "approved": return <CheckCircle size={14} />;
-      case "processing": return <Clock size={14} />;
-      case "completed": return <CheckCircle size={14} />;
-      case "rejected": return <XCircle size={14} />;
-      default: return <Clock size={14} />;
+  const getStatusConfig = (status) => {
+    const s = (status || "").toLowerCase();
+    switch (s) {
+      case "pending":
+        return {
+          label: "Pending",
+          className: "bg-amber-50 text-amber-700 border-amber-200/80",
+          dot: "bg-amber-500",
+          icon: Clock,
+        };
+      case "approved":
+        return {
+          label: "Approved",
+          className: "bg-blue-50 text-blue-700 border-blue-200/80",
+          dot: "bg-blue-500",
+          icon: CheckCircle,
+        };
+      case "processing":
+        return {
+          label: "Processing",
+          className: "bg-purple-50 text-purple-700 border-purple-200/80",
+          dot: "bg-purple-500",
+          icon: Clock,
+        };
+      case "completed":
+        return {
+          label: "Completed",
+          className: "bg-emerald-50 text-emerald-700 border-emerald-200/80",
+          dot: "bg-emerald-500",
+          icon: CheckCircle,
+        };
+      case "rejected":
+        return {
+          label: "Rejected",
+          className: "bg-rose-50 text-rose-700 border-rose-200/80",
+          dot: "bg-rose-500",
+          icon: XCircle,
+        };
+      default:
+        return {
+          label: status || "Unknown",
+          className: "bg-gray-50 text-gray-700 border-gray-200/80",
+          dot: "bg-gray-400",
+          icon: Clock,
+        };
     }
   };
 
@@ -259,86 +301,93 @@ useEffect(() => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between gap-3 flex-wrap">
-        <PageHeader title="Exit Management" desc="Manage employee resignations, notice periods, and exit workflows." />
-        <ExportButton data={exitRequests} filename="exit-requests" />
+      {/* HEADER */}
+      <PageHeader
+        title="Exit Management"
+        desc="Manage employee resignations, notice periods, and exit workflows."
+      />
+
+      {/* KPI STAT CARDS */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+        <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center shrink-0">
+              <UserMinus size={18} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Exits</p>
+              <p className="text-xl font-bold text-gray-900 mt-0.5">{stats?.total ?? exitRequests.length}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl p-4 border border-amber-100/60 shadow-sm hover:shadow-md transition">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center shrink-0 border border-amber-100">
+              <Clock size={18} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-amber-600/80">Pending</p>
+              <p className="text-xl font-bold text-gray-900 mt-0.5">{stats?.pending ?? 0}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl p-4 border border-purple-100/60 shadow-sm hover:shadow-md transition">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center shrink-0 border border-purple-100">
+              <Clock size={18} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-purple-600/80">Processing</p>
+              <p className="text-xl font-bold text-gray-900 mt-0.5">{stats?.processing ?? 0}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl p-4 border border-emerald-100/60 shadow-sm hover:shadow-md transition">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center shrink-0 border border-emerald-100">
+              <CheckCircle size={18} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-600/80">Completed</p>
+              <p className="text-xl font-bold text-gray-900 mt-0.5">{stats?.completed ?? 0}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl p-4 border border-rose-100/60 shadow-sm hover:shadow-md transition">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center shrink-0 border border-rose-100">
+              <XCircle size={18} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-rose-600/80">Rejected</p>
+              <p className="text-xl font-bold text-gray-900 mt-0.5">{stats?.rejected ?? 0}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-              <UserMinus className="text-gray-600" size={20} />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Total</p>
-              <p className="text-xl font-bold text-gray-900">{stats?.total || 0}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-              <Clock className="text-yellow-600" size={20} />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Pending</p>
-              <p className="text-xl font-bold text-gray-900">{stats?.pending || 0}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-              <Clock className="text-purple-600" size={20} />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Processing</p>
-              <p className="text-xl font-bold text-gray-900">{stats?.processing || 0}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <CheckCircle className="text-green-600" size={20} />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Completed</p>
-              <p className="text-xl font-bold text-gray-900">{stats?.completed || 0}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-              <XCircle className="text-red-600" size={20} />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Rejected</p>
-              <p className="text-xl font-bold text-gray-900">{stats?.rejected || 0}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-        <div className="p-4 border-b border-gray-100 flex flex-wrap gap-4 justify-between items-center">
-          <div className="flex gap-2 items-center">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+      {/* FILTER & ACTIONS BAR */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <div className="relative min-w-[220px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
               <input
                 type="text"
-                placeholder="Search employee..."
+                placeholder="Search employee or code..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 w-64"
+                className="w-full pl-8 pr-3 py-2 border border-gray-200 rounded-xl text-sm bg-gray-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition"
               />
             </div>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-2 border border-gray-200 rounded-xl text-sm bg-gray-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition"
             >
               <option value="">All Status</option>
               <option value="pending">Pending</option>
@@ -348,12 +397,13 @@ useEffect(() => {
               <option value="rejected">Rejected</option>
             </select>
           </div>
-          <div className="flex gap-2">
+
+          <div className="flex items-center gap-2">
             <button
               onClick={exportToCSV}
-              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-xl transition shadow-sm"
             >
-              <Download size={18} />
+              <Download size={14} />
               Export CSV
             </button>
             <button
@@ -363,123 +413,191 @@ useEffect(() => {
                 }
                 setShowModal(true);
               }}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white text-sm font-semibold rounded-xl shadow-sm transition hover:shadow whitespace-nowrap"
             >
-              <Plus size={18} />
+              <Plus size={15} />
               New Exit Request
             </button>
           </div>
         </div>
+      </div>
 
-        <div className="overflow-auto max-h-[60vh]">
+      {/* TABLE */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="overflow-x-auto max-h-[60vh]">
           {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="animate-spin text-blue-600" size={32} />
+            <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-500">
+              <Loader2 className="animate-spin text-violet-600" size={30} />
+              <p className="text-sm font-medium">Loading exit requests...</p>
             </div>
           ) : exitRequests.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              <UserMinus size={48} className="mx-auto mb-4 text-gray-300" />
-              <p>No exit requests found</p>
+            <div className="text-center py-16 text-gray-400">
+              <UserMinus size={44} className="mx-auto mb-2.5 text-gray-300" />
+              <p className="text-sm font-semibold text-gray-700">No exit requests found</p>
+              <p className="text-xs text-gray-400 mt-0.5">Try adjusting your filters or search term</p>
             </div>
           ) : (
-            <table className="w-full">
-              <thead className="sticky top-0 z-10 bg-gray-50">
-                <tr className="bg-gray-50">
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Employee</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Resignation Date</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Notice Period</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Exit Date</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Remaining</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Type</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Status</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Actions</th>
+            <table className="w-full text-left text-sm whitespace-nowrap">
+              <thead className="sticky top-0 z-10 bg-slate-50 border-b border-gray-100 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+                <tr>
+                  <th className="px-5 py-3.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">Employee</th>
+                  <th className="px-5 py-3.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">Resignation Date</th>
+                  <th className="px-5 py-3.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">Notice Period</th>
+                  <th className="px-5 py-3.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">Exit Date</th>
+                  <th className="px-5 py-3.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">Remaining</th>
+                  <th className="px-5 py-3.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">Type</th>
+                  <th className="px-5 py-3.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">Status</th>
+                  <th className="px-5 py-3.5 text-right text-[11px] font-bold uppercase tracking-wider text-slate-500">Actions</th>
                 </tr>
               </thead>
-              <tbody>
-                {exitRequests.map((request) => (
-                  <tr key={request.id} className="border-t border-gray-100 hover:bg-gray-50">
-                    <td className="px-4 py-3">
-                      <p className="font-medium text-gray-900">{request.employee_name}</p>
-                      <p className="text-sm text-gray-500">{request.employeeCode}</p>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
-                      {request.resignation_date ? new Date(request.resignation_date).toLocaleDateString() : "-"}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
-                      {request.notice_period_days} days
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
-                      {request.exit_date ? new Date(request.exit_date).toLocaleDateString() : "-"}
-                    </td>
-                    <td className="px-4 py-3">
-                      {request.exit_date && request.status !== "completed" && request.status !== "rejected" ? (
-                        <span className={`text-sm font-medium ${calculateRemainingDays(request.exit_date).includes('Expired') ? 'text-red-600' : 'text-green-600'}`}>
-                          {calculateRemainingDays(request.exit_date)}
+              <tbody className="divide-y divide-gray-100">
+                {exitRequests.map((request) => {
+                  const statusConf = getStatusConfig(request.status);
+                  const remaining = calculateRemainingDays(request.exit_date);
+                  const isDone = request.status === "completed" || request.status === "rejected";
+
+                  return (
+                    <tr key={request.id} className="hover:bg-slate-50/70 transition-colors">
+                      {/* Employee */}
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 font-bold text-white shadow-sm text-xs">
+                            {(request.employee_name || "E").charAt(0).toUpperCase()}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-semibold text-gray-900 leading-tight">
+                              {request.employee_name || "—"}
+                            </p>
+                            <p className="text-xs text-gray-400 font-mono mt-0.5">
+                              {request.employeeCode || "—"}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Resignation Date */}
+                      <td className="px-5 py-4 text-gray-700 font-medium">
+                        {formatDate(request.resignation_date)}
+                      </td>
+
+                      {/* Notice Period */}
+                      <td className="px-5 py-4">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">
+                          {request.notice_period_days || 0} days
                         </span>
-                      ) : (
-                        <span className="text-sm text-gray-400">-</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="text-sm text-gray-600 capitalize">{request.exit_type}</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(request.status)}`}>
-                        {getStatusIcon(request.status)}
-                        {request.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => openDetailModal(request)}
-                          className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                          title="View Details"
+                      </td>
+
+                      {/* Exit Date */}
+                      <td className="px-5 py-4 text-gray-700 font-medium">
+                        {formatDate(request.exit_date)}
+                      </td>
+
+                      {/* Remaining */}
+                      <td className="px-5 py-4">
+                        {request.exit_date && !isDone && remaining !== null ? (
+                          remaining < 0 ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200/80">
+                              <AlertCircle size={12} /> Expired
+                            </span>
+                          ) : remaining === 0 ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200/80">
+                              <Clock size={12} /> Today
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+                              <Clock size={12} /> {remaining} {remaining === 1 ? "day left" : "days left"}
+                            </span>
+                          )
+                        ) : (
+                          <span className="text-gray-400">—</span>
+                        )}
+                      </td>
+
+                      {/* Type */}
+                      <td className="px-5 py-4">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-purple-50 text-purple-700 border border-purple-100 capitalize">
+                          {request.exit_type || "Voluntary"}
+                        </span>
+                      </td>
+
+                      {/* Status */}
+                      <td className="px-5 py-4">
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${statusConf.className}`}
                         >
-                          <Eye size={16} />
-                        </button>
-                        <button
-                          onClick={() => openStatusModal(request)}
-                          className="p-1.5 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
-                          title="Update Status"
-                        >
-                          <CheckCircle size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteExit(request.id)}
-                          className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                          title="Delete"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                          <span className={`h-1.5 w-1.5 rounded-full ${statusConf.dot}`} />
+                          {statusConf.label}
+                        </span>
+                      </td>
+
+                      {/* Actions */}
+                      <td className="px-5 py-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => openDetailModal(request)}
+                            className="p-1.5 text-gray-500 hover:text-violet-600 hover:bg-violet-50 rounded-lg transition"
+                            title="View Details"
+                          >
+                            <Eye size={16} />
+                          </button>
+                          <button
+                            onClick={() => openStatusModal(request)}
+                            className="p-1.5 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition"
+                            title="Update Status"
+                          >
+                            <CheckCircle size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteExit(request.id)}
+                            className="p-1.5 text-gray-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                            title="Delete"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           )}
         </div>
+
+        {/* Table Footer */}
+        <div className="px-5 py-3.5 border-t border-gray-100 bg-gray-50/70 flex flex-wrap items-center justify-between gap-3 text-xs text-gray-500">
+          <span>
+            Showing <strong className="text-gray-700 font-semibold">{exitRequests.length}</strong> exit {exitRequests.length === 1 ? "request" : "requests"}
+          </span>
+          <div className="flex items-center gap-4">
+            <span>Pending: <strong className="text-amber-700 font-semibold">{stats?.pending ?? 0}</strong></span>
+            <span>Processing: <strong className="text-purple-700 font-semibold">{stats?.processing ?? 0}</strong></span>
+            <span>Completed: <strong className="text-emerald-700 font-semibold">{stats?.completed ?? 0}</strong></span>
+          </div>
+        </div>
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">New Exit Request</h3>
-              <button onClick={() => setShowModal(false)} className="p-1 hover:bg-gray-100 rounded">
-                <X size={20} className="text-gray-500" />
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto border border-gray-100">
+            <div className="flex justify-between items-center mb-5 pb-3 border-b border-gray-100">
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">New Exit Request</h3>
+                <p className="text-xs text-gray-500 mt-0.5">Record an employee resignation or offboarding workflow</p>
+              </div>
+              <button onClick={() => setShowModal(false)} className="p-1.5 hover:bg-gray-100 rounded-xl text-gray-400 hover:text-gray-600 transition">
+                <X size={18} />
               </button>
             </div>
             <form onSubmit={handleSubmitExit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Employee *
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1.5">
+                  Employee <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={exitForm.employee_id}
                   onChange={(e) => handleEmployeeSelect(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm bg-gray-50/50 focus:bg-white outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition"
                   required
                   disabled={employeesLoading}
                 >
@@ -493,55 +611,55 @@ useEffect(() => {
                   ))}
                 </select>
                 {employees.length === 0 && !employeesLoading && (
-                  <p className="text-xs text-red-500 mt-1">Please ensure employees are added in the system.</p>
+                  <p className="text-xs text-rose-500 mt-1">Please ensure employees are added in the system.</p>
                 )}
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3.5">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Resignation Date *
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1.5">
+                    Resignation Date <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="date"
                     value={exitForm.resignation_date}
                     onChange={(e) => setExitForm({ ...exitForm, resignation_date: e.target.value })}
-                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm bg-gray-50/50 focus:bg-white outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Notice Period (Days) *
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1.5">
+                    Notice Period (Days) <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="number"
                     value={exitForm.notice_period_days}
                     onChange={(e) => setExitForm({ ...exitForm, notice_period_days: e.target.value })}
-                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm bg-gray-50/50 focus:bg-white outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition"
                     required
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3.5">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1.5">
                     Expected Exit Date
                   </label>
                   <input
                     type="date"
                     value={exitForm.exit_date}
                     onChange={(e) => setExitForm({ ...exitForm, exit_date: e.target.value })}
-                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm bg-gray-50/50 focus:bg-white outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1.5">
                     Exit Type
                   </label>
                   <select
                     value={exitForm.exit_type}
                     onChange={(e) => setExitForm({ ...exitForm, exit_type: e.target.value })}
-                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm bg-gray-50/50 focus:bg-white outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition capitalize"
                   >
                     <option value="voluntary">Voluntary</option>
                     <option value="resignation">Resignation</option>
@@ -551,31 +669,31 @@ useEffect(() => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1.5">
                   Reason for Leaving
                 </label>
                 <textarea
                   value={exitForm.reason}
                   onChange={(e) => setExitForm({ ...exitForm, reason: e.target.value })}
                   rows={3}
-                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm bg-gray-50/50 focus:bg-white outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition resize-none"
                   placeholder="Enter reason for leaving..."
                 />
               </div>
-              <div className="flex gap-3 justify-end pt-2">
+              <div className="flex gap-2.5 justify-end pt-3 border-t border-gray-100">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-xl text-sm font-medium transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white px-5 py-2 rounded-xl text-sm font-semibold transition shadow-sm disabled:opacity-50"
                 >
-                  {loading && <Loader2 className="animate-spin" size={16} />}
+                  {loading && <Loader2 className="animate-spin" size={15} />}
                   Submit Request
                 </button>
               </div>
@@ -585,23 +703,26 @@ useEffect(() => {
       )}
 
       {statusModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl p-6 w-full max-w-lg">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Update Exit Request</h3>
-              <button onClick={() => setStatusModal(false)} className="p-1 hover:bg-gray-100 rounded">
-                <X size={20} className="text-gray-500" />
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-lg border border-gray-100">
+            <div className="flex justify-between items-center mb-5 pb-3 border-b border-gray-100">
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Update Exit Request</h3>
+                <p className="text-xs text-gray-500 mt-0.5">Update offboarding status and settlement dates</p>
+              </div>
+              <button onClick={() => setStatusModal(false)} className="p-1.5 hover:bg-gray-100 rounded-xl text-gray-400 hover:text-gray-600 transition">
+                <X size={18} />
               </button>
             </div>
             <form onSubmit={handleUpdateStatus} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Status *
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1.5">
+                  Status <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={statusForm.status}
                   onChange={(e) => setStatusForm({ ...statusForm, status: e.target.value })}
-                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm bg-gray-50/50 focus:bg-white outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition capitalize"
                   required
                 >
                   <option value="pending">Pending</option>
@@ -611,56 +732,56 @@ useEffect(() => {
                   <option value="rejected">Rejected</option>
                 </select>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3.5">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1.5">
                     Exit Interview Date
                   </label>
                   <input
                     type="date"
                     value={statusForm.exit_interview_date}
                     onChange={(e) => setStatusForm({ ...statusForm, exit_interview_date: e.target.value })}
-                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm bg-gray-50/50 focus:bg-white outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1.5">
                     Final Settlement Date
                   </label>
                   <input
                     type="date"
                     value={statusForm.final_settlement_date}
                     onChange={(e) => setStatusForm({ ...statusForm, final_settlement_date: e.target.value })}
-                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm bg-gray-50/50 focus:bg-white outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1.5">
                   HR Remarks
                 </label>
                 <textarea
                   value={statusForm.hr_remarks}
                   onChange={(e) => setStatusForm({ ...statusForm, hr_remarks: e.target.value })}
                   rows={3}
-                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm bg-gray-50/50 focus:bg-white outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition resize-none"
                   placeholder="Add remarks..."
                 />
               </div>
-              <div className="flex gap-3 justify-end pt-2">
+              <div className="flex gap-2.5 justify-end pt-3 border-t border-gray-100">
                 <button
                   type="button"
                   onClick={() => setStatusModal(false)}
-                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-xl text-sm font-medium transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white px-5 py-2 rounded-xl text-sm font-semibold transition shadow-sm disabled:opacity-50"
                 >
-                  {loading && <Loader2 className="animate-spin" size={16} />}
+                  {loading && <Loader2 className="animate-spin" size={15} />}
                   Update Status
                 </button>
               </div>
@@ -670,84 +791,93 @@ useEffect(() => {
       )}
 
       {showDetailModal && selectedRequest && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl p-6 w-full max-w-2xl">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">Exit Request Details</h3>
-              <button onClick={() => setShowDetailModal(false)} className="p-1 hover:bg-gray-100 rounded">
-                <X size={20} className="text-gray-500" />
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-2xl border border-gray-100">
+            <div className="flex justify-between items-center mb-6 pb-3 border-b border-gray-100">
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Exit Request Details</h3>
+                <p className="text-xs text-gray-500 mt-0.5">Employee offboarding record and timeline</p>
+              </div>
+              <button onClick={() => setShowDetailModal(false)} className="p-1.5 hover:bg-gray-100 rounded-xl text-gray-400 hover:text-gray-600 transition">
+                <X size={18} />
               </button>
             </div>
             
-            <div className="space-y-6">
-              <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-                <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center">
-                  <UserMinus className="text-blue-600" size={28} />
+            <div className="space-y-5">
+              <div className="flex items-start gap-4 p-4 bg-slate-50 border border-slate-100 rounded-2xl">
+                <div className="w-12 h-12 bg-gradient-to-br from-violet-600 to-indigo-600 text-white font-bold rounded-2xl flex items-center justify-center shrink-0 shadow-sm text-base">
+                  {(selectedRequest.employee_name || "E").charAt(0).toUpperCase()}
                 </div>
-                <div className="flex-1">
-                  <h4 className="text-xl font-semibold text-gray-900">{selectedRequest.employee_name}</h4>
-                  <p className="text-gray-500">{selectedRequest.employeeCode}</p>
-                  <div className="flex gap-4 mt-2 text-sm text-gray-600">
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-base font-bold text-gray-900 leading-tight">{selectedRequest.employee_name}</h4>
+                  <p className="text-xs text-gray-400 font-mono mt-0.5">{selectedRequest.employeeCode}</p>
+                  <div className="flex flex-wrap gap-4 mt-2 text-xs text-gray-600">
                     {selectedRequest.email && (
-                      <span className="flex items-center gap-1"><Mail size={14} /> {selectedRequest.email}</span>
+                      <span className="flex items-center gap-1.5"><Mail size={13} className="text-gray-400" /> {selectedRequest.email}</span>
                     )}
                     {selectedRequest.phone && (
-                      <span className="flex items-center gap-1"><Phone size={14} /> {selectedRequest.phone}</span>
+                      <span className="flex items-center gap-1.5"><Phone size={13} className="text-gray-400" /> {selectedRequest.phone}</span>
                     )}
                   </div>
                 </div>
-                <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(selectedRequest.status)}`}>
-                  {getStatusIcon(selectedRequest.status)}
-                  {selectedRequest.status}
-                </span>
+                {(() => {
+                  const conf = getStatusConfig(selectedRequest.status);
+                  const Icon = conf.icon;
+                  return (
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${conf.className}`}>
+                      <Icon size={13} />
+                      {conf.label}
+                    </span>
+                  );
+                })()}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 border border-gray-200 rounded-lg">
-                  <p className="text-sm text-gray-500 mb-1">Resignation Date</p>
+                <div className="p-4 border border-gray-100 bg-gray-50/50 rounded-xl">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Resignation Date</p>
                   <p className="font-medium text-gray-900">
-                    {selectedRequest.resignation_date ? new Date(selectedRequest.resignation_date).toLocaleDateString() : "-"}
+                    {formatDate(selectedRequest.resignation_date)}
                   </p>
                 </div>
-                <div className="p-4 border border-gray-200 rounded-lg">
-                  <p className="text-sm text-gray-500 mb-1">Notice Period</p>
+                <div className="p-4 border border-gray-100 bg-gray-50/50 rounded-xl">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Notice Period</p>
                   <p className="font-medium text-gray-900">{selectedRequest.notice_period_days} days</p>
                 </div>
-                <div className="p-4 border border-gray-200 rounded-lg">
-                  <p className="text-sm text-gray-500 mb-1">Expected Exit Date</p>
+                <div className="p-4 border border-gray-100 bg-gray-50/50 rounded-xl">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Expected Exit Date</p>
                   <p className="font-medium text-gray-900">
-                    {selectedRequest.exit_date ? new Date(selectedRequest.exit_date).toLocaleDateString() : "-"}
+                    {formatDate(selectedRequest.exit_date)}
                   </p>
                 </div>
-                <div className="p-4 border border-gray-200 rounded-lg">
-                  <p className="text-sm text-gray-500 mb-1">Exit Type</p>
+                <div className="p-4 border border-gray-100 bg-gray-50/50 rounded-xl">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Exit Type</p>
                   <p className="font-medium text-gray-900 capitalize">{selectedRequest.exit_type || "Voluntary"}</p>
                 </div>
-                <div className="p-4 border border-gray-200 rounded-lg">
-                  <p className="text-sm text-gray-500 mb-1">Exit Interview Date</p>
+                <div className="p-4 border border-gray-100 bg-gray-50/50 rounded-xl">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Exit Interview Date</p>
                   <p className="font-medium text-gray-900">
-                    {selectedRequest.exit_interview_date ? new Date(selectedRequest.exit_interview_date).toLocaleDateString() : "Not scheduled"}
+                    {formatDate(selectedRequest.exit_interview_date)}
                   </p>
                 </div>
-                <div className="p-4 border border-gray-200 rounded-lg">
-                  <p className="text-sm text-gray-500 mb-1">Final Settlement Date</p>
+                <div className="p-4 border border-gray-100 bg-gray-50/50 rounded-xl">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Final Settlement Date</p>
                   <p className="font-medium text-gray-900">
-                    {selectedRequest.final_settlement_date ? new Date(selectedRequest.final_settlement_date).toLocaleDateString() : "Pending"}
+                    {formatDate(selectedRequest.final_settlement_date)}
                   </p>
                 </div>
               </div>
 
               {selectedRequest.reason && (
-                <div className="p-4 border border-gray-200 rounded-lg">
-                  <p className="text-sm text-gray-500 mb-2">Reason for Leaving</p>
-                  <p className="text-gray-700">{selectedRequest.reason}</p>
+                <div className="p-4 border border-gray-100 bg-gray-50/50 rounded-xl">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">Reason for Leaving</p>
+                  <p className="text-gray-700 text-sm">{selectedRequest.reason}</p>
                 </div>
               )}
 
               {selectedRequest.hr_remarks && (
-                <div className="p-4 border border-gray-200 rounded-lg">
-                  <p className="text-sm text-gray-500 mb-2">HR Remarks</p>
-                  <p className="text-gray-700">{selectedRequest.hr_remarks}</p>
+                <div className="p-4 border border-gray-100 bg-gray-50/50 rounded-xl">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">HR Remarks</p>
+                  <p className="text-gray-700 text-sm">{selectedRequest.hr_remarks}</p>
                 </div>
               )}
 
@@ -757,9 +887,9 @@ useEffect(() => {
                     setShowDetailModal(false);
                     openStatusModal(selectedRequest);
                   }}
-                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                  className="inline-flex items-center gap-1.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-semibold transition shadow-sm"
                 >
-                  <CheckCircle size={18} />
+                  <CheckCircle size={16} />
                   Update Status
                 </button>
                 <button
@@ -767,9 +897,9 @@ useEffect(() => {
                     setShowDetailModal(false);
                     handleDeleteExit(selectedRequest.id);
                   }}
-                  className="flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg font-medium transition-colors"
+                  className="inline-flex items-center gap-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 px-4 py-2 rounded-xl text-sm font-semibold transition"
                 >
-                  <Trash2 size={18} />
+                  <Trash2 size={16} />
                   Delete
                 </button>
               </div>

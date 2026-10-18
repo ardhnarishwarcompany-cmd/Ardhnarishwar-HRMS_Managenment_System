@@ -105,10 +105,10 @@ export default function ComplaintList() {
     );
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-6">
       <PageHeader
-        title=" Complaint Box"
-        desc=" You can send any kind of complaint here Direct to super admin "
+        title="Complaint Box"
+        desc="Send any complaint directly to the super admin"
       />
 
       {/* ── NEW COMPLAINT FORM ────────────────────────────── */}

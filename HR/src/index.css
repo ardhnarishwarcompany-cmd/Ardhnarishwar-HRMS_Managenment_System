@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
-/* Class-based dark mode (Tailwind v4) — toggled by adding .dark on <html> */
-@variant dark (&:where(.dark, .dark *));
+/* Lock dark mode variant to nonexistent selector so Tailwind dark:... classes never activate */
+@variant dark (&:where([data-theme="dark"]));
 
 @keyframes slideAcross {
   0% {
@@ -18,7 +18,6 @@
   animation: slideAcross 10s linear forwards;
 }
 
-
 /* ===== Mobile responsive hardening (global) ===== */
 html, body { overflow-x: hidden; }
 img, video, canvas { max-width: 100%; height: auto; }
@@ -28,205 +27,21 @@ img, video, canvas { max-width: 100%; height: auto; }
   input, select, textarea { font-size: 16px; }
 }
 
-
-
-/* ============================================================
-   PREMIUM DARK THEME LAYER
-   Applied when <html> has the .dark class (see ThemeContext)
-   ============================================================ */
-
-.theme-transition,
-.theme-transition * {
-  transition:
-    background-color 0.25s ease,
-    border-color 0.25s ease,
-    color 0.25s ease !important;
-}
-
-.dark {
-  color-scheme: dark;
-}
-
-.dark body {
-  background-color: #0b0f1a;
-  color: #e2e8f0;
-}
-
-/* --- Core surface overrides --- */
-.dark .bg-white {
-  background-color: #111827 !important;
-}
-.dark .bg-white\/50,
-.dark .bg-white\/60,
-.dark .bg-white\/70,
-.dark .bg-white\/75,
-.dark .bg-white\/80,
-.dark .bg-white\/85,
-.dark .bg-white\/90,
-.dark .bg-white\/95 {
-  background-color: rgba(17, 24, 39, 0.85) !important;
-}
-.dark .bg-gray-50,
-.dark .bg-slate-50 {
-  background-color: #0b0f1a !important;
-}
-.dark .bg-gray-100,
-.dark .bg-slate-100 {
-  background-color: #1f2937 !important;
-}
-.dark .bg-gray-200,
-.dark .bg-slate-200 {
-  background-color: #273449 !important;
-}
-/* Translucent light surfaces (section headers, filter bars, table heads) */
-.dark .bg-slate-50\/50,
-.dark .bg-slate-50\/60,
-.dark .bg-gray-50\/50,
-.dark .bg-gray-50\/60,
-.dark .bg-gray-100\/60 {
-  background-color: rgba(30, 41, 59, 0.6) !important;
-}
-.dark .hover\:bg-gray-50\/50:hover,
-.dark .hover\:bg-slate-50\/60:hover {
-  background-color: #1f2937 !important;
-}
-.dark .bg-indigo-50 {
-  background-color: rgba(99, 102, 241, 0.12) !important;
-}
-.dark .bg-blue-50,
-.dark .bg-sky-50 {
-  background-color: rgba(59, 130, 246, 0.12) !important;
-}
-.dark .bg-green-50,
-.dark .bg-emerald-50 {
-  background-color: rgba(16, 185, 129, 0.12) !important;
-}
-.dark .bg-red-50,
-.dark .bg-rose-50 {
-  background-color: rgba(244, 63, 94, 0.12) !important;
-}
-.dark .bg-amber-50,
-.dark .bg-yellow-50,
-.dark .bg-orange-50 {
-  background-color: rgba(245, 158, 11, 0.12) !important;
-}
-.dark .bg-purple-50,
-.dark .bg-violet-50 {
-  background-color: rgba(139, 92, 246, 0.12) !important;
-}
-
-/* --- Text --- */
-.dark .text-gray-900,
-.dark .text-slate-900,
-.dark .text-black {
-  color: #f1f5f9 !important;
-}
-.dark .text-gray-800,
-.dark .text-slate-800 {
-  color: #e2e8f0 !important;
-}
-.dark .text-gray-700,
-.dark .text-slate-700 {
-  color: #cbd5e1 !important;
-}
-.dark .text-gray-600,
-.dark .text-slate-600 {
-  color: #94a3b8 !important;
-}
-.dark .text-gray-500,
-.dark .text-slate-500 {
-  color: #7c8aa0 !important;
-}
-.dark .text-gray-400,
-.dark .text-slate-400 {
-  color: #64748b !important;
-}
-
-/* --- Borders / dividers --- */
-.dark .border-gray-100,
-.dark .border-slate-100,
-.dark .border-gray-200,
-.dark .border-slate-200,
-.dark .border-gray-300,
-.dark .border-slate-300 {
-  border-color: #273449 !important;
-}
-.dark .divide-gray-100 > *,
-.dark .divide-gray-200 > *,
-.dark .divide-slate-100 > *,
-.dark .divide-slate-200 > * {
-  border-color: #273449 !important;
-}
-
-/* --- Hover states --- */
-.dark .hover\:bg-gray-50:hover,
-.dark .hover\:bg-slate-50:hover,
-.dark .hover\:bg-gray-100:hover,
-.dark .hover\:bg-slate-100:hover {
-  background-color: #1f2937 !important;
-}
-.dark .hover\:bg-indigo-50:hover {
-  background-color: rgba(99, 102, 241, 0.18) !important;
-}
-
-/* --- Shadows: soften for dark surfaces --- */
-.dark .shadow-sm,
-.dark .shadow,
-.dark .shadow-md,
-.dark .shadow-lg,
-.dark .shadow-xl,
-.dark .shadow-2xl {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45) !important;
-}
-
-/* --- Custom utility classes (.th .td .input .label) --- */
-.dark .th {
-  color: #94a3b8;
-}
-.dark .td {
-  color: #cbd5e1;
-}
-.dark input,
-.dark select,
-.dark textarea {
-  color-scheme: dark;
-}
-.dark .input {
-  background-color: #1f2937 !important;
-  border-color: #334155 !important;
-  color: #e2e8f0 !important;
-}
-.dark .label {
-  color: #94a3b8;
-}
-.dark input::placeholder,
-.dark textarea::placeholder {
-  color: #5b6b82;
-}
-
-/* --- Tables --- */
-.dark table thead {
-  background-color: #16203a;
-}
-.dark table tbody tr:hover {
-  background-color: rgba(99, 102, 241, 0.06);
-}
-
-/* --- Scrollbars --- */
-.dark ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-.dark ::-webkit-scrollbar-track {
-  background: #0b0f1a;
-}
-.dark ::-webkit-scrollbar-thumb {
-  background: #273449;
-  border-radius: 8px;
-}
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
-}
-
-
 body { margin: 0; min-width: 320px; }
+
+/* Login: keep inputs dark when the browser autofills saved credentials */
+#login-email:-webkit-autofill,
+#login-email:-webkit-autofill:hover,
+#login-email:-webkit-autofill:focus,
+#login-password:-webkit-autofill,
+#login-password:-webkit-autofill:hover,
+#login-password:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #120a22 inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff;
+  transition: background-color 9999s ease-in-out 0s;
+  border-radius: 0.75rem;
+}
+
+
+

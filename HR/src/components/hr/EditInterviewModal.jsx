@@ -43,6 +43,7 @@ export default function EditInterviewModal({
   const [loading, setLoading] = useState(false);
   const [jobPositions, setJobPositions] = useState([]);
   const [languages, setLanguages] = useState([]);
+  const [clients, setClients] = useState([]);
 
   const token = localStorage.getItem("hrms_hr_Token");
   const BASE = import.meta.env.VITE_API_BASE_URL;
@@ -87,7 +88,19 @@ export default function EditInterviewModal({
   useEffect(() => {
     fetchJobPositions();
     fetchLanguages();
+    fetchClients();
   }, []);
+
+  const fetchClients = async () => {
+    try {
+      const res = await axios.get(`${BASE}/hr/interviews/clients`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setClients(Array.isArray(res?.data?.data) ? res.data.data : []);
+    } catch (err) {
+      console.error("Clients fetch error:", err);
+    }
+  };
 
   const fetchJobPositions = async () => {
     try {
@@ -155,42 +168,55 @@ export default function EditInterviewModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="w-full max-w-lg max-h-[90vh] flex flex-col rounded-3xl border border-white/20 bg-white/10 backdrop-blur-xl shadow-[0_20px_80px_rgba(0,0,0,0.35)]">
-        {" "}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
+      <div className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-3xl bg-white shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-white/20">
-          <h2 className="text-xl font-semibold text-white">Edit Interview</h2>
-          <button onClick={onClose} className="text-white/60 text-lg">
-            ✕
-          </button>
+        <div className="relative z-10 shrink-0 overflow-hidden bg-slate-900 px-6 py-5">
+          <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-violet-600/25 blur-3xl" />
+          <div className="relative flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-indigo-300">
+                Recruitment
+              </p>
+              <h2 className="mt-0.5 text-xl font-bold text-white">
+                Edit Interview
+              </h2>
+            </div>
+            <button
+              onClick={onClose}
+              aria-label="Close"
+              className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white transition-colors hover:bg-white/20"
+            >
+              ✕
+            </button>
+          </div>
         </div>
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto">
           {/* Name */}
           <div>
-            <label className="block text-sm font-medium text-white mb-1">
+            <label className="mb-1 block text-sm font-medium text-slate-700">
               Candidate Name
             </label>
             <input
               name="candidate_name"
               value={form.candidate_name}
               onChange={handleChange}
-              className="w-full rounded-xl border px-4 py-2.5 border-gray-300 text-white"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
               required
             />
           </div>
 
           {/* Phone */}
           <div>
-            <label className="block text-sm font-medium text-white mb-1">
+            <label className="mb-1 block text-sm font-medium text-slate-700">
               Phone
             </label>
             <input
               name="candidate_phone"
               value={form.candidate_phone}
               onChange={handlePhoneChange}
-              className="w-full rounded-xl border px-4 py-2.5 border-gray-300 text-white"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
               required
               type="tel"
               inputMode="numeric"
@@ -200,7 +226,7 @@ export default function EditInterviewModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white mb-1">
+            <label className="mb-1 block text-sm font-medium text-slate-700">
               Location
             </label>
 
@@ -208,7 +234,7 @@ export default function EditInterviewModal({
               name="location"
               value={form.location}
               onChange={handleChange}
-              className="w-full rounded-xl border border-gray-300 text-white px-4 py-2.5"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
             >
               <option value="" className="text-black">
                 Select Location
@@ -223,7 +249,7 @@ export default function EditInterviewModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white mb-1">
+            <label className="mb-1 block text-sm font-medium text-slate-700">
               Add Address
             </label>
             <input
@@ -231,19 +257,19 @@ export default function EditInterviewModal({
               placeholder="Address"
               value={form.address}
               onChange={handleChange}
-              className="w-full rounded-xl border px-4 py-2.5 border-gray-300 text-white"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white mb-1">
+            <label className="mb-1 block text-sm font-medium text-slate-700">
               Job Profile
             </label>
             <select
               name="job_profile"
               value={form.job_profile}
               onChange={handleChange}
-              className="w-full rounded-xl border border-gray-300 text-white px-4 py-2.5"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
             >
               <option value="" className="text-black">
                 Select Job Profile
@@ -264,7 +290,7 @@ export default function EditInterviewModal({
             </select>
           </div>
           <div>
-  <label className="block text-sm font-medium text-white mb-1">
+  <label className="mb-1 block text-sm font-medium text-slate-700">
     Language
   </label>
 
@@ -272,7 +298,7 @@ export default function EditInterviewModal({
     name="language_id"
     value={form.language_id}
     onChange={handleChange}
-    className="w-full rounded-xl border border-gray-300 text-white px-4 py-2.5"
+    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
   >
     <option value="" className="text-black">
       Select Language
@@ -286,7 +312,7 @@ export default function EditInterviewModal({
   </select>
 </div>
           <div>
-            <label className="block text-sm font-medium text-white mb-1">
+            <label className="mb-1 block text-sm font-medium text-slate-700">
               Experience
             </label>
             <input
@@ -294,11 +320,11 @@ export default function EditInterviewModal({
               placeholder="eg 2 Years"
               value={form.experience}
               onChange={handleChange}
-              className="w-full rounded-xl border px-4 py-2.5 border-gray-300 text-white"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
             />
           </div>
 
-          <label className="block text-sm font-medium text-white mb-1">
+          <label className="mb-1 block text-sm font-medium text-slate-700">
             Current CTC
           </label>
           <div className="grid grid-cols-2 gap-4">
@@ -307,7 +333,7 @@ export default function EditInterviewModal({
               placeholder="Current CTC"
               value={form.current_ctc}
               onChange={handleChange}
-              className="rounded-xl border px-4 py-2.5 border-gray-300 text-white"
+              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
             />
 
             <input
@@ -315,12 +341,12 @@ export default function EditInterviewModal({
               placeholder="Expected CTC"
               value={form.expected_ctc}
               onChange={handleChange}
-              className="rounded-xl border px-4 py-2.5 border-gray-300 text-white"
+              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white mb-1">
+            <label className="mb-1 block text-sm font-medium text-slate-700">
               Notice Period
             </label>
             <input
@@ -328,34 +354,51 @@ export default function EditInterviewModal({
               placeholder="Notice Period"
               value={form.notice_period}
               onChange={handleChange}
-              className="w-full rounded-xl border px-4 py-2.5 border-gray-300 text-white"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
             />
           </div>
 
           {/* Client */}
           <div>
-            <label className="block text-sm font-medium text-white mb-1">
-              Client Code
+            <label className="mb-1 block text-sm font-medium text-slate-700">
+              Client
             </label>
-            <input
-              name="client_code"
-              value={form.client_code}
-              onChange={handleChange}
-              className="w-full rounded-xl border px-4 py-2.5 border-gray-300 text-white"
-              required
-            />
+            {clients.length ? (
+              <select
+                name="client_code"
+                value={form.client_code}
+                onChange={handleChange}
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                required
+              >
+                <option value="">Select client</option>
+                {clients.map((c) => (
+                  <option key={c.id} value={c.client_code}>
+                    {c.client_code} — {c.company_name || "Unnamed client"}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                name="client_code"
+                value={form.client_code}
+                onChange={handleChange}
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                required
+              />
+            )}
           </div>
 
           {/* Call Status */}
           <div>
-            <label className="block text-sm font-medium text-white mb-1">
+            <label className="mb-1 block text-sm font-medium text-slate-700">
               Call Status
             </label>
             <select
               name="call_status_id"
               value={form.call_status_id}
               onChange={handleChange}
-              className="w-full rounded-xl border px-4 py-2.5 border-gray-300 text-white"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
             >
               <option value="" className="text-black">
                 Select status
@@ -375,19 +418,19 @@ export default function EditInterviewModal({
               name="interview_date"
               value={form.interview_date}
               onChange={handleChange}
-              className="rounded-xl border px-4 py-2.5 border-gray-300 text-white"
+              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
             />
             <input
               type="time"
               name="interview_time"
               value={form.interview_time}
               onChange={handleChange}
-              className="rounded-xl border px-4 py-2.5 border-gray-300 text-white"
+              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white mb-1">
+            <label className="mb-1 block text-sm font-medium text-slate-700">
               Replace CV
             </label>
 
@@ -406,18 +449,18 @@ export default function EditInterviewModal({
               type="file"
               accept=".pdf,.doc,.docx,image/*"
               onChange={handleFile}
-              className="w-full rounded-xl border px-4 py-2.5 border-gray-300 text-white"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
             />
 
             {form.cv_file && (
-              <p className="text-xs text-green-400 mt-1">
+              <p className="mt-1 text-xs text-emerald-600">
                 Selected: {form.cv_file.name}
               </p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white mb-1">
+            <label className="mb-1 block text-sm font-medium text-slate-700">
               Add Remarks
             </label>
             <input
@@ -425,7 +468,7 @@ export default function EditInterviewModal({
               placeholder="Remarks"
               value={form.hr_remarks}
               onChange={handleChange}
-              className="w-full rounded-xl border px-4 py-2.5 border-gray-300 text-white"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-colors focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
             />
           </div>
 
@@ -434,13 +477,13 @@ export default function EditInterviewModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border rounded-xl border-gray-300 text-white"
+              className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50"
             >
               Cancel
             </button>
             <button
               disabled={loading}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-xl"
+              className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-700"
             >
               {loading ? "Updating..." : "Update"}
             </button>

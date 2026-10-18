@@ -137,19 +137,7 @@ export default function MyLeave() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-6 space-y-6">
-        {/* Title */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center">
-            <CalendarDays className="text-indigo-600" size={20} />
-          </div>
-          <div>
-            <h2 className="text-lg md:text-xl font-semibold text-gray-800">My Leave</h2>
-            <p className="text-sm text-gray-500">Apply for leave and track balances</p>
-          </div>
-        </div>
+    <div className="w-full space-y-6">
 
         {/* Balance cards */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
@@ -177,7 +165,7 @@ export default function MyLeave() {
             className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 space-y-4 h-fit"
           >
             <h3 className="font-semibold text-gray-800 flex items-center gap-2">
-              <Send size={16} className="text-indigo-500" /> Apply for Leave
+              <Send size={16} className="text-purple-600" /> Apply for Leave
             </h3>
             <select
               value={form.leave_type_id}
@@ -224,7 +212,11 @@ export default function MyLeave() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl py-2.5 text-sm font-semibold disabled:opacity-50"
+              className="w-full text-white rounded-xl py-2.5 text-sm font-bold shadow-md hover:opacity-95 transition active:scale-[0.99] disabled:opacity-50"
+              style={{
+                background: "linear-gradient(135deg, #6d28d9, #c026d3)",
+                boxShadow: "0 8px 18px rgba(124, 58, 237, 0.25)",
+              }}
             >
               {submitting ? "Submitting..." : "Submit Application"}
             </button>
@@ -252,7 +244,11 @@ export default function MyLeave() {
               <button
                 onClick={requestCompOff}
                 type="button"
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-2 text-sm font-semibold"
+                className="w-full text-white rounded-xl py-2.5 text-sm font-bold shadow-md hover:opacity-95 transition active:scale-[0.99]"
+                style={{
+                  background: "linear-gradient(135deg, #059669, #10b981)",
+                  boxShadow: "0 8px 18px rgba(16, 185, 129, 0.25)",
+                }}
               >
                 Request Comp-Off
               </button>
@@ -261,7 +257,7 @@ export default function MyLeave() {
             {/* Overtime request */}
             <div className="pt-4 border-t border-gray-100 space-y-3">
               <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                <Clock size={15} className="text-indigo-500" /> Request Overtime
+                <Clock size={15} className="text-purple-600" /> Request Overtime
               </h4>
               <p className="text-xs text-gray-400">
                 Worked extra hours? Log them for approval.
@@ -290,7 +286,11 @@ export default function MyLeave() {
               <button
                 onClick={requestOvertime}
                 type="button"
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl py-2 text-sm font-semibold"
+                className="w-full text-white rounded-xl py-2.5 text-sm font-bold shadow-md hover:opacity-95 transition active:scale-[0.99]"
+                style={{
+                  background: "linear-gradient(135deg, #6d28d9, #c026d3)",
+                  boxShadow: "0 8px 18px rgba(124, 58, 237, 0.25)",
+                }}
               >
                 Request Overtime
               </button>
@@ -444,7 +444,6 @@ export default function MyLeave() {
             </div>
           </div>
         </div>
-      </div>
     </div>
   );
 }

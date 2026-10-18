@@ -175,7 +175,7 @@ export default function SOPLibrary() {
                             <button
                               key={file.id}
                               onClick={() => downloadFile(file.download_url, file.file_name || sop.title)}
-                              className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border border-indigo-100 bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
+                              className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100"
                             >
                               <Download size={13} /> {file.file_name || "Download"}
                             </button>
@@ -183,7 +183,7 @@ export default function SOPLibrary() {
                         ) : (
                           <button
                             onClick={() => downloadFile(sop.file_url, sop.file_name || sop.title)}
-                            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border border-indigo-100 bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
+                            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100"
                           >
                             <Download size={13} /> Download SOP
                           </button>
@@ -193,7 +193,8 @@ export default function SOPLibrary() {
                         <button
                           onClick={() => acknowledge(sop)}
                           disabled={busyId === sop.id}
-                          className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50"
+                          className="inline-flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-xl text-white shadow-sm hover:opacity-95 transition disabled:opacity-50 active:scale-[0.98]"
+                          style={{ background: "linear-gradient(135deg, #6d28d9, #c026d3)", boxShadow: "0 6px 16px rgba(124, 58, 237, 0.25)" }}
                         >
                           <CheckCircle2 size={13} />
                           {busyId === sop.id
@@ -206,7 +207,8 @@ export default function SOPLibrary() {
                           <button
                             onClick={() => completeTraining(sop)}
                             disabled={busyId === sop.id}
-                            className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50"
+                            className="inline-flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-xl text-white shadow-sm hover:opacity-95 transition disabled:opacity-50 active:scale-[0.98]"
+                            style={{ background: "linear-gradient(135deg, #6d28d9, #c026d3)", boxShadow: "0 6px 16px rgba(124, 58, 237, 0.25)" }}
                           >
                             <GraduationCap size={13} />
                             {busyId === sop.id

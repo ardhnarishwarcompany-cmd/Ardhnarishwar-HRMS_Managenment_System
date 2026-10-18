@@ -59,15 +59,13 @@ export default function EmployeeSearch() {
   return (
     <div className="space-y-6 animate-fadeUp">
       {/* Header */}
-      <div className="flex items-start gap-3.5">
-        <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-50 to-violet-100 ring-1 ring-indigo-100 flex items-center justify-center shrink-0">
-          <UserSearch size={20} className="text-indigo-600" />
-        </div>
+      <div className="page-header-main">
+        <span className="page-header-icon">
+          <UserSearch size={26} strokeWidth={1.8} />
+        </span>
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 text-balance">
-            Employee Search
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <h1 className="page-header-title text-balance">Employee Search</h1>
+          <p className="page-header-subtitle">
             Find employees by name, salary range, or joining period.
           </p>
         </div>

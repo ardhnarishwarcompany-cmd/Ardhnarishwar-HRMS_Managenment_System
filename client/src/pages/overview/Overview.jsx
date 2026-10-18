@@ -4,9 +4,9 @@ import {
   Users,
   CalendarCheck,
   CalendarClock,
-  ClipboardList,
   FileText,
   ArrowRight,
+  LayoutGrid,
 } from "lucide-react";
 
 import PageHeader from "../../components/common/PageHeader";
@@ -27,22 +27,22 @@ const asArray = (res) => {
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
-const STATUS_TONE = {
-  PRESENT: "bg-emerald-50 text-emerald-700 ring-emerald-100",
-  ABSENT: "bg-rose-50 text-rose-700 ring-rose-100",
-  HALF_DAY: "bg-amber-50 text-amber-700 ring-amber-100",
-  LEAVE: "bg-sky-50 text-sky-700 ring-sky-100",
-  PENDING: "bg-amber-50 text-amber-700 ring-amber-100",
-  APPROVED: "bg-emerald-50 text-emerald-700 ring-emerald-100",
-  REJECTED: "bg-rose-50 text-rose-700 ring-rose-100",
+const STATUS_CHIP = {
+  PRESENT: "chip-success",
+  ABSENT: "chip-danger",
+  HALF_DAY: "chip-warning",
+  LEAVE: "chip-info",
+  PENDING: "chip-warning",
+  APPROVED: "chip-success",
+  REJECTED: "chip-danger",
 };
 
-function Tone({ value }) {
+function Tone({ value, uppercase = false }) {
   const key = String(value || "").toUpperCase().replace(/\s+/g, "_");
   return (
     <span
-      className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap ring-1 ${
-        STATUS_TONE[key] || "bg-slate-100 text-slate-600 ring-slate-200"
+      className={`chip ${STATUS_CHIP[key] || "chip-neutral"} ${
+        uppercase ? "uppercase tracking-wide" : ""
       }`}
     >
       {value || "-"}
@@ -51,90 +51,50 @@ function Tone({ value }) {
 }
 
 // =========================
-// STAT CARD (premium)
+// STAT CARD
 // =========================
 const STAT_ACCENTS = [
-  {
-    bar: "from-indigo-500 to-violet-500",
-    icon: "from-indigo-50 to-violet-100 ring-indigo-100 text-indigo-600",
-  },
-  {
-    bar: "from-emerald-500 to-teal-500",
-    icon: "from-emerald-50 to-teal-100 ring-emerald-100 text-emerald-600",
-  },
-  {
-    bar: "from-amber-500 to-orange-500",
-    icon: "from-amber-50 to-orange-100 ring-amber-100 text-amber-600",
-  },
-  {
-    bar: "from-sky-500 to-indigo-500",
-    icon: "from-sky-50 to-indigo-100 ring-sky-100 text-sky-600",
-  },
-  {
-    bar: "from-violet-500 to-fuchsia-500",
-    icon: "from-violet-50 to-fuchsia-100 ring-violet-100 text-violet-600",
-  },
+  "stat-accent-indigo",
+  "stat-accent-emerald",
+  "stat-accent-amber",
+  "stat-accent-sky",
+  "stat-accent-fuchsia",
 ];
 
 function StatCard({ icon: Icon, label, value, sub, to, accent }) {
   const a = STAT_ACCENTS[accent % STAT_ACCENTS.length];
   return (
-    <Link
-      to={to}
-      className="card-premium group relative overflow-hidden p-5 flex items-start gap-4 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-slate-900/10 transition-all"
-    >
-      <div
-        className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${a.bar}`}
-      />
-      <div
-        className={`w-11 h-11 rounded-2xl bg-gradient-to-br ring-1 flex items-center justify-center shrink-0 ${a.icon}`}
-      >
-        <Icon size={20} />
-      </div>
+    <Link to={to} className={`stat-card ${a}`}>
+      <span className="stat-card-icon">
+        <Icon size={22} strokeWidth={1.8} />
+      </span>
       <div className="min-w-0">
-        <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-          {label}
-        </div>
-        <div className="text-2xl font-bold tracking-tight text-slate-900 leading-tight mt-0.5">
-          {value}
-        </div>
-        {sub && (
-          <div className="text-xs text-slate-400 truncate mt-0.5">{sub}</div>
-        )}
+        <small className="stat-card-label">{label}</small>
+        <strong className="stat-card-value">{value}</strong>
+        {sub && <em className="stat-card-sub truncate">{sub}</em>}
       </div>
-      <ArrowRight
-        size={14}
-        className="absolute right-4 top-4 text-slate-300 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all"
-      />
     </Link>
   );
 }
 
 // =========================
-// PANEL (premium)
+// PANEL
 // =========================
 function Panel({ title, sub, to, toLabel, children }) {
   return (
-    <div className="card-premium p-6 flex flex-col">
-      <div className="flex items-center justify-between mb-4">
+    <div className="card-premium ov-panel">
+      <div className="ov-panel-head">
         <div>
-          <h2 className="text-base font-bold tracking-tight text-slate-900">
-            {title}
-          </h2>
-          {sub && <p className="text-xs text-slate-400 mt-0.5">{sub}</p>}
+          <h2 className="ov-panel-title">{title}</h2>
+          {sub && <p className="ov-panel-sub">{sub}</p>}
         </div>
         {to && (
-          <Link
-            to={to}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 hover:text-indigo-700 px-2.5 py-1.5 rounded-lg hover:bg-indigo-50 transition-colors"
-          >
-            {toLabel || "View all"} <ArrowRight size={12} />
+          <Link to={to} className="ov-view-all">
+            {toLabel || "View all"} <ArrowRight size={16} strokeWidth={2} />
           </Link>
         )}
       </div>
-      <div className="max-h-[260px] overflow-y-auto overflow-x-auto scrollbar-thin-premium">
-        {children}
-      </div>
+      <div className="ov-panel-body scrollbar-thin-premium">{children}</div>
     </div>
   );
 }
@@ -145,12 +105,15 @@ function Panel({ title, sub, to, toLabel, children }) {
 export default function Overview() {
   const { client } = useClientAuth();
   const isEmployee = String(client?.role || "").toUpperCase() === "CLIENT_EMPLOYEE";
+  // Employee-scoped rows come back without a joined employee name; they are all the signed-in user.
+  const selfName = isEmployee ? client?.name || client?.full_name || client?.employeeCode || "" : "";
   const [loading, setLoading] = useState(true);
   const [employees, setEmployees] = useState([]);
   const [attendance, setAttendance] = useState([]);
   const [leaves, setLeaves] = useState([]);
   const [interviews, setInterviews] = useState([]);
   const [invoices, setInvoices] = useState([]);
+  const [workTargets, setWorkTargets] = useState([]);
 
   useEffect(() => {
     let alive = true;
@@ -160,6 +123,7 @@ export default function Overview() {
         ? [
             ["att", API.get("/client/attendance")],
             ["lev", API.get("/client/leave-offer/leaves")],
+            ["tgt", API.get("/client/work-target")],
           ]
         : [
             ["emp", API.get("/client/employees")],
@@ -179,6 +143,7 @@ export default function Overview() {
       if (result.lev?.status === "fulfilled") setLeaves(asArray(result.lev.value));
       if (result.intv?.status === "fulfilled") setInterviews(asArray(result.intv.value));
       if (result.inv?.status === "fulfilled") setInvoices(asArray(result.inv.value));
+      if (result.tgt?.status === "fulfilled") setWorkTargets(asArray(result.tgt.value));
       setLoading(false);
     })();
 
@@ -211,13 +176,14 @@ export default function Overview() {
   if (loading) {
     return (
       <div>
-        <PageHeader title="Overview" desc="Loading your workspace..." />
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div
-              key={i}
-              className="card-premium p-4 h-24 animate-pulse bg-slate-50"
-            />
+        <PageHeader
+          icon={LayoutGrid}
+          title="Overview"
+          desc="Loading your workspace..."
+        />
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-[18px]">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="card-premium h-28 animate-pulse" />
           ))}
         </div>
       </div>
@@ -227,12 +193,21 @@ export default function Overview() {
   return (
     <div>
       <PageHeader
+        icon={LayoutGrid}
         title="Overview"
-        desc="A live snapshot of your workforce, attendance, and approvals."
+        desc={
+          isEmployee
+            ? "Your attendance, leave requests and work targets at a glance."
+            : "A live snapshot of your workforce, attendance, and approvals."
+        }
       />
 
       {/* ===== STAT CARDS ===== */}
-      <div className={`grid grid-cols-2 md:grid-cols-3 ${isEmployee ? "xl:grid-cols-3" : "xl:grid-cols-5"} gap-4 mb-6`}>
+      <div
+        className={`grid grid-cols-1 sm:grid-cols-2 ${
+          isEmployee ? "xl:grid-cols-3" : "xl:grid-cols-4"
+        } gap-4 md:gap-[18px] mb-6`}
+      >
         {!isEmployee && (
           <StatCard
             icon={Users}
@@ -259,24 +234,25 @@ export default function Overview() {
           to="/leave-approvals"
           accent={2}
         />
-        {!isEmployee && (
+        {isEmployee ? (
           <StatCard
-            icon={ClipboardList}
-            label="Interviews"
-            value={interviews.length}
-            sub="Tracked in pipeline"
-            to="/interviews"
-            accent={3}
+            icon={FileText}
+            label="My Work Targets"
+            value={workTargets.filter((t) => t.isActive === 1 || t.isActive === true).length}
+            sub="Active targets"
+            to="/work-target"
+            accent={4}
+          />
+        ) : (
+          <StatCard
+            icon={FileText}
+            label="Invoices"
+            value={invoices.length}
+            sub="All invoices"
+            to="/invoices"
+            accent={4}
           />
         )}
-        <StatCard
-          icon={FileText}
-          label="Invoices"
-          value={invoices.length}
-          sub={isEmployee ? "My invoices" : "All invoices"}
-          to="/invoices"
-          accent={4}
-        />
       </div>
 
       {/* ===== PANELS ===== */}
@@ -288,20 +264,17 @@ export default function Overview() {
             to="/employees"
           >
             {deptList.length === 0 && (
-              <p className="text-sm text-slate-400">No employees yet.</p>
+              <p className="ov-empty">No employees yet.</p>
             )}
-            <div className="flex flex-col gap-3.5">
+            <div className="flex flex-col gap-4">
               {deptList.map(([dept, count]) => (
-                <div key={dept}>
-                  <div className="flex items-center justify-between text-xs mb-1.5">
-                    <span className="font-semibold text-slate-700">{dept}</span>
-                    <span className="font-semibold text-slate-400">{count}</span>
+                <div key={dept} className="ov-dept">
+                  <div className="ov-dept-row">
+                    <span>{dept}</span>
+                    <span>{count}</span>
                   </div>
-                  <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all"
-                      style={{ width: `${(count / maxDept) * 100}%` }}
-                    />
+                  <div className="ov-bar">
+                    <i style={{ width: `${(count / maxDept) * 100}%` }} />
                   </div>
                 </div>
               ))}
@@ -316,31 +289,24 @@ export default function Overview() {
           to="/leave-approvals"
         >
           {leaves.length === 0 && (
-            <p className="text-sm text-slate-400">No leave requests.</p>
+            <p className="ov-empty">No leave requests.</p>
           )}
-          <table className="w-full min-w-[280px] text-sm">
-            <tbody>
-              {leaves.slice(0, 8).map((l, i) => (
-                <tr
-                  key={l.id ?? i}
-                  className="border-b border-slate-50 last:border-0 hover:bg-indigo-50/30 transition-colors"
-                >
-                  <td className="py-2.5 pr-2 font-semibold text-slate-800 whitespace-nowrap">
-                    {l.employee_name || l.name || `#${l.employee_id}`}
-                    <div className="text-[11px] font-normal text-slate-400">
-                      {l.leave_type || l.type || ""}
-                    </div>
-                  </td>
-                  <td className="py-2.5 pr-2 text-xs text-slate-500 whitespace-nowrap">
-                    {String(l.from_date || l.start_date || "").slice(0, 10)}
-                  </td>
-                  <td className="py-2.5 text-right">
-                    <Tone value={l.status} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="ov-rows">
+            {leaves.slice(0, 8).map((l, i) => (
+              <div key={l.id ?? i} className="ov-row">
+                <div className="min-w-0">
+                  <b className="truncate">
+                    {l.employee_name || l.name || selfName || `#${l.employee_id}`}
+                  </b>
+                  <small>{l.leave_type || l.type || ""}</small>
+                </div>
+                <span className="ov-row-date">
+                  {String(l.from_date || l.start_date || "").slice(0, 10)}
+                </span>
+                <Tone value={l.status} />
+              </div>
+            ))}
+          </div>
         </Panel>
 
         {/* Recent attendance */}
@@ -350,28 +316,21 @@ export default function Overview() {
           to="/attendance"
         >
           {attendance.length === 0 && (
-            <p className="text-sm text-slate-400">No attendance records.</p>
+            <p className="ov-empty">No attendance records.</p>
           )}
-          <table className="w-full min-w-[280px] text-sm">
-            <tbody>
-              {attendance.slice(0, 8).map((a, i) => (
-                <tr
-                  key={a.id ?? i}
-                  className="border-b border-slate-50 last:border-0 hover:bg-indigo-50/30 transition-colors"
-                >
-                  <td className="py-2.5 pr-2 font-semibold text-slate-800 whitespace-nowrap">
-                    {a.employee_name || a.name || `#${a.employee_id}`}
-                  </td>
-                  <td className="py-2.5 pr-2 text-xs text-slate-500 whitespace-nowrap">
-                    {String(a.date || a.attendance_date || "").slice(0, 10)}
-                  </td>
-                  <td className="py-2.5 text-right">
-                    <Tone value={a.status} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="ov-rows">
+            {attendance.slice(0, 8).map((a, i) => (
+              <div key={a.id ?? i} className="ov-row">
+                <span className="ov-row-id truncate">
+                  {a.employee_name || a.name || selfName || `#${a.employee_id}`}
+                </span>
+                <span className="ov-row-date">
+                  {String(a.date || a.attendance_date || "").slice(0, 10)}
+                </span>
+                <Tone value={a.status} uppercase />
+              </div>
+            ))}
+          </div>
         </Panel>
       </div>
     </div>

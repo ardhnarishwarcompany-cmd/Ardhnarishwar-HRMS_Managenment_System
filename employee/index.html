@@ -4,27 +4,28 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/jpeg" href="/logo.jpeg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Employee | HRMS</title>
+    <title>ARDHNARISHWAR – HRMS Employee Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- PWA -->
     <meta name="theme-color" content="#4f46e5" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="apple-touch-icon" href="/pwa-192.png" />
 
-    <!-- Apply saved theme before React loads: prevents white flash in dark mode -->
+    <!-- Force light mode -->
     <script>
       (function () {
         try {
-          var t = localStorage.getItem("hrms-theme");
-          var dark =
-            t === "dark" ||
-            ((t === null || t === "system") &&
-              window.matchMedia("(prefers-color-scheme: dark)").matches);
-          if (dark) document.documentElement.classList.add("dark");
+          localStorage.removeItem("hrms-theme");
+          document.documentElement.classList.remove("dark");
+          document.documentElement.setAttribute("data-theme", "light");
         } catch (e) {}
       })();
     </script>
-  </head>
+    <link rel="stylesheet" href="/logo-3d-bounce.css?v=1">
+</head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>

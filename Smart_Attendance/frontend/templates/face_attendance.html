@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Face AI Biometric Attendance • Global Attendance Management System</title>
-<link rel="icon" type="image/svg+xml" href="/favicon.ico">
+<title>Face AI Biometric Attendance • Ardhnarishwar Global Platform</title>
+<link rel="icon" type="image/png" href="/static/images/ardhnarishwar_logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/css/theme.css">
+<link rel="stylesheet" href="/static/css/ardhnarishwar_3d.css">
 <style>
 .clockin-container {
   min-height: 100vh;
@@ -181,16 +182,19 @@
   color: #000;
 }
 </style>
+<link rel="stylesheet" href="/static/css/ardh_logo.css?v=1">
 </head>
 <body>
 <div class="clockin-container">
-  <div class="clockin-card">
+  <div class="clockin-card card-3d">
     <div class="hud-top">
       <div class="hud-title">
-        <div class="hud-icon">📷</div>
+        <div class="ardh-medallion-nav" style="width:48px; height:48px;">
+          <img src="/static/images/ardhnarishwar_logo_emblem.png" alt="Ardhnarishwar Logo" class="ardh-medallion-img">
+        </div>
         <div>
-          <h1 style="font-size:18px; font-weight:800; letter-spacing:-0.3px;">Authorized Attendance Engine</h1>
-          <p style="font-size:12px; color:var(--text-muted); font-family:var(--font-mono);">MULTI-FACTOR BIOMETRIC & OFFLINE VAULT</p>
+          <h1 style="font-size:18px; font-weight:900; letter-spacing:-0.3px; background:linear-gradient(135deg, #C084FC, #38BDF8, #FBBF24); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">ARDHNARISHWAR FACE AI</h1>
+          <p style="font-size:11.5px; color:var(--text-muted); font-family:var(--font-mono);">MULTI-FACTOR BIOMETRIC NEURAL SCANNER</p>
         </div>
       </div>
       <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
@@ -203,10 +207,20 @@
       </div>
     </div>
 
+    <!-- Clock-IN / Clock-OUT Selector -->
+    <div style="display:flex; background:var(--bg-input); padding:4px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle); margin-bottom:12px;">
+      <button type="button" id="toggle-punch-in" onclick="setPunchType('IN')" style="flex:1; padding:8px 12px; border-radius:6px; border:none; font-weight:700; font-size:12.5px; cursor:pointer; background:var(--emerald); color:#fff; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;">
+        <span>🟢 Clock-IN</span>
+      </button>
+      <button type="button" id="toggle-punch-out" onclick="setPunchType('OUT')" style="flex:1; padding:8px 12px; border-radius:6px; border:none; font-weight:700; font-size:12.5px; cursor:pointer; background:transparent; color:var(--text-secondary); display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;">
+        <span>🔴 Clock-OUT</span>
+      </button>
+    </div>
+
     <!-- Mode Selector Tabs -->
     <div class="checkin-tab-nav">
       <button class="checkin-tab-btn active" id="tab-btn-face" onclick="switchCheckInMode('face')">📷 Biometric Face AI</button>
-      <button class="checkin-tab-btn" id="tab-btn-code" onclick="switchCheckInMode('code')">🔢 Dynamic Code / QR</button>
+      <button class="checkin-tab-btn" id="tab-btn-code" onclick="switchCheckInMode('code')">🔢 Email OTP Verification</button>
     </div>
 
     <!-- Live Telemetry Stream -->
@@ -214,6 +228,10 @@
       <div class="telemetry-item">
         <span class="telemetry-label">Employee ID</span>
         <span class="telemetry-val" id="emp-id">EMP-000</span>
+      </div>
+      <div class="telemetry-item">
+        <span class="telemetry-label">Punch Type</span>
+        <span class="telemetry-val" style="color:var(--emerald);" id="punch-type-label">Clock-IN</span>
       </div>
       <div class="telemetry-item">
         <span class="telemetry-label">Engine Mode</span>
@@ -276,12 +294,13 @@
     <!-- Dynamic Code / In-App OTP Input Box (For Code Mode) -->
     <div id="code-input-box" style="display:none; background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:20px; text-align:center;">
       <span style="font-size:32px; display:block; margin-bottom:8px;">🔑</span>
-      <h3 style="font-size:15px; margin-bottom:6px;">Enter Dynamic Office Token or In-App OTP</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Scan the rotating token displayed at your office terminal, or enter your 6-digit In-App OTP code.</p>
+      <h3 style="font-size:15px; margin-bottom:6px;">Email OTP Verification</h3>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Send a 6-digit OTP to the company's authorized HR / Manager email, then enter the code below.</p>
       <input type="text" id="dynamic-code-input" class="form-input" style="font-size:20px; font-weight:800; letter-spacing:4px; text-align:center; max-width:240px; margin:0 auto 10px;" placeholder="000000" maxlength="6">
-      <button class="btn btn-secondary btn-sm" onclick="fetchMyActiveOTP()" style="margin-top:4px;">
-        🔍 Check My In-App Private OTP
+      <button class="btn btn-secondary btn-sm" onclick="requestEmailOtp()" style="margin-top:4px;">
+        📧 Send OTP to Authorized Email
       </button>
+      <div id="email-otp-status" style="font-size:11.5px;color:var(--text-muted);margin-top:6px;min-height:18px;"></div>
     </div>
 
     <!-- Success Confirmation Box -->
@@ -302,7 +321,7 @@
     </button>
 
     <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--text-muted); margin-top:4px;">
-      <a href="/employee" style="color:var(--text-muted); text-decoration:none;">← Return to Portal</a>
+      <a href="/employee" class="btn btn-secondary btn-sm" style="text-decoration:none;">← Return to Portal</a>
       <span style="font-family:var(--font-mono);">ZERO 3RD PARTY LEAK</span>
     </div>
   </div>
@@ -318,11 +337,66 @@ let stream = null;
 let currentCompanyId = "";
 let currentEmpId = "";
 let currentMode = "face"; // 'face' or 'code'
+let currentPunchType = "IN"; // 'IN' or 'OUT'
 let userLat = null;
 let userLng = null;
 let userAccuracy = null;
 
+function setPunchType(type) {
+  currentPunchType = type;
+  const inBtn = document.getElementById('toggle-punch-in');
+  const outBtn = document.getElementById('toggle-punch-out');
+  const label = document.getElementById('punch-type-label');
+  const actionBtn = document.getElementById('btn-action');
+
+  if (type === 'OUT') {
+    if (inBtn) {
+      inBtn.style.background = 'transparent';
+      inBtn.style.color = 'var(--text-secondary)';
+    }
+    if (outBtn) {
+      outBtn.style.background = 'var(--rose)';
+      outBtn.style.color = '#fff';
+    }
+    if (label) {
+      label.textContent = 'Clock-OUT';
+      label.style.color = 'var(--rose)';
+    }
+    if (actionBtn && currentMode === 'code') {
+      actionBtn.innerHTML = '<span>Verify OTP & Clock-OUT</span> ⚡';
+    } else if (actionBtn && stream) {
+      actionBtn.innerHTML = '<span>Scan Face & Clock-OUT</span> ⚡';
+    }
+  } else {
+    if (inBtn) {
+      inBtn.style.background = 'var(--emerald)';
+      inBtn.style.color = '#fff';
+    }
+    if (outBtn) {
+      outBtn.style.background = 'transparent';
+      outBtn.style.color = 'var(--text-secondary)';
+    }
+    if (label) {
+      label.textContent = 'Clock-IN';
+      label.style.color = 'var(--emerald)';
+    }
+    if (actionBtn && currentMode === 'code') {
+      actionBtn.innerHTML = '<span>Verify OTP & Clock-IN</span> ⚡';
+    } else if (actionBtn && stream) {
+      actionBtn.innerHTML = '<span>Scan Face & Clock-IN</span> ⚡';
+    }
+  }
+}
+
 async function initPage() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const modeParam = (urlParams.get('mode') || '').toUpperCase();
+  if (modeParam === 'OUT') {
+    setPunchType('OUT');
+  } else {
+    setPunchType('IN');
+  }
+
   try {
     const res = await fetch('/api/me');
     const data = await res.json();
@@ -372,12 +446,12 @@ function switchCheckInMode(mode) {
     camBox.style.display = 'block';
     codeBox.style.display = 'none';
     modeLabel.textContent = 'Biometric Vision';
-    btn.innerHTML = stream ? '<span>Scan & Record Attendance</span> ⚡' : '<span>Engage Camera Stream</span> →';
+    btn.innerHTML = stream ? `<span>Scan Face & Clock-${currentPunchType}</span> ⚡` : '<span>Engage Camera Stream</span> →';
   } else {
     camBox.style.display = 'none';
     codeBox.style.display = 'block';
-    modeLabel.textContent = 'Dynamic Token';
-    btn.innerHTML = '<span>Verify Code & Check-In</span> ⚡';
+    modeLabel.textContent = 'Email OTP';
+    btn.innerHTML = `<span>Verify OTP & Clock-${currentPunchType}</span> ⚡`;
     if (stream && window.ArdhnarishwarTelemetry) {
       ArdhnarishwarTelemetry.stopCamera(document.getElementById('cam-video'));
       stream = null;
@@ -385,20 +459,8 @@ function switchCheckInMode(mode) {
   }
 }
 
-async function fetchMyActiveOTP() {
-  try {
-    const res = await fetch('/api/attendance/my-active-otp');
-    const data = await res.json();
-    if (data.ok && data.otp_code) {
-      document.getElementById('dynamic-code-input').value = data.otp_code;
-      showToast(`In-App OTP retrieved: ${data.otp_code} (Valid for ${data.expires_in_seconds}s)`, 'success');
-    } else {
-      showToast(data.error || 'No active OTP request found for your account. Please request OTP first.', 'error');
-    }
-  } catch (e) {
-    showToast('Failed to retrieve active OTP', 'error');
-  }
-}
+let emailOtpSent=false;
+async function requestEmailOtp(){resolveActiveIds();const statusEl=document.getElementById('email-otp-status');if(statusEl)statusEl.textContent='Sending secure OTP to the authorized company email...';try{const res=await fetch('/api/attendance/otp-send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({company_id:currentCompanyId,emp_id:currentEmpId})});const data=await res.json();if(!data.ok)throw new Error(data.error||'Unable to send OTP');emailOtpSent=true;if(statusEl)statusEl.textContent='OTP sent. Valid for 5 minutes and delivered to the company authorized person.';showToast(data.message||'OTP sent successfully','success');document.getElementById('dynamic-code-input').focus();}catch(e){emailOtpSent=false;if(statusEl)statusEl.textContent=e.message||'OTP could not be sent';showToast(e.message||'Failed to send OTP','error');}}
 
 async function handleCheckInAction() {
   if (currentMode === 'face') {
@@ -408,35 +470,7 @@ async function handleCheckInAction() {
   }
 }
 
-async function submitCodeCheckIn() {
-  const code = document.getElementById('dynamic-code-input').value.trim();
-  if (!code) {
-    showToast('Please enter the 6-digit dynamic code or OTP', 'error');
-    return;
-  }
-
-  // Resolve IDs
-  resolveActiveIds();
-  const btn = document.getElementById('btn-action');
-  btn.disabled = true;
-  btn.innerHTML = '<span>Verifying Token...</span> ⏳';
-
-  const payload = {
-    company_id: currentCompanyId,
-    emp_id: currentEmpId,
-    method: 'Code',
-    code: code,
-    lat: userLat,
-    lng: userLng,
-    accuracy: userAccuracy
-  };
-
-  const result = await ArdhnarishwarTelemetry.executeCheckIn(payload);
-  btn.disabled = false;
-  btn.innerHTML = '<span>Verify Code & Check-In</span> ⚡';
-
-  handleCheckInResponse(result);
-}
+async function submitCodeCheckIn(){const code=document.getElementById('dynamic-code-input').value.trim();if(!emailOtpSent){showToast('Send the Email OTP first, then enter the 6-digit code.','error');return;}if(!/^\d{6}$/.test(code)){showToast('Please enter the 6-digit OTP.','error');return;}resolveActiveIds();const btn=document.getElementById('btn-action');btn.disabled=true;btn.innerHTML='<span>Verifying Email OTP...</span> ⏳';try{const res=await fetch('/api/attendance/otp-verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({company_id:currentCompanyId,emp_id:currentEmpId,otp:code,check_type:currentPunchType})});const result=await res.json();btn.disabled=false;btn.innerHTML=`<span>Verify OTP & Clock-${currentPunchType}</span> ⚡`;handleCheckInResponse(result);}catch(e){btn.disabled=false;btn.innerHTML=`<span>Verify OTP & Clock-${currentPunchType}</span> ⚡`;showToast('Network error verifying OTP','error');}}
 
 let currentLivenessSession = null;
 let livenessTimerInterval = null;
@@ -635,6 +669,7 @@ async function startOrCaptureFace() {
     lat: userLat,
     lng: userLng,
     accuracy: userAccuracy,
+    check_type: currentPunchType,
     timezone: actionSnapshot.timezone,
     timestamp: actionSnapshot.timestampIso
   };
@@ -649,7 +684,7 @@ async function startOrCaptureFace() {
     return;
   }
 
-  btn.innerHTML = '<span>Scan & Record Attendance</span> ⚡';
+  btn.innerHTML = `<span>Scan Face & Clock-${currentPunchType}</span> ⚡`;
   handleCheckInResponse(result);
 }
 
@@ -721,6 +756,20 @@ function showToast(msg, type = 'info') {
 }
 
 window.onload = initPage;
+</script>
+<script src="/static/js/ardhnarishwar_runtime.js"></script>
+<script src="/static/js/ardh_logo.js?v=1"></script>
+<script id="face-only-hide-otp-v1">
+(function () {
+  function hideOtp() {
+    document.querySelectorAll('body *').forEach(function (e) {
+      var tx = (e.textContent || '').trim();
+      if (tx && tx.length <= 32 && tx.indexOf('Email OTP Verification') !== -1) e.style.display = 'none';
+    });
+  }
+  document.addEventListener('DOMContentLoaded', hideOtp);
+  setTimeout(hideOtp, 600);
+})();
 </script>
 </body>
 </html>

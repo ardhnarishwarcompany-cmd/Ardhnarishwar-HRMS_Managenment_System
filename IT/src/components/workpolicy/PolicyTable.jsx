@@ -185,63 +185,94 @@ export default function PolicyTable({ rows, loading, onRefresh, onDelete, onEdit
 
       {selected && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
           onClick={() => setSelected(null)}
           role="dialog"
           aria-modal="true"
         >
-          <div className="w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-black/5 dark:bg-slate-900" onClick={(e) => e.stopPropagation()}>
-            <div className="relative overflow-hidden bg-slate-950 px-7 py-6 text-white">
-              <div aria-hidden className="pointer-events-none absolute inset-0 opacity-70" style={{ background: "radial-gradient(600px circle at 90% -20%, rgba(99,102,241,.55), transparent 60%)" }} />
+          <div
+            className="w-full max-w-2xl overflow-hidden rounded-[28px] border border-[var(--line)] bg-[var(--card)] shadow-2xl transition-all dark:bg-slate-900"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header with IT brand gradient */}
+            <div className="relative overflow-hidden bg-gradient-to-r from-[#6d28d9] via-[#7c3aed] to-[#c026d3] px-7 py-6 text-white shadow-md">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 opacity-25"
+                style={{
+                  background:
+                    "radial-gradient(500px circle at 90% 10%, rgba(255,255,255,0.4), transparent 60%)",
+                }}
+              />
               <div className="relative flex items-start justify-between gap-4">
                 <div className="min-w-0">
-                  <p className="font-mono text-xs text-indigo-300">{selected.policyId || `POL-${selected.id}`}</p>
-                  <h3 className="mt-1 truncate text-xl font-bold tracking-tight">{selected.title}</h3>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="inline-flex items-center rounded-lg bg-white/20 px-2.5 py-0.5 font-mono text-xs font-bold text-white backdrop-blur-md border border-white/25">
+                      {selected.policyId || `POL-${selected.id}`}
+                    </span>
+                    <StatusBadge status={selected.status} />
+                  </div>
+                  <h3 className="mt-2 truncate text-xl font-bold tracking-tight text-white drop-shadow-sm">
+                    {selected.title}
+                  </h3>
                 </div>
-                <button onClick={() => setSelected(null)} aria-label="Close" className="rounded-lg p-1.5 text-white/60 transition hover:bg-white/10 hover:text-white">
+                <button
+                  onClick={() => setSelected(null)}
+                  aria-label="Close"
+                  className="rounded-xl bg-white/15 p-2 text-white/90 backdrop-blur-sm transition hover:bg-white/25 hover:text-white"
+                >
                   <X size={18} />
                 </button>
               </div>
             </div>
 
             <div className="flex flex-col gap-6 p-7">
-              <dl className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm sm:grid-cols-4">
+              {/* Metadata Grid */}
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {[
                   ["Category", selected.category],
                   ["Department", selected.department || "All"],
                   ["Effective", fmt(selected.effectiveDate)],
                   ["Updated", fmt(selected.lastUpdated)],
                 ].map(([k, v]) => (
-                  <div key={k}>
-                    <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-400">{k}</dt>
-                    <dd className="mt-1 font-semibold text-gray-900 dark:text-white">{v}</dd>
+                  <div
+                    key={k}
+                    className="rounded-2xl border border-[var(--line)] bg-[var(--soft)]/70 p-3.5 transition dark:bg-slate-800/60 dark:border-slate-800"
+                  >
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--mute)]">
+                      {k}
+                    </p>
+                    <p className="mt-1 text-sm font-bold text-[var(--ink)] truncate dark:text-white">
+                      {v}
+                    </p>
                   </div>
                 ))}
-                <div>
-                  <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-400">Status</dt>
-                  <dd className="mt-1"><StatusBadge status={selected.status} /></dd>
-                </div>
-              </dl>
+              </div>
 
+              {/* Description */}
               <div>
-                <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-400">Description</p>
-                <p className="whitespace-pre-wrap rounded-2xl bg-gray-50 p-4 text-sm leading-relaxed text-gray-700 dark:bg-slate-800 dark:text-slate-200">
+                <p className="mb-2 text-xs font-bold uppercase tracking-wider text-[var(--mute)]">
+                  Description
+                </p>
+                <p className="whitespace-pre-wrap rounded-2xl border border-[var(--line)] bg-[var(--soft)]/40 p-4 text-sm leading-relaxed text-[var(--ink)] dark:bg-slate-800/40 dark:border-slate-800 dark:text-slate-200">
                   {selected.description || "No description provided."}
                 </p>
               </div>
 
-              <div className="flex flex-col gap-2 border-t border-gray-100 pt-5 sm:flex-row dark:border-slate-800">
+              {/* Actions */}
+              <div className="flex flex-col gap-3 border-t border-[var(--line)] pt-5 sm:flex-row dark:border-slate-800">
                 <button
                   onClick={() => handleDownload(selected)}
                   disabled={downloading}
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-600/25 transition hover:bg-indigo-700 disabled:opacity-60"
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl py-3 px-5 text-sm font-bold text-white shadow-lg shadow-purple-600/30 transition-all hover:shadow-purple-600/50 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60"
+                  style={{ background: "linear-gradient(135deg, #6d28d9, #c026d3)" }}
                 >
                   <Download size={16} /> {downloading ? "Preparing PDF..." : "Download PDF"}
                 </button>
                 {canMutate && (
                   <button
                     onClick={() => handleEdit(selected)}
-                    className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                    className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-[var(--line)] bg-[var(--card)] px-5 py-3 text-sm font-bold text-[var(--ink)] transition hover:bg-[var(--soft)] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                   >
                     <Pencil size={16} /> Edit policy
                   </button>

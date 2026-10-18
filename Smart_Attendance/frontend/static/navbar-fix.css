@@ -1,0 +1,46 @@
+/* navbar-fix.css : compact + responsive header & page layout */
+.navbar { flex-wrap: wrap; gap: 10px 20px; padding: 10px 24px; }
+.nav-brand { flex: 1 1 340px; min-width: 0; gap: 12px; }
+.nav-brand > div:last-child { min-width: 0; }
+.nav-brand > div:last-child > div:first-child { flex-wrap: wrap; row-gap: 4px; }
+.brand-title { font-size: 16px; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.brand-sub { font-size: 10px; letter-spacing: 0.4px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.navbar > div:last-child { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px !important; flex: 0 1 auto; max-width: 100%; }
+.navbar .theme-btn-trigger, .navbar .btn-sound-fx, .navbar .btn-runtime-refresh, .navbar .auto-refresh-toggle, .navbar .runtime-live-pill, .navbar a.badge, .navbar .tz-clock-badge, .navbar .btn-sm { min-height: 32px; padding: 0 12px; font-size: 11.5px; line-height: 1; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; box-sizing: border-box; }
+.navbar .runtime-last-sync { font-size: 10.5px; white-space: nowrap; }
+.navbar .auto-refresh-toggle b { font-weight: 700; }
+@media (max-width: 1700px) { .navbar .runtime-last-sync { display: none; } }
+@media (max-width: 1450px) {
+  .navbar > div:last-child { flex: 1 1 100%; justify-content: flex-start; padding-top: 10px; border-top: 1px solid var(--border-subtle); }
+  .navbar .runtime-last-sync { display: inline-flex; }
+  .navbar > div:last-child > .btn-danger:last-child { margin-left: auto; }
+}
+@media (max-width: 900px) {
+  .navbar { padding: 10px 16px; }
+  .navbar .runtime-last-sync, .navbar a.badge[href="/health"], .navbar .tz-clock-badge { display: none; }
+  .navbar #current-theme-label > span:last-child, .navbar .btn-sound-fx > span:last-child, .navbar .btn-runtime-refresh > span:last-child, .navbar .runtime-live-pill > span:last-child { display: none; }
+  .navbar .theme-btn-trigger, .navbar .btn-sound-fx, .navbar .btn-runtime-refresh { padding: 0 10px; }
+  .main-content { padding: 20px 18px; }
+  .brand-sub { display: none; }
+}
+@media (max-width: 600px) {
+  .navbar { position: static; padding: 10px 12px; gap: 8px; }
+  .ardh-medallion-nav { width: 38px; height: 38px; }
+  .brand-title { font-size: 14px; white-space: normal; }
+  .nav-brand > div:last-child > div:first-child .badge { font-size: 9.5px !important; padding: 2px 6px !important; }
+  .navbar > div:last-child { padding-top: 8px; gap: 6px !important; }
+  .main-content { padding: 14px 12px; }
+  .page-header { margin-bottom: 18px; gap: 12px; }
+  .page-title h1 { font-size: 20px; }
+  .page-header > div:last-child { width: 100%; }
+  .page-header > div:last-child > * { flex: 0 1 auto; max-width: 100%; }
+  .page-header select, .page-header input { max-width: 100%; }
+  .telemetry-hud-bar { padding: 8px 12px; margin-bottom: 16px; gap: 8px; }
+  .telemetry-pill { font-size: 11px; padding: 4px 9px; }
+}
+.page-header > div:last-child { flex-wrap: wrap !important; }
+.view-tabs { flex-wrap: nowrap; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
+.view-tab { flex: 0 0 auto; white-space: nowrap; }
+.table-container { max-width: 100%; -webkit-overflow-scrolling: touch; }
+.card, .main-content { min-width: 0; }
+img { max-width: 100%; }

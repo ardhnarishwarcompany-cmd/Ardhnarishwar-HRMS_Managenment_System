@@ -1,9 +1,13 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
-import { Clock, Download } from "lucide-react";
+import { Clock, Download, Users } from "lucide-react";
 
-export default function AttendanceFilters({ filters, onFilterChange }) {
-  const [departments, setDepartments] = useState([]);
+const SCOPE_OPTIONS = [
+  { id: "department", label: "IT department" },
+  { id: "me", label: "My records" },
+];
+
+export default function AttendanceFilters({ filters, onFilterChange, isAdmin = false }) {
   const [exporting, setExporting] = useState(false);
 
   const token = localStorage.getItem("hrms_it_Token");
@@ -13,20 +17,7 @@ export default function AttendanceFilters({ filters, onFilterChange }) {
     onFilterChange((prev) => ({ ...prev, [key]: value }));
   };
 
-  useEffect(() => {
-    const fetchDepartments = async () => {
-      try {
-        const res = await axios.get(`${BASE}/hr/departments`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setDepartments(res?.data?.departments || []);
-      } catch (err) {
-        console.error("Department fetch failed", err);
-      }
-    };
-
-    fetchDepartments();
-  }, []);
+  const scope = filters.scope || (isAdmin ? "department" : "me");
 
   // NEW: Export handler
   const handleExport = async () => {
@@ -35,7 +26,7 @@ export default function AttendanceFilters({ filters, onFilterChange }) {
       
       const queryParams = new URLSearchParams({
         date: filters.date || new Date().toISOString().split('T')[0],
-        department: filters.department || '',
+        scope,
         status: filters.status || ''
       });
 
@@ -67,46 +58,56 @@ export default function AttendanceFilters({ filters, onFilterChange }) {
   };
 
   return (
-    <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl px-6 py-4 shadow-lg">
+    <div className="it-card px-6 py-4">
       <div className="flex flex-wrap items-center gap-4">
 
         {/* DATE */}
         <div className="flex items-center gap-2">
-          <Clock className="w-5 h-5 text-gray-500" />
-          <label className="text-sm font-medium text-gray-700">Date</label>
+          <Clock className="w-4 h-4 text-[var(--mute)]" />
+          <label className="text-xs font-bold uppercase tracking-wider text-[var(--mute)]">Date</label>
           <input
             type="date"
             value={filters.date}
             onChange={(e) => handleChange("date", e.target.value)}
-            className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
+            className="px-3.5 py-2 border border-[var(--line)] bg-white rounded-xl text-sm text-[var(--ink)] focus:outline-none focus:border-[var(--p)] focus:ring-2 focus:ring-purple-500/20 transition"
           />
         </div>
 
-        {/* DEPARTMENT */}
+        {/* SCOPE: IT department (for admin) or My records (for candidate) */}
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-gray-700">Department</label>
-          <select
-            value={filters.department}
-            onChange={(e) => handleChange("department", e.target.value)}
-            className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
-          >
-            <option value="">All Departments</option>
-
-            {departments.map((dept) => (
-              <option key={dept.id} value={dept.id}>
-                {dept.name}
-              </option>
-            ))}
-          </select>
+          <Users className="w-4 h-4 text-[var(--mute)]" />
+          {isAdmin ? (
+            <div className="inline-flex rounded-xl border border-[var(--line)] bg-[var(--soft)]/50 p-1" role="group" aria-label="Attendance scope">
+              {SCOPE_OPTIONS.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => handleChange("scope", option.id)}
+                  aria-pressed={scope === option.id}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-bold transition ${
+                    scope === option.id
+                      ? "bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white shadow-sm"
+                      : "text-[var(--mute)] hover:text-[var(--ink)]"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <span className="rounded-xl bg-purple-50 border border-purple-100 px-3 py-1.5 text-xs font-bold text-[var(--p)]">
+              My Records
+            </span>
+          )}
         </div>
 
         {/* STATUS */}
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-gray-700">Status</label>
+          <label className="text-xs font-bold uppercase tracking-wider text-[var(--mute)]">Status</label>
           <select
             value={filters.status}
             onChange={(e) => handleChange("status", e.target.value)}
-            className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
+            className="px-3.5 py-2 border border-[var(--line)] bg-white rounded-xl text-sm text-[var(--ink)] focus:outline-none focus:border-[var(--p)] focus:ring-2 focus:ring-purple-500/20 transition"
           >
             <option value="">All Status</option>
             <option value="present">Present</option>
@@ -118,14 +119,14 @@ export default function AttendanceFilters({ filters, onFilterChange }) {
 
         <div className="flex-1" />
 
-        {/* EXPORT BUTTON - NOW WITH onClick HANDLER */}
+        {/* EXPORT BUTTON */}
         <button 
           onClick={handleExport}
           disabled={exporting}
-          className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white font-semibold text-sm shadow-md shadow-purple-500/25 transition hover:shadow-purple-500/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-60 disabled:hover:translate-y-0"
         >
           <Download className="w-4 h-4" />
-          {exporting ? 'Exporting...' : 'Export'}
+          {exporting ? 'Exporting...' : 'Export CSV'}
         </button>
       </div>
     </div>

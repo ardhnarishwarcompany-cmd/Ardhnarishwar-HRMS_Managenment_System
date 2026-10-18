@@ -5,9 +5,8 @@ export const getAllInventory = async (req, res) => {
   try {
     const { search, category } = req.query;
 
-    let sql = "SELECT * FROM sales_inventory WHERE 1=1";
-    const params = [];
-
+    let sql = "SELECT * FROM sales_inventory WHERE created_by = ?";
+    const params = [req.salesUser?.employeeId];
     if (search) {
       sql += " AND item_name LIKE ?";
       params.push(`%${search}%`);
@@ -36,11 +35,14 @@ export const getInventoryStats = async (req, res) => {
         COALESCE(SUM(quantity * price), 0) AS total_value,
         COALESCE(SUM(quantity), 0) AS total_units,
         SUM(CASE WHEN quantity <= low_stock_threshold THEN 1 ELSE 0 END) AS low_stock_count
-       FROM sales_inventory`,
+       FROM sales_inventory
+       WHERE created_by = ?`,
+      [req.salesUser?.employeeId],
     );
 
     const [categories] = await db.query(
-      "SELECT DISTINCT category FROM sales_inventory WHERE category IS NOT NULL AND category != ''",
+      "SELECT DISTINCT category FROM sales_inventory WHERE created_by = ? AND category IS NOT NULL AND category != ''",
+      [req.salesUser?.employeeId],
     );
 
     res.json({
@@ -133,7 +135,7 @@ export const updateInventoryItem = async (req, res) => {
       `UPDATE sales_inventory SET
         item_name = ?, category = ?, quantity = ?, price = ?,
         mrp = ?, discount_price = ?, gst_percent = ?, low_stock_threshold = ?
-       WHERE id = ?`,
+       WHERE id = ? AND created_by = ?`,
       [
         String(item_name).trim(),
         category || null,
@@ -144,6 +146,7 @@ export const updateInventoryItem = async (req, res) => {
         Number.parseFloat(gst_percent) || 0,
         Number.parseInt(low_stock_threshold, 10) || 5,
         id,
+        req.salesUser?.employeeId,
       ],
     );
 
@@ -169,8 +172,8 @@ export const adjustStock = async (req, res) => {
     }
 
     const [result] = await db.query(
-      "UPDATE sales_inventory SET quantity = GREATEST(quantity + ?, 0) WHERE id = ?",
-      [delta, id],
+      "UPDATE sales_inventory SET quantity = GREATEST(quantity + ?, 0) WHERE id = ? AND created_by = ?",
+      [delta, id, req.salesUser?.employeeId],
     );
 
     if (result.affectedRows === 0) {
@@ -178,8 +181,8 @@ export const adjustStock = async (req, res) => {
     }
 
     const [[row]] = await db.query(
-      "SELECT quantity FROM sales_inventory WHERE id = ?",
-      [id],
+      "SELECT quantity FROM sales_inventory WHERE id = ? AND created_by = ?",
+      [id, req.salesUser?.employeeId],
     );
 
     res.json({ message: "Stock updated", quantity: row.quantity });
@@ -195,8 +198,8 @@ export const deleteInventoryItem = async (req, res) => {
     const { id } = req.params;
 
     const [result] = await db.query(
-      "DELETE FROM sales_inventory WHERE id = ?",
-      [id],
+      "DELETE FROM sales_inventory WHERE id = ? AND created_by = ?",
+      [id, req.salesUser?.employeeId],
     );
 
     if (result.affectedRows === 0) {

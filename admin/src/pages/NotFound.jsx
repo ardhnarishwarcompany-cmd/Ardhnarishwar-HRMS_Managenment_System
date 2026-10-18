@@ -1,21 +1,26 @@
 import { Link } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 export default function NotFound() {
   return (
-    <div className="min-h-[70vh] flex items-center justify-center p-6">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow border border-gray-100 p-8 text-center">
-        <h1 className="text-3xl font-extrabold text-gray-900">404</h1>
-        <p className="text-gray-600 mt-2">
-          Page not found. This route is not created yet.
+    <main className="flex min-h-[100dvh] items-center justify-center p-6">
+      <div className="w-full max-w-md rounded-[28px] border border-[var(--line)] bg-[var(--card)] p-10 text-center shadow-[var(--shadow)]">
+        <p
+          className="bg-clip-text text-[64px] font-extrabold leading-none tracking-tight text-transparent"
+          style={{ backgroundImage: "var(--grad)" }}
+        >
+          404
+        </p>
+        <h1 className="mt-4 text-lg font-bold text-[var(--ink)]">Page not found</h1>
+        <p className="mt-1.5 text-sm leading-relaxed text-[var(--mute)]">
+          This route is not created yet. Head back to the dashboard to keep working.
         </p>
 
-        <Link
-          to="/"
-          className="inline-block mt-6 px-5 py-2.5 rounded-xl bg-black text-white font-semibold hover:bg-gray-900 transition"
-        >
+        <Link to="/" className="btn-primary mt-7">
+          <ArrowLeft size={16} />
           Go to Dashboard
         </Link>
       </div>
-    </div>
+    </main>
   );
 }

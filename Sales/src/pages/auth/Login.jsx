@@ -126,8 +126,8 @@ export default function Login() {
       {/* header */}
       <header className="lx-rise relative z-10 flex shrink-0 items-center justify-between px-5 py-4 sm:px-8 lg:px-12">
         <div className="flex items-center gap-3">
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 via-fuchsia-500 to-indigo-500 text-sm font-black shadow-[0_0_30px_rgba(217,70,239,.5)]">
-            S
+          <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-violet-500 via-fuchsia-500 to-indigo-500 text-sm font-black shadow-[0_0_30px_rgba(217,70,239,.5)]">
+            <img src="/logo.jpeg" alt="Ardhnarishwar" className="h-full w-full object-cover" />
             <span className="lx-anim absolute inset-0 rounded-xl border border-fuchsia-400/60" style={{ animation: "ringPulse 2.6s ease-out infinite" }} aria-hidden="true" />
           </div>
           <div className="leading-none">

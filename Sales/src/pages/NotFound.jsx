@@ -11,7 +11,7 @@ export default function NotFound() {
 
         <Link
           to="/sales-reports"
-          className="inline-block mt-6 px-5 py-2.5 rounded-xl bg-black text-white font-semibold hover:bg-gray-900 transition"
+          className="btn-primary mt-6"
         >
           Go to Dashboard
         </Link>

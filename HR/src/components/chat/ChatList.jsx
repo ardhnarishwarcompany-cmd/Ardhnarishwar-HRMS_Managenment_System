@@ -94,27 +94,37 @@ export default function ChatList({ setActiveChat, activeChat }) {
 
     const load = async () => {
       try {
-        const [clientsRes, itRes, hrRes] = await Promise.all([
+        // One failing list must not blank the other two.
+        const [clientsRes, itRes, hrRes] = await Promise.allSettled([
           axios.get(`${BASE_URL}/chat/hr/clients`, auth),
           axios.get(`${BASE_URL}/chat/internal/it-contacts`, auth),
           axios.get(`${BASE_URL}/chat/internal/hrs`, auth),
         ]);
+        const rowsOf = (result, label) => {
+          if (result.status === "fulfilled") return result.value.data?.data || [];
+          console.error(`Chat ${label} load error:`, result.reason);
+          return null;
+        };
 
-        const nextClients = clientsRes.data?.data || [];
-        const nextItContacts = (itRes.data?.data || []).map((contact) => ({
+        const clientRows = rowsOf(clientsRes, "clients");
+        const itRows = rowsOf(itRes, "IT contacts");
+        const hrRows = rowsOf(hrRes, "HR contacts");
+
+        const nextClients = clientRows || [];
+        const nextItContacts = (itRows || []).map((contact) => ({
           ...contact,
           contactType: "it",
         }));
-        const nextHrContacts = (hrRes.data?.data || []).map((contact) => ({
+        const nextHrContacts = (hrRows || []).map((contact) => ({
           ...contact,
           contactType: "hr",
         }));
 
         if (cancelled) return;
 
-        setClients(nextClients);
-        setItContacts(nextItContacts);
-        setHrContacts(nextHrContacts);
+        if (clientRows) setClients(nextClients);
+        if (itRows) setItContacts(nextItContacts);
+        if (hrRows) setHrContacts(nextHrContacts);
 
         if (!firstLoadRef.current) {
           for (const contact of [...nextItContacts, ...nextHrContacts]) {

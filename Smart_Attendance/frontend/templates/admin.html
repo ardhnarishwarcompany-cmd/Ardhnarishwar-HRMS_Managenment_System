@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Workspace Admin • Global Attendance Management System</title>
-<link rel="icon" type="image/svg+xml" href="/favicon.ico">
+<title>Ardhnarishwar 3D • Workspace Admin Command Portal</title>
+<link rel="icon" type="image/png" href="/static/images/ardhnarishwar_logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/css/theme.css">
+<link rel="stylesheet" href="/static/css/ardhnarishwar_3d.css">
 <style>
 .dashboard-layout {
   min-height: 100vh;
@@ -226,7 +227,121 @@
   align-items: center;
   gap: 8px;
 }
+
+/* Monthly Matrix & Late/Early Styles */
+.matrix-container {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 650px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: #0B1120;
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+}
+.matrix-table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12px;
+}
+.matrix-table th {
+  padding: 10px 8px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: #151F32 !important;
+  border-bottom: 2px solid var(--border-medium);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  white-space: nowrap;
+}
+.matrix-table td {
+  padding: 6px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: 1px solid rgba(255, 255, 255, 0.03);
+  white-space: nowrap;
+  background: #0B1120;
+}
+.matrix-table tr:hover td {
+  background: #111A2C;
+}
+.matrix-table th.sticky-col {
+  position: sticky;
+  left: 0;
+  top: 0;
+  background: #151F32 !important;
+  z-index: 25 !important;
+  text-align: left;
+  padding: 10px 14px;
+  min-width: 210px;
+  max-width: 260px;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.65);
+  border-right: 2px solid var(--border-medium);
+}
+.matrix-table td.sticky-col {
+  position: sticky;
+  left: 0;
+  background: #0B1120 !important;
+  z-index: 10 !important;
+  text-align: left;
+  padding: 8px 14px;
+  min-width: 210px;
+  max-width: 260px;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.65);
+  border-right: 2px solid var(--border-medium);
+}
+.matrix-table tr:hover td.sticky-col {
+  background: #162238 !important;
+}
+.matrix-table th.col-dept, .matrix-table td.col-dept {
+  min-width: 120px;
+  padding: 8px 12px;
+}
+.matrix-table th.col-day, .matrix-table td.col-day {
+  min-width: 42px;
+  width: 42px;
+  text-align: center;
+  padding: 5px 2px;
+}
+.matrix-table th.col-stat, .matrix-table td.col-stat {
+  min-width: 52px;
+  text-align: center;
+  padding: 8px 10px;
+}
+.matrix-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 29px;
+  height: 29px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+}
+.pill-P { background: rgba(16, 185, 129, 0.2); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.4); }
+.pill-L { background: rgba(245, 158, 11, 0.2); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.4); }
+.pill-HD { background: rgba(249, 115, 22, 0.2); color: #F97316; border: 1px solid rgba(249, 115, 22, 0.4); }
+.pill-A { background: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+.pill-LV { background: rgba(99, 102, 241, 0.2); color: #818CF8; border: 1px solid rgba(99, 102, 241, 0.4); }
+.pill-dash { color: var(--text-muted); opacity: 0.3; }
+.matrix-scroll-note{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg-input);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text-muted);font-size:11px;}
+.employee-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:680px){.employee-edit-grid{grid-template-columns:1fr;}}
+.dossier-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
 </style>
+<link rel="stylesheet" href="/static/css/navbar_responsive.css">
+<script src="/static/js/navbar_responsive.js" defer></script>
 </head>
 <body>
 <div class="dashboard-layout">
@@ -248,29 +363,23 @@
   <!-- Top Navigation Bar -->
   <header class="navbar">
     <div class="nav-brand">
-      <div class="brand-icon" style="background:transparent; border:none; display:flex; align-items:center; justify-content:center;">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="32" height="32">
-          <defs>
-            <linearGradient id="adminBrandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#10B981"/>
-              <stop offset="100%" stop-color="#6366F1"/>
-            </linearGradient>
-          </defs>
-          <circle cx="24" cy="24" r="18" fill="none" stroke="url(#adminBrandGrad)" stroke-width="2.5"/>
-          <ellipse cx="24" cy="24" rx="9" ry="18" fill="none" stroke="url(#adminBrandGrad)" stroke-width="1.8" stroke-dasharray="2 1"/>
-          <line x1="6" y1="24" x2="42" y2="24" stroke="url(#adminBrandGrad)" stroke-width="1.8"/>
-          <circle cx="24" cy="24" r="5.5" fill="#10B981"/>
-          <path d="M24 20v4l3 2" fill="none" stroke="#070B14" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="34" cy="14" r="3.5" fill="#06B6D4"/>
-        </svg>
+      <div class="ardh-medallion-nav" title="Ardhnarishwar 3D Emblem">
+        <img src="/static/images/ardhnarishwar_logo_emblem.png" alt="Ardhnarishwar Logo">
       </div>
       <div>
-        <div class="brand-title" id="nav-company-name">Global Attendance Management System</div>
-        <div class="brand-sub">WORKSPACE ID: <span id="nav-company-id">...</span> • ENTERPRISE HRMS</div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div class="brand-title" id="nav-company-name">Global Attendance Management System</div>
+          <span class="badge badge-indigo" style="font-size:10px; font-weight:800; padding:2px 7px; letter-spacing:0.5px;">🏢 COMPANY ADMIN PORTAL</span>
+        </div>
+        <div class="brand-sub">WORKSPACE ID: <span id="nav-company-id" style="color:var(--cyan); font-weight:700;">...</span> • WORKFORCE & ATTENDANCE MANAGEMENT</div>
       </div>
     </div>
 
-    <div style="display:flex; align-items:center; gap:14px;">
+    <button type="button" class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navActions">
+      <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+    </button>
+
+    <div class="nav-actions" id="navActions">
       <!-- Theme Switcher -->
       <div class="theme-selector-wrap">
         <button class="theme-btn-trigger" onclick="toggleThemeMenu(event)" title="Choose Appearance Theme">
@@ -317,6 +426,28 @@
         </div>
       </div>
 
+      <!-- 3D Audio FX Toggle -->
+      <button class="btn-sound-fx" title="Toggle Sound FX">
+        <span>🔊</span> <span>Sound</span>
+      </button>
+
+      <!-- Runtime Live Status Indicator -->
+      <div class="runtime-live-pill" title="Runtime Live Engine Active">
+        <span class="pulse-dot"></span> <span>RUNTIME LIVE</span>
+      </div>
+
+      <div class="runtime-last-sync" id="adminLastSyncTime">Synced: Just now</div>
+
+      <!-- Master Runtime Refresh Button -->
+      <button class="btn-runtime-refresh" onclick="ArdhnarishwarRuntime.triggerGlobalSync(true)" title="Synchronize Workspace in Runtime">
+        <span class="refresh-icon">🔄</span> <span>Refresh Workspace</span>
+      </button>
+
+      <!-- Auto-Refresh Toggle -->
+      <div class="auto-refresh-toggle" onclick="ArdhnarishwarRuntime.toggleAutoRefresh()" title="Toggle Background Live Polling">
+        <span>⚡ Auto-Sync: <b>ON (15s)</b></span>
+      </div>
+
       <div class="tz-clock-badge">
         <span>🕒</span> <span id="clock-time">--:--:--</span> (<span id="clock-tz">UTC</span>)
       </div>
@@ -333,8 +464,10 @@
         <p>Real-time attendance intelligence, workforce operations, and compliance policies</p>
       </div>
 
-      <div style="display:flex; align-items:center; gap:10px;">
-        <button class="btn btn-secondary btn-sm" onclick="loadCompanyData()">🔄 Refresh</button>
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <a href="/portal/organization" id="btn-open-org-portal" class="btn btn-indigo btn-sm" target="_blank" rel="noopener" title="Open the Organization Enterprise Portal in a new tab (approvers, Wi-Fi & geofence, work modes)">🏛️ Organization Enterprise Portal ↗</a>
+        <button class="btn btn-secondary btn-sm" onclick="switchView('timings')" title="See today's check-in and check-out time of every employee">🕒 Check-In / Check-Out</button>
+        <button class="btn btn-secondary btn-sm btn-runtime-refresh" onclick="ArdhnarishwarRuntime.triggerGlobalSync(true)"><span class="refresh-icon">🔄</span> Refresh</button>
         <select id="export-period" class="form-select" style="width:auto; padding:7px 30px 7px 12px; font-size:12.5px;">
           <option value="today">Today's Report</option>
           <option value="month">This Month</option>
@@ -435,6 +568,18 @@
       <button class="view-tab active" id="tab-btn-attendance" onclick="switchView('attendance')">
         ⚡ Live Attendance
       </button>
+      <button class="view-tab" id="tab-btn-timings" onclick="switchView('timings')">
+        🕒 Check-In / Check-Out Timings
+      </button>
+      <button class="view-tab" id="tab-btn-monthly" onclick="switchView('monthly')">
+        📅 Monthly Matrix
+      </button>
+      <button class="view-tab" id="tab-btn-late-early" onclick="switchView('late-early')">
+        ⚠️ Late & Early Records (<span id="tab-count-late-early">0</span>)
+      </button>
+      <button class="view-tab" id="tab-btn-reports-export" onclick="switchView('reports-export')">
+        📊 Reports & Exports
+      </button>
       <button class="view-tab" id="tab-btn-employees" onclick="switchView('employees')">
         👥 Active Employees (<span id="tab-count-employees">0</span>)
       </button>
@@ -510,6 +655,177 @@
       </div>
     </div>
 
+    <!-- VIEW: Check-In / Check-Out Timings of all employees -->
+    <div id="view-timings" style="display:none;">
+      <div style="margin-bottom:14px;">
+        <h3 style="font-size:16px; font-weight:800; margin:0;">🕒 Employee Check-In & Check-Out Timings</h3>
+        <p style="font-size:12.5px; color:var(--text-muted); margin:2px 0 0;">First check-in and last check-out of every employee for the selected day, with hours worked. Click a counter to filter.</p>
+      </div>
+      <div id="timings-panel"></div>
+    </div>
+
+    <!-- VIEW: Monthly Attendance Matrix -->
+    <div id="view-monthly" style="display:none;">
+      <div class="toolbar">
+        <div class="filter-group">
+          <input type="month" id="filter-monthly-month" class="form-input" style="width:auto;" onchange="loadMonthlyAttendance()">
+          <input type="text" id="filter-monthly-search" class="form-input" placeholder="Search employee..." style="width:220px;" oninput="filterMonthlyMatrix()">
+          <button class="btn btn-secondary btn-sm btn-runtime-refresh" onclick="ArdhnarishwarRuntime.triggerGlobalSync(true)"><span class="refresh-icon">🔄</span> Refresh Matrix</button>
+          <button class="btn btn-indigo btn-sm" onclick="exportMonthlyMatrixCSV()">📥 Export Matrix CSV</button>
+        </div>
+        <div class="matrix-scroll-note">↔ Scroll horizontally to view all days • One compact status code per day</div>
+        <div style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700;">
+          <span class="matrix-pill pill-P">P</span> <span style="color:var(--text-muted);">Present</span>
+          <span class="matrix-pill pill-L">L</span> <span style="color:var(--text-muted);">Late</span>
+          <span class="matrix-pill pill-HD">HD</span> <span style="color:var(--text-muted);">Half-Day</span>
+          <span class="matrix-pill pill-LV">LV</span> <span style="color:var(--text-muted);">Leave</span>
+          <span class="matrix-pill pill-A">A</span> <span style="color:var(--text-muted);">Absent</span>
+        </div>
+      </div>
+
+      <div class="matrix-container" style="max-height:600px; overflow:auto;">
+        <table class="matrix-table" id="monthly-matrix-table">
+          <thead id="monthly-matrix-head">
+            <tr>
+              <th class="sticky-col">Employee Name & ID</th>
+              <th>Dept</th>
+              <th>P</th>
+              <th>L</th>
+              <th>HD</th>
+              <th>A</th>
+              <th>LV</th>
+              <th>Rate %</th>
+            </tr>
+          </thead>
+          <tbody id="monthly-matrix-body">
+            <tr>
+              <td colspan="38" style="text-align:center; padding:30px;">
+                <div class="empty-state">
+                  <div class="empty-icon">📅</div>
+                  <div class="empty-title">Loading Monthly Attendance Matrix...</div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- VIEW: Late & Early Records -->
+    <div id="view-late-early" style="display:none;">
+      <div class="toolbar">
+        <div class="filter-group">
+          <input type="date" id="filter-late-date" class="form-input" style="width:auto;" onchange="loadLateEarlyRecords()">
+          <input type="text" id="filter-late-search" class="form-input" placeholder="Filter employee or ID..." style="width:240px;" oninput="filterLateEarlyRecords()">
+          <button class="btn btn-secondary btn-sm btn-runtime-refresh" onclick="ArdhnarishwarRuntime.triggerGlobalSync(true)"><span class="refresh-icon">🔄</span> Refresh Late Log</button>
+        </div>
+        <div style="font-size:12.5px; color:var(--text-muted);" id="late-early-summary-text">0 late incidents</div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Employee ID</th>
+              <th>Employee Name</th>
+              <th>Shift Start</th>
+              <th>Actual Check-In</th>
+              <th>Arrival Delay</th>
+              <th>Status</th>
+              <th>Reason / Excuse</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="late-early-table-body">
+            <tr>
+              <td colspan="9">
+                <div class="empty-state">
+                  <div class="empty-icon">⚠️</div>
+                  <div class="empty-title">Loading Late & Early Records...</div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- VIEW: Attendance Reports & Exports -->
+    <div id="view-reports-export" style="display:none;">
+      <div class="card" style="margin-bottom:20px;">
+        <h3 style="font-size:17px; font-weight:800; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+          <span>📊</span> Custom Attendance Report Generator
+        </h3>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px; margin-bottom:16px;">
+          <div class="form-group">
+            <label class="form-label">From Date</label>
+            <input type="date" id="report-date-from" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">To Date</label>
+            <input type="date" id="report-date-to" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status Filter</label>
+            <select id="report-filter-status" class="form-select">
+              <option value="">All Statuses</option>
+              <option value="Present">Present Only</option>
+              <option value="Late">Late Only</option>
+              <option value="Half Day">Half Day Only</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Workforce Type</label>
+            <select id="report-filter-worktype" class="form-select">
+              <option value="">All Types (Office / WFH / Field)</option>
+              <option value="Office">Office Workers</option>
+              <option value="WFH">Remote / WFH</option>
+              <option value="Field">Field Staff</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div style="display:flex; gap:10px;">
+            <button class="btn btn-primary btn-sm" onclick="generateReportPreview()">🔍 Generate Preview</button>
+            <button class="btn btn-indigo btn-sm" onclick="exportCustomReportCSV()">📥 Export Filtered CSV</button>
+            <button class="btn btn-secondary btn-sm" onclick="window.print()">🖨️ Print Report</button>
+          </div>
+          <div id="report-preview-stats" style="font-size:12.5px; font-family:var(--font-mono); color:var(--cyan);"></div>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Employee ID</th>
+              <th>Employee Name</th>
+              <th>Department</th>
+              <th>Method</th>
+              <th>Workforce</th>
+              <th>Status</th>
+              <th>Notes / Location</th>
+            </tr>
+          </thead>
+          <tbody id="report-preview-table-body">
+            <tr>
+              <td colspan="9">
+                <div class="empty-state">
+                  <div class="empty-icon">📊</div>
+                  <div class="empty-title">Select Filters & Click "Generate Preview"</div>
+                  <div class="empty-desc">Generate tailored compliance and payroll reports for any date window.</div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- VIEW 2: Employee Directory -->
     <div id="view-employees" style="display:none;">
       <div class="toolbar">
@@ -534,6 +850,7 @@
               <th>Department</th>
               <th>Designation</th>
               <th>Work Type</th>
+              <th>Assigned Methods</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -556,7 +873,7 @@
     <div id="view-pending-emps" style="display:none;">
       <div class="toolbar">
         <h3 style="font-size:16px; font-weight:700;">⏳ Self-Registered Staff Approval Queue</h3>
-        <button class="btn btn-secondary btn-sm" onclick="loadPendingEmployees()">🔄 Refresh Queue</button>
+        <button class="btn btn-secondary btn-sm btn-runtime-refresh" onclick="ArdhnarishwarRuntime.triggerGlobalSync(true)"><span class="refresh-icon">🔄</span> Refresh Queue</button>
       </div>
 
       <div class="table-container">
@@ -826,7 +1143,7 @@
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
         <div class="form-group">
           <label class="form-label">Workforce Type</label>
-          <select id="emp-worktype" class="form-select">
+          <select id="emp-worktype" class="form-select" onchange="syncAddEmpMethodCheckboxes(this.value)">
             <option value="Office">Office Worker</option>
             <option value="WFH">Work From Home (WFH)</option>
             <option value="Field">Field / Client Site</option>
@@ -838,9 +1155,128 @@
         </div>
       </div>
 
+      <!-- Attendance Methods Assignment (Role & Super Admin Governed) -->
+      <div style="background:var(--bg-input); padding:14px 16px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <label class="form-label" style="margin:0; font-weight:700;">Assigned Attendance Methods</label>
+          <span style="font-size:11px; color:var(--text-muted);" id="modal-emp-method-note">Governed by Super Admin</span>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;" id="add-emp-methods-grid">
+          <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; cursor:pointer;" id="lbl-emp-method-face">
+            <input type="checkbox" id="emp-method-face" value="Face" checked style="accent-color:var(--emerald);">
+            <span>📷 Face Recognition</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; cursor:pointer;" id="lbl-emp-method-otp">
+            <input type="checkbox" id="emp-method-otp" value="OTP" checked style="accent-color:var(--indigo);">
+            <span>🔢 Dynamic OTP</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; cursor:pointer;" id="lbl-emp-method-wifi">
+            <input type="checkbox" id="emp-method-wifi" value="WiFi" checked style="accent-color:var(--cyan);">
+            <span>📶 Office Wi-Fi</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; cursor:pointer;" id="lbl-emp-method-gps">
+            <input type="checkbox" id="emp-method-gps" value="GPS" style="accent-color:var(--amber);">
+            <span>🚗 Field GPS</span>
+          </label>
+        </div>
+      </div>
+
       <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
         <button type="button" class="btn btn-secondary" onclick="closeAddEmployeeModal()">Cancel</button>
         <button type="submit" class="btn btn-primary" id="btn-save-emp">Add Employee Account →</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Edit Employee Details -->
+<div class="modal-overlay" id="edit-employee-modal">
+  <div class="modal-content" style="max-width:720px;">
+    <div class="modal-header"><div><h3 class="modal-title" style="margin:0;">Edit Employee Details</h3><p style="font-size:12px;color:var(--text-secondary);margin:3px 0 0;">Update employee profile and portal login details.</p></div><button class="btn-close" type="button" onclick="closeEditEmployeeModal()">✕</button></div>
+    <form id="edit-employee-form" onsubmit="handleSaveEmployeeDetails(event)" style="display:flex;flex-direction:column;gap:14px;">
+      <input type="hidden" id="edit-emp-id">
+      <div class="employee-edit-grid">
+        <div class="form-group"><label class="form-label">Employee ID</label><input id="edit-emp-id-display" class="form-input" readonly style="font-family:var(--font-mono);color:var(--cyan);"></div>
+        <div class="form-group"><label class="form-label">Full Name</label><input id="edit-emp-name" class="form-input" required></div>
+        <div class="form-group"><label class="form-label">Contact Number</label><input id="edit-emp-mobile" class="form-input" required></div>
+        <div class="form-group"><label class="form-label">Corporate Email</label><input id="edit-emp-email" type="email" class="form-input"></div>
+        <div class="form-group"><label class="form-label">Department</label><input id="edit-emp-dept" class="form-input"></div>
+        <div class="form-group"><label class="form-label">Designation</label><input id="edit-emp-desig" class="form-input"></div>
+        <div class="form-group"><label class="form-label">Workforce Type</label><select id="edit-emp-worktype" class="form-select"><option value="Office">Office Worker</option><option value="WFH">Work From Home</option><option value="Field">Field / Client Site</option></select></div>
+        <div class="form-group"><label class="form-label">Status</label><select id="edit-emp-status" class="form-select"><option value="active">Active</option><option value="inactive">Inactive</option><option value="pending">Pending</option></select></div>
+        <div class="form-group"><label class="form-label">Assigned Location</label><input id="edit-emp-location" class="form-input" placeholder="Office / Branch / Home"></div>
+        <div class="form-group"><label class="form-label">Timezone</label><input id="edit-emp-timezone" class="form-input" placeholder="Asia/Kolkata"></div>
+      </div>
+      <div style="padding:12px 14px;background:var(--bg-input);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);"><label class="form-label">New Portal Password <span style="font-weight:500;color:var(--text-muted);">(optional)</span></label><input id="edit-emp-password" type="password" class="form-input" autocomplete="new-password" placeholder="Leave blank to keep current password"></div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;"><button type="button" class="btn btn-secondary" onclick="closeEditEmployeeModal()">Cancel</button><button type="submit" class="btn btn-primary" id="btn-save-employee-details">Save Employee Details →</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Assign Attendance Methods to Existing Employee -->
+<div class="modal-overlay" id="edit-emp-methods-modal">
+  <div class="modal-content" style="max-width:520px;">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title" style="margin:0;">Assign Attendance Verification Methods</h3>
+        <p style="font-size:12px; color:var(--text-secondary); margin:2px 0 0 0;" id="edit-methods-emp-subtitle">Configure allowed clock-in/out verification channels</p>
+      </div>
+      <button class="btn-close" onclick="closeEditEmpMethodsModal()">✕</button>
+    </div>
+
+    <form id="edit-emp-methods-form" onsubmit="handleSaveEmpMethods(event)" style="display:flex; flex-direction:column; gap:16px;">
+      <input type="hidden" id="edit-methods-emp-id">
+
+      <div style="background:var(--bg-input); padding:12px 14px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <strong id="edit-methods-emp-name" style="color:var(--text-primary); font-size:14px;">Employee Name</strong>
+          <div style="font-size:12px; font-family:var(--font-mono); color:var(--cyan);" id="edit-methods-emp-meta">EMP-001 • Office</div>
+        </div>
+        <span class="badge badge-indigo" id="edit-methods-worktype-badge">Office</span>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <label class="form-label" style="margin:0; font-weight:700;">Select Permitted Methods for this Employee:</label>
+        
+        <label style="display:flex; align-items:flex-start; gap:10px; padding:10px; background:var(--bg-surface); border-radius:var(--radius-sm); border:1px solid var(--border-subtle); cursor:pointer;" id="edit-lbl-face">
+          <input type="checkbox" id="edit-method-face" value="Face" style="width:16px; height:16px; accent-color:var(--emerald); margin-top:2px;">
+          <div>
+            <strong style="font-size:13px;">📷 Neural Biometric Face AI</strong>
+            <div style="font-size:11px; color:var(--text-secondary);">Local OpenCV facial landmark recognition with liveness HUD.</div>
+          </div>
+        </label>
+
+        <label style="display:flex; align-items:flex-start; gap:10px; padding:10px; background:var(--bg-surface); border-radius:var(--radius-sm); border:1px solid var(--border-subtle); cursor:pointer;" id="edit-lbl-otp">
+          <input type="checkbox" id="edit-method-otp" value="OTP" style="width:16px; height:16px; accent-color:var(--indigo); margin-top:2px;">
+          <div>
+            <strong style="font-size:13px;">🔢 In-App Dynamic Code & OTP</strong>
+            <div style="font-size:11px; color:var(--text-secondary);">Rotating 6-digit cryptographic tokens and private 2FA codes.</div>
+          </div>
+        </label>
+
+        <label style="display:flex; align-items:flex-start; gap:10px; padding:10px; background:var(--bg-surface); border-radius:var(--radius-sm); border:1px solid var(--border-subtle); cursor:pointer;" id="edit-lbl-wifi">
+          <input type="checkbox" id="edit-method-wifi" value="WiFi" style="width:16px; height:16px; accent-color:var(--cyan); margin-top:2px;">
+          <div>
+            <strong style="font-size:13px;">📶 Corporate Office Wi-Fi</strong>
+            <div style="font-size:11px; color:var(--text-secondary);">Verified on-premise attendance when connected to office network.</div>
+          </div>
+        </label>
+
+        <label style="display:flex; align-items:flex-start; gap:10px; padding:10px; background:var(--bg-surface); border-radius:var(--radius-sm); border:1px solid var(--border-subtle); cursor:pointer;" id="edit-lbl-gps">
+          <input type="checkbox" id="edit-method-gps" value="GPS" style="width:16px; height:16px; accent-color:var(--amber); margin-top:2px;">
+          <div>
+            <strong style="font-size:13px;">🚗 Field & Remote GPS</strong>
+            <div style="font-size:11px; color:var(--text-secondary);">Real-time satellite GPS coordinates for field or client visits.</div>
+          </div>
+        </label>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="applyWorkTypeDefaultMethods()">↺ Apply Role Defaults</button>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn btn-secondary" onclick="closeEditEmpMethodsModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-methods">Save Methods →</button>
+        </div>
       </div>
     </form>
   </div>
@@ -946,6 +1382,90 @@
   </div>
 </div>
 
+<!-- Modal: Employee Attendance History Dossier -->
+<div class="modal-overlay" id="employee-dossier-modal">
+  <div class="modal-content" style="max-width:860px; width:95%; max-height:90vh; overflow-y:auto;">
+    <div class="modal-header">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="width:44px; height:44px; border-radius:12px; background:linear-gradient(135deg, var(--emerald), var(--indigo)); display:flex; align-items:center; justify-content:center; font-size:22px;">👤</div>
+        <div>
+          <h3 class="modal-title" id="dossier-name" style="margin-bottom:2px;">Employee Attendance Dossier</h3>
+          <div style="font-size:12px; color:var(--text-secondary);">
+            ID: <span id="dossier-emp-id" style="font-family:var(--font-mono); color:var(--cyan); font-weight:700;">-</span> • 
+            <span id="dossier-dept">General</span> • 
+            <span id="dossier-desig">Staff</span> • 
+            <span id="dossier-worktype" class="badge badge-indigo">Office</span>
+          </div>
+        </div>
+      </div>
+      <button class="btn-close" onclick="closeEmployeeDossier()">✕</button>
+    </div>
+
+    <div style="padding-top:14px;">
+      <!-- Dossier KPI Tiles -->
+      <div class="dossier-grid">
+        <div class="kpi-card" style="padding:12px 14px;">
+          <div class="kpi-label">Punches <span>⚡</span></div>
+          <div class="kpi-value" id="dossier-kpi-punches" style="font-size:22px;">0</div>
+        </div>
+        <div class="kpi-card" style="padding:12px 14px;">
+          <div class="kpi-label">Present <span>🟢</span></div>
+          <div class="kpi-value" id="dossier-kpi-present" style="font-size:22px; color:var(--emerald);">0</div>
+        </div>
+        <div class="kpi-card" style="padding:12px 14px;">
+          <div class="kpi-label">Late Days <span>⚠️</span></div>
+          <div class="kpi-value" id="dossier-kpi-late" style="font-size:22px; color:var(--amber);">0</div>
+        </div>
+        <div class="kpi-card" style="padding:12px 14px;">
+          <div class="kpi-label">Leaves <span>📅</span></div>
+          <div class="kpi-value" id="dossier-kpi-leaves" style="font-size:22px; color:var(--indigo);">0</div>
+        </div>
+        <div class="kpi-card" style="padding:12px 14px;">
+          <div class="kpi-label">Punctuality <span>🎯</span></div>
+          <div class="kpi-value" id="dossier-kpi-rate" style="font-size:22px; color:var(--cyan);">100%</div>
+        </div>
+      </div>
+
+      <h4 style="font-size:14px; font-weight:700; margin-bottom:10px;">📜 Punch Record Timeline (Latest 100)</h4>
+      <div class="table-container" style="max-height:260px; overflow-y:auto; margin-bottom:20px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Type</th>
+              <th>Method</th>
+              <th>Status</th>
+              <th>Location / Notes</th>
+            </tr>
+          </thead>
+          <tbody id="dossier-punches-body">
+            <tr><td colspan="6" style="text-align:center; padding:20px;">Loading punch history...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4 style="font-size:14px; font-weight:700; margin-bottom:10px;">📅 Leave Applications Dossier</h4>
+      <div class="table-container" style="max-height:180px; overflow-y:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Leave ID</th>
+              <th>Type</th>
+              <th>Dates</th>
+              <th>Reason</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="dossier-leaves-body">
+            <tr><td colspan="5" style="text-align:center; padding:15px;">No leave records found.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Toast Container -->
 <div class="toast-container" id="toast-container"></div>
 
@@ -954,6 +1474,7 @@ let currentCompanyId = "";
 let currentCompanyTimezone = "UTC";
 let allEmployees = [];
 let isSuperAdmin = false;
+let currentCompanyPermissions = null;
 
 async function loadCompanyData() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -972,6 +1493,14 @@ async function loadCompanyData() {
       }
 
       document.getElementById('nav-company-id').textContent = currentCompanyId || 'GLOBAL';
+
+      // Direct link to the Organization Enterprise Portal for this workspace
+      const orgPortalBtn = document.getElementById('btn-open-org-portal');
+      if (orgPortalBtn) {
+        orgPortalBtn.href = (isSuperAdmin && currentCompanyId)
+          ? `/portal/organization?company_id=${encodeURIComponent(currentCompanyId)}`
+          : '/portal/organization';
+      }
 
       if (data.company) {
         document.getElementById('nav-company-name').textContent = data.company.name || 'Company Workspace';
@@ -995,10 +1524,23 @@ async function loadCompanyData() {
   }
 
   startLiveClock();
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const monthInput = document.getElementById('filter-monthly-month');
+  if (monthInput && !monthInput.value) monthInput.value = `${yyyy}-${mm}`;
+  const dateFrom = document.getElementById('report-date-from');
+  if (dateFrom && !dateFrom.value) dateFrom.value = `${yyyy}-${mm}-01`;
+  const dateTo = document.getElementById('report-date-to');
+  if (dateTo && !dateTo.value) dateTo.value = `${yyyy}-${mm}-${dd}`;
+
   await Promise.all([
+    loadControllerPermissions(),
     loadStats(),
     loadAIInsights(),
     loadAttendanceStream(),
+    loadLateEarlyRecords(),
     loadEmployees(),
     loadPendingEmployees(),
     loadBranches(),
@@ -1133,10 +1675,10 @@ async function loadAttendanceStream() {
         return `
           <tr>
             <td><strong style="font-family:var(--font-mono); color:var(--cyan);">${r.emp_id}</strong></td>
-            <td><strong style="color:var(--text-primary);">${r.name}</strong></td>
+            <td><strong style="color:var(--text-primary);">${r.name || r.employee_name || r.emp_id}</strong></td>
             <td style="font-family:var(--font-mono); font-size:12px;">${r.date}</td>
             <td style="font-family:var(--font-mono); font-size:12px;">${r.time}</td>
-            <td><span class="badge badge-neutral">${r.method}</span></td>
+            <td><span class="badge badge-neutral">${(r.method || r.verification_method || "Standard").replace(/_/g, " ")}</span></td>
             <td><span class="badge badge-indigo">${r.work_type || 'Office'}</span></td>
             <td><span class="badge ${badgeClass}"><span class="badge-dot"></span> ${st}</span></td>
             <td style="font-size:12px; color:var(--text-muted);">${r.notes || (r.location ? `${r.location.lat.toFixed(4)}, ${r.location.lng.toFixed(4)}` : 'Standard')}</td>
@@ -1254,7 +1796,7 @@ function renderEmployeeTable(list) {
   if (list.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="8">
+        <td colspan="9">
           <div class="empty-state">
             <div class="empty-icon">👥</div>
             <div class="empty-title">No Active Employees Registered</div>
@@ -1266,20 +1808,42 @@ function renderEmployeeTable(list) {
     return;
   }
 
-  tbody.innerHTML = list.map(e => `
-    <tr>
-      <td><strong style="font-family:var(--font-mono); color:var(--cyan);">${e.emp_id}</strong></td>
-      <td><strong style="color:var(--text-primary);">${e.name}</strong></td>
-      <td style="font-family:var(--font-mono); font-size:12.5px;">${e.mobile}</td>
-      <td>${e.department || 'General'}</td>
-      <td>${e.designation || 'Staff'}</td>
-      <td><span class="badge badge-indigo">${e.work_type}</span></td>
-      <td><span class="badge badge-emerald"><span class="badge-dot"></span> ACTIVE</span></td>
-      <td>
-        <button class="btn btn-danger btn-sm" onclick="deleteEmployee('${e.emp_id}', '${e.name}')">Delete</button>
-      </td>
-    </tr>
-  `).join('');
+  tbody.innerHTML = list.map(e => {
+    const rawMethods = e.allowed_methods || [];
+    let methodBadges = '';
+    if (rawMethods.length > 0) {
+      methodBadges = rawMethods.map(m => {
+        if (m === 'Face') return `<span class="badge badge-emerald" style="font-size:10.5px; padding:2px 6px;">📷 Face</span>`;
+        if (m === 'OTP') return `<span class="badge badge-indigo" style="font-size:10.5px; padding:2px 6px;">🔢 OTP</span>`;
+        if (m === 'WiFi') return `<span class="badge badge-cyan" style="font-size:10.5px; padding:2px 6px;">📶 Wi-Fi</span>`;
+        if (m === 'GPS') return `<span class="badge badge-amber" style="font-size:10.5px; padding:2px 6px;">🚗 GPS</span>`;
+        return `<span class="badge badge-neutral" style="font-size:10.5px;">${m}</span>`;
+      }).join(' ');
+    } else {
+      methodBadges = `<span class="badge badge-neutral" style="font-size:10.5px;">Standard Defaults</span>`;
+    }
+
+    return `
+      <tr>
+        <td><strong style="font-family:var(--font-mono); color:var(--cyan);">${e.emp_id}</strong></td>
+        <td><strong style="color:var(--text-primary);">${e.name}</strong></td>
+        <td style="font-family:var(--font-mono); font-size:12.5px;">${e.mobile}</td>
+        <td>${e.department || 'General'}</td>
+        <td>${e.designation || 'Staff'}</td>
+        <td><span class="badge badge-indigo">${e.work_type}</span></td>
+        <td><div style="display:flex; gap:4px; flex-wrap:wrap;">${methodBadges}</div></td>
+        <td><span class="badge badge-emerald"><span class="badge-dot"></span> ACTIVE</span></td>
+        <td>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm" onclick="openEditEmployeeModal('${e.emp_id}')" title="Edit employee profile and portal login">✏️ Edit Details</button>
+            <button class="btn btn-secondary btn-sm" onclick="openEditEmpMethodsModal('${e.emp_id}', '${(e.name || '').replace(/'/g, "\\'")}', '${e.work_type || 'Office'}')" title="Assign allowed attendance methods">🎯 Methods</button>
+            <button class="btn btn-secondary btn-sm" onclick="openEmployeeDossier('${e.emp_id}', '${(e.name || '').replace(/'/g, "\\'")}')">📜 History</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteEmployee('${e.emp_id}', '${(e.name || '').replace(/'/g, "\\'")}')">Delete</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
 }
 
 async function loadBranches() {
@@ -1581,16 +2145,449 @@ function exportAttendanceCSV() {
 }
 
 function switchView(view) {
-  const views = ['attendance', 'employees', 'pending-emps', 'branches', 'departments', 'shifts', 'corrections', 'leaves', 'visits', 'policy'];
+  const views = ['attendance', 'timings', 'monthly', 'late-early', 'reports-export', 'employees', 'pending-emps', 'branches', 'departments', 'shifts', 'corrections', 'leaves', 'visits', 'policy'];
   views.forEach(v => {
     const el = document.getElementById(`view-${v}`);
     const tabBtn = document.getElementById(`tab-btn-${v}`);
     if (el) el.style.display = (v === view) ? 'block' : 'none';
     if (tabBtn) tabBtn.classList.toggle('active', v === view);
   });
+  if (view === 'monthly') loadMonthlyAttendance();
+  if (view === 'late-early') loadLateEarlyRecords();
+  if (view === 'timings') {
+    if (timingsPanel) timingsPanel.reload();
+    const target = document.getElementById('view-timings');
+    if (target && target.scrollIntoView) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }
 
-function openAddEmployeeModal() { document.getElementById('add-emp-modal').classList.add('active'); }
+// ══════════════════════════════════════════════════════════════════════════════
+//  CHECK-IN / CHECK-OUT TIMINGS (all employees of this company)
+// ══════════════════════════════════════════════════════════════════════════════
+let timingsPanel = null;
+
+function initTimingsPanel() {
+  if (timingsPanel || !window.CheckinCheckoutPanel) return;
+  timingsPanel = CheckinCheckoutPanel.mount(document.getElementById('timings-panel'), {
+    endpoint: '/api/company/checkin-checkout',
+    extraParams: () => ({ company_id: currentCompanyId || (new URLSearchParams(window.location.search).get('company_id') || '').toUpperCase() }),
+    showCompany: false,
+    emptyText: 'No employees found for this day.'
+  });
+}
+
+function refreshTimingsIfVisible() {
+  const v = document.getElementById('view-timings');
+  if (timingsPanel && v && v.style.display !== 'none') return timingsPanel.reload();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  MONTHLY ATTENDANCE MATRIX LOGIC
+// ══════════════════════════════════════════════════════════════════════════════
+let currentMonthlyMatrix = [];
+
+async function loadMonthlyAttendance() {
+  const monthInput = document.getElementById('filter-monthly-month');
+  if (!monthInput.value) {
+    const d = new Date();
+    monthInput.value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  }
+  const monthVal = monthInput.value;
+  const tbody = document.getElementById('monthly-matrix-body');
+  const thead = document.getElementById('monthly-matrix-head');
+
+  try {
+    const res = await fetch(`/api/company/attendance/monthly?company_id=${currentCompanyId}&month=${monthVal}`);
+    const data = await res.json();
+    if (data.ok) {
+      currentMonthlyMatrix = data.matrix || [];
+      const daysInMonth = data.days_in_month || 31;
+      
+      let headHtml = `<tr><th class="sticky-col">Employee Name & ID</th><th class="col-dept">Department</th>`;
+      for (let day = 1; day <= daysInMonth; day++) {
+        headHtml += `<th class="col-day">${day}</th>`;
+      }
+      headHtml += `<th class="col-stat" style="color:var(--emerald);" title="Present">P</th><th class="col-stat" style="color:var(--amber);" title="Late">L</th><th class="col-stat" style="color:var(--rose);" title="Half-Day">HD</th><th class="col-stat" style="color:var(--text-muted);" title="Absent">A</th><th class="col-stat" style="color:var(--indigo);" title="Leave">LV</th><th class="col-stat" style="color:var(--cyan);">Rate %</th></tr>`;
+      thead.innerHTML = headHtml;
+
+      renderMonthlyMatrix(currentMonthlyMatrix, daysInMonth);
+    } else {
+      tbody.innerHTML = `<tr><td colspan="40" style="text-align:center; padding:20px; color:var(--text-muted);">${data.error || 'Failed to load monthly matrix'}</td></tr>`;
+    }
+  } catch (err) {
+    console.error('Error loading monthly matrix:', err);
+    tbody.innerHTML = `<tr><td colspan="40" style="text-align:center; padding:20px; color:var(--rose);">Network error loading matrix</td></tr>`;
+  }
+}
+
+function renderMonthlyMatrix(matrix, daysInMonth) {
+  const tbody = document.getElementById('monthly-matrix-body');
+  if (!matrix || matrix.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="40"><div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">No Attendance Records for Selected Month</div><div class="empty-desc">Records will appear as employees check in during this month.</div></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = matrix.map(m => {
+    let dayPills = '';
+    const dailyMap = m.days || {};
+    for (let day = 1; day <= daysInMonth; day++) {
+      const rawCode = dailyMap[String(day)] || '-';
+      const labels = {Present:'P',P:'P',Late:'L',L:'L','Half Day':'HD','Half-Day':'HD',HD:'HD',Leave:'LV',LV:'LV',Absent:'A',A:'A'};
+      const code = labels[rawCode] || '-';
+      let pillClass = 'pill-dash';
+      if (code === 'P') pillClass = 'pill-P';
+      else if (code === 'L') pillClass = 'pill-L';
+      else if (code === 'HD') pillClass = 'pill-HD';
+      else if (code === 'A') pillClass = 'pill-A';
+      else if (code === 'LV') pillClass = 'pill-LV';
+
+      dayPills += `<td class="col-day"><span class="matrix-pill ${pillClass}" title="${rawCode}">${code}</span></td>`;
+    }
+
+    return `
+      <tr>
+        <td class="sticky-col">
+          <strong style="color:var(--text-primary); display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${m.name}</strong>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--cyan);">${m.emp_id}</span>
+        </td>
+        <td class="col-dept" style="font-size:12px; color:var(--text-secondary);">${m.department || 'General'}</td>
+        ${dayPills}
+        <td class="col-stat" style="font-weight:700; color:var(--emerald);">${m.summary?.present || 0}</td>
+        <td class="col-stat" style="font-weight:700; color:var(--amber);">${m.summary?.late || 0}</td>
+        <td class="col-stat" style="font-weight:700; color:var(--rose);">${m.summary?.half_day || 0}</td>
+        <td class="col-stat" style="font-weight:700; color:var(--text-muted);">${m.summary?.absent || 0}</td>
+        <td class="col-stat" style="font-weight:700; color:var(--indigo);">${m.summary?.leaves || 0}</td>
+        <td class="col-stat" style="font-weight:800; font-family:var(--font-mono); color:var(--cyan);">${m.summary?.rate || 0}%</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function filterMonthlyMatrix() {
+  const q = document.getElementById('filter-monthly-search').value.trim().toLowerCase();
+  const daysInMonth = (document.getElementById('monthly-matrix-head').querySelectorAll('th').length) - 8;
+  const filtered = currentMonthlyMatrix.filter(m => 
+    (m.name || '').toLowerCase().includes(q) || 
+    (m.emp_id || '').toLowerCase().includes(q) || 
+    (m.department || '').toLowerCase().includes(q)
+  );
+  renderMonthlyMatrix(filtered, Math.max(28, daysInMonth));
+}
+
+function exportMonthlyMatrixCSV() {
+  if (!currentMonthlyMatrix || currentMonthlyMatrix.length === 0) {
+    showToast('No monthly matrix data to export', 'error');
+    return;
+  }
+  const month = document.getElementById('filter-monthly-month').value || 'Month';
+  let csv = 'Employee ID,Name,Department,Present Days,Late Days,Half Days,Absent Days,Leaves,Attendance Rate %\n';
+  currentMonthlyMatrix.forEach(m => {
+    csv += `"${m.emp_id}","${m.name}","${m.department || ''}",${m.summary?.present||0},${m.summary?.late||0},${m.summary?.half_day||0},${m.summary?.absent||0},${m.summary?.leaves||0},"${m.summary?.rate||0}%"\n`;
+  });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `monthly_attendance_matrix_${currentCompanyId}_${month}.csv`;
+  a.click();
+  showToast('Monthly matrix CSV downloaded!', 'success');
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  LATE & EARLY RECORDS MANAGEMENT
+// ══════════════════════════════════════════════════════════════════════════════
+let allLateRecords = [];
+
+async function loadLateEarlyRecords() {
+  const dateVal = document.getElementById('filter-late-date') ? document.getElementById('filter-late-date').value : '';
+  let url = `/api/company/attendance/late-early?company_id=${currentCompanyId}`;
+  if (dateVal) url += `&date=${dateVal}`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    const tbody = document.getElementById('late-early-table-body');
+    if (data.ok && data.records) {
+      allLateRecords = data.records;
+      const countEl = document.getElementById('tab-count-late-early');
+      if (countEl) countEl.textContent = allLateRecords.length;
+      const summaryEl = document.getElementById('late-early-summary-text');
+      if (summaryEl) summaryEl.textContent = `${allLateRecords.length} late/half-day incidents logged`;
+
+      renderLateEarlyTable(allLateRecords);
+    }
+  } catch (err) {
+    console.error('Error loading late records:', err);
+  }
+}
+
+function renderLateEarlyTable(list) {
+  const tbody = document.getElementById('late-early-table-body');
+  if (!list || list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">✅</div><div class="empty-title">No Late Arrivals Recorded</div><div class="empty-desc">All employees punched in on schedule or within grace period.</div></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map(r => {
+    const isExcused = !!r.excused;
+    return `
+      <tr>
+        <td style="font-family:var(--font-mono); font-size:12px;">${r.date} ${r.time}</td>
+        <td><strong style="font-family:var(--font-mono); color:var(--cyan);">${r.emp_id}</strong></td>
+        <td><strong style="color:var(--text-primary);">${r.name || 'Staff'}</strong></td>
+        <td style="font-family:var(--font-mono); font-size:12px;">09:30</td>
+        <td style="font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--amber);">${r.time}</td>
+        <td><span class="badge badge-amber">+${r.delay_minutes || 15} mins</span></td>
+        <td><span class="badge ${isExcused ? 'badge-emerald' : 'badge-rose'}">${isExcused ? '✓ Excused' : r.status || 'Late'}</span></td>
+        <td style="font-size:12px; color:var(--text-secondary);">${isExcused ? (r.excuse_reason || 'Excused by Admin') : (r.notes || 'Arrival past shift grace')}</td>
+        <td>
+          ${!isExcused ? `
+            <button class="btn btn-primary btn-sm" onclick="excuseLateRecord('${r._id}', '${(r.name || r.emp_id).replace(/'/g, "\\'")}')">🕊️ Excuse</button>
+          ` : '<span style="font-size:11px; color:var(--text-muted);">Resolved</span>'}
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function filterLateEarlyRecords() {
+  const q = document.getElementById('filter-late-search').value.trim().toLowerCase();
+  const filtered = allLateRecords.filter(r => 
+    (r.name || '').toLowerCase().includes(q) || 
+    (r.emp_id || '').toLowerCase().includes(q)
+  );
+  renderLateEarlyTable(filtered);
+}
+
+async function excuseLateRecord(recordId, empName) {
+  const reason = prompt(`Excuse late arrival for ${empName}? Enter justification/notes:`, 'Approved by HR - Traffic / Transit delay');
+  if (!reason) return;
+
+  try {
+    const res = await fetch(`/api/company/attendance/late-early/excuse?company_id=${currentCompanyId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ record_id: recordId, reason })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      showToast(data.message, 'success');
+      await Promise.all([loadLateEarlyRecords(), loadAttendanceStream(), loadStats()]);
+    } else {
+      showToast(data.error || 'Failed to excuse late punch', 'error');
+    }
+  } catch (err) {
+    showToast('Network error excusing record', 'error');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  REPORTS & EXPORTS LOGIC
+// ══════════════════════════════════════════════════════════════════════════════
+async function generateReportPreview() {
+  const fromDate = document.getElementById('report-date-from').value;
+  const toDate = document.getElementById('report-date-to').value;
+  const status = document.getElementById('report-filter-status').value;
+  const workType = document.getElementById('report-filter-worktype').value;
+
+  let url = `/api/company/attendance?company_id=${currentCompanyId}&limit=300`;
+  if (fromDate) url += `&from_date=${fromDate}`;
+  if (toDate) url += `&to_date=${toDate}`;
+  if (status) url += `&status=${status}`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    const tbody = document.getElementById('report-preview-table-body');
+    let rows = data.rows || data.records || [];
+    if (workType) {
+      rows = rows.filter(r => (r.work_type || 'Office') === workType);
+    }
+
+    const statsEl = document.getElementById('report-preview-stats');
+    if (statsEl) {
+      statsEl.textContent = `${rows.length} Records Found`;
+    }
+
+    if (rows.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">📊</div><div class="empty-title">No Records Found Matching Filters</div></div></td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = rows.map(r => `
+      <tr>
+        <td style="font-family:var(--font-mono); font-size:12px;">${r.date}</td>
+        <td style="font-family:var(--font-mono); font-size:12px; font-weight:700;">${r.time}</td>
+        <td><strong style="font-family:var(--font-mono); color:var(--cyan);">${r.emp_id}</strong></td>
+        <td><strong style="color:var(--text-primary);">${r.name || 'Staff'}</strong></td>
+        <td>${r.department || 'General'}</td>
+        <td><span class="badge badge-neutral">${r.method || 'Standard'}</span></td>
+        <td><span class="badge badge-indigo">${r.work_type || 'Office'}</span></td>
+        <td><span class="badge ${r.status === 'Present' ? 'badge-emerald' : r.status === 'Late' ? 'badge-amber' : 'badge-rose'}">${r.status || 'Present'}</span></td>
+        <td style="font-size:12px; color:var(--text-secondary);">${r.notes || (r.location ? `${r.location.lat.toFixed(3)}, ${r.location.lng.toFixed(3)}` : 'Verified')}</td>
+      </tr>
+    `).join('');
+  } catch (err) {
+    showToast('Error generating report preview', 'error');
+  }
+}
+
+function exportCustomReportCSV() {
+  const fromDate = document.getElementById('report-date-from').value;
+  const toDate = document.getElementById('report-date-to').value;
+  const status = document.getElementById('report-filter-status').value;
+  let url = `/api/company/export-csv?company_id=${currentCompanyId}&period=custom`;
+  if (fromDate) url += `&from_date=${fromDate}`;
+  if (toDate) url += `&to_date=${toDate}`;
+  if (status) url += `&status=${status}`;
+  window.location.href = url;
+  showToast('Downloading custom attendance report CSV...', 'info');
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  EMPLOYEE ATTENDANCE HISTORY DOSSIER MODAL
+// ══════════════════════════════════════════════════════════════════════════════
+async function openEmployeeDossier(empId, empName) {
+  const modal = document.getElementById('employee-dossier-modal');
+  modal.classList.add('active');
+
+  document.getElementById('dossier-name').textContent = empName || 'Employee Dossier';
+  document.getElementById('dossier-emp-id').textContent = empId;
+  document.getElementById('dossier-punches-body').innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px;">Fetching biometric & punch records for ${empId}...</td></tr>`;
+  document.getElementById('dossier-leaves-body').innerHTML = `<tr><td colspan="5" style="text-align:center; padding:15px;">Loading leave dossier...</td></tr>`;
+
+  try {
+    const res = await fetch(`/api/company/employees/${encodeURIComponent(empId)}/attendance-history?company_id=${currentCompanyId}`);
+    const data = await res.json();
+    if (data.ok) {
+      const emp = data.employee || {};
+      document.getElementById('dossier-name').textContent = emp.name || empName;
+      document.getElementById('dossier-dept').textContent = emp.department || 'General';
+      document.getElementById('dossier-desig').textContent = emp.designation || 'Staff';
+      document.getElementById('dossier-worktype').textContent = emp.work_type || 'Office';
+
+      const punches = data.punches || [];
+      const leaves = data.leaves || [];
+
+      let presentCount = 0;
+      let lateCount = 0;
+      punches.forEach(p => {
+        if (p.status === 'Present') presentCount++;
+        else if (p.status === 'Late' || p.status === 'Half Day') lateCount++;
+      });
+      const punctualityRate = (presentCount + lateCount > 0) ? Math.round((presentCount / (presentCount + lateCount)) * 100) : 100;
+
+      document.getElementById('dossier-kpi-punches').textContent = punches.length;
+      document.getElementById('dossier-kpi-present').textContent = presentCount;
+      document.getElementById('dossier-kpi-late').textContent = lateCount;
+      document.getElementById('dossier-kpi-leaves').textContent = leaves.length;
+      document.getElementById('dossier-kpi-rate').textContent = `${punctualityRate}%`;
+
+      const tbodyPunches = document.getElementById('dossier-punches-body');
+      if (punches.length === 0) {
+        tbodyPunches.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:15px; color:var(--text-muted);">No attendance punches recorded yet for ${empId}.</td></tr>`;
+      } else {
+        tbodyPunches.innerHTML = punches.map(p => {
+          const st = p.status || 'Present';
+          const badgeClass = st === 'Present' ? 'badge-emerald' : st === 'Late' ? 'badge-amber' : 'badge-rose';
+          return `
+            <tr>
+              <td style="font-family:var(--font-mono); font-size:12px;">${p.date}</td>
+              <td style="font-family:var(--font-mono); font-size:12px; font-weight:700;">${p.time}</td>
+              <td><span class="badge badge-neutral">${p.check_type || 'IN'}</span></td>
+              <td><span class="badge badge-indigo">${p.method || 'Standard'}</span></td>
+              <td><span class="badge ${badgeClass}">${st}</span></td>
+              <td style="font-size:12px; color:var(--text-secondary);">${p.notes || (p.location ? `GPS: ${p.location.lat.toFixed(3)}, ${p.location.lng.toFixed(3)}` : 'Standard')}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      const tbodyLeaves = document.getElementById('dossier-leaves-body');
+      if (leaves.length === 0) {
+        tbodyLeaves.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:15px; color:var(--text-muted);">No leave applications on record.</td></tr>`;
+      } else {
+        tbodyLeaves.innerHTML = leaves.map(l => `
+          <tr>
+            <td><strong style="font-family:var(--font-mono); color:var(--cyan);">${l.leave_id}</strong></td>
+            <td><span class="badge badge-indigo">${l.leave_type}</span></td>
+            <td style="font-family:var(--font-mono); font-size:12px;">${l.start_date} to ${l.end_date}</td>
+            <td style="font-size:12px; color:var(--text-secondary);">${l.reason}</td>
+            <td><span class="badge ${l.status === 'approved' ? 'badge-emerald' : l.status === 'rejected' ? 'badge-rose' : 'badge-amber'}">${(l.status || 'pending').toUpperCase()}</span></td>
+          </tr>
+        `).join('');
+      }
+    }
+  } catch (err) {
+    showToast('Failed to load employee dossier', 'error');
+  }
+}
+
+function closeEmployeeDossier() {
+  document.getElementById('employee-dossier-modal').classList.remove('active');
+}
+
+async function loadControllerPermissions() {
+  try {
+    const res = await fetch(`/api/company/controller-permissions?company_id=${currentCompanyId}`);
+    const data = await res.json();
+    if (data.ok) {
+      currentCompanyPermissions = data;
+    }
+  } catch (err) {
+    console.warn('Failed to load controller permissions', err);
+  }
+}
+
+function syncAddEmpMethodCheckboxes(workType) {
+  workType = workType || (document.getElementById('emp-worktype') ? document.getElementById('emp-worktype').value : 'Office');
+  const permitted = (currentCompanyPermissions && currentCompanyPermissions.allowed_methods) || ['Face', 'OTP', 'WiFi', 'GPS'];
+  const defaults = {
+    'Office': ['OTP', 'WiFi', 'Face'],
+    'WFH': ['Face', 'OTP', 'GPS'],
+    'Field': ['GPS', 'Face', 'OTP']
+  };
+  const activeDefaults = defaults[workType] || ['Face', 'OTP'];
+
+  const methods = [
+    { id: 'emp-method-face', key: 'Face', lblId: 'lbl-emp-method-face' },
+    { id: 'emp-method-otp', key: 'OTP', lblId: 'lbl-emp-method-otp' },
+    { id: 'emp-method-wifi', key: 'WiFi', lblId: 'lbl-emp-method-wifi' },
+    { id: 'emp-method-gps', key: 'GPS', lblId: 'lbl-emp-method-gps' }
+  ];
+
+  methods.forEach(m => {
+    const el = document.getElementById(m.id);
+    const lbl = document.getElementById(m.lblId);
+    if (!el) return;
+    const isCompanyAllowed = permitted.includes(m.key);
+    if (!isCompanyAllowed) {
+      el.checked = false;
+      el.disabled = true;
+      if (lbl) {
+        lbl.style.opacity = '0.35';
+        lbl.title = `${m.key} is disabled by Super Admin for this company`;
+      }
+    } else {
+      el.disabled = false;
+      el.checked = activeDefaults.includes(m.key);
+      if (lbl) {
+        lbl.style.opacity = '1';
+        lbl.title = '';
+      }
+    }
+  });
+
+  const note = document.getElementById('modal-emp-method-note');
+  if (note) {
+    note.textContent = `${permitted.length} method(s) permitted by Super Admin`;
+  }
+}
+
+function openAddEmployeeModal() {
+  syncAddEmpMethodCheckboxes();
+  document.getElementById('add-emp-modal').classList.add('active');
+}
 function closeAddEmployeeModal() { document.getElementById('add-emp-modal').classList.remove('active'); }
 function openAddBranchModal() { document.getElementById('add-branch-modal').classList.add('active'); }
 function closeAddBranchModal() { document.getElementById('add-branch-modal').classList.remove('active'); }
@@ -1598,6 +2595,163 @@ function openAddDeptModal() { document.getElementById('add-dept-modal').classLis
 function closeAddDeptModal() { document.getElementById('add-dept-modal').classList.remove('active'); }
 function openAddShiftModal() { document.getElementById('add-shift-modal').classList.add('active'); }
 function closeAddShiftModal() { document.getElementById('add-shift-modal').classList.remove('active'); }
+
+let currentEditingEmployee = null;
+
+function openEditEmployeeModal(empId){
+  const emp=(allEmployees||[]).find(e=>e.emp_id===empId);
+  if(!emp){showToast('Employee details could not be loaded','error');return;}
+  document.getElementById('edit-emp-id').value=emp.emp_id||'';
+  document.getElementById('edit-emp-id-display').value=emp.emp_id||'';
+  document.getElementById('edit-emp-name').value=emp.name||'';
+  document.getElementById('edit-emp-mobile').value=emp.mobile||emp.phone||'';
+  document.getElementById('edit-emp-email').value=emp.email||'';
+  document.getElementById('edit-emp-dept').value=emp.department||'General';
+  document.getElementById('edit-emp-desig').value=emp.designation||'Staff';
+  document.getElementById('edit-emp-worktype').value=emp.work_type||'Office';
+  document.getElementById('edit-emp-status').value=emp.status||'active';
+  document.getElementById('edit-emp-location').value=emp.assigned_location||'';
+  document.getElementById('edit-emp-timezone').value=emp.timezone||currentCompanyTimezone||'';
+  document.getElementById('edit-emp-password').value='';
+  document.getElementById('edit-employee-modal').classList.add('active');
+}
+function closeEditEmployeeModal(){document.getElementById('edit-employee-modal').classList.remove('active');}
+async function handleSaveEmployeeDetails(e){
+  e.preventDefault();
+  const btn=document.getElementById('btn-save-employee-details');
+  const payload={company_id:currentCompanyId,emp_id:document.getElementById('edit-emp-id').value,name:document.getElementById('edit-emp-name').value.trim(),mobile:document.getElementById('edit-emp-mobile').value.trim(),email:document.getElementById('edit-emp-email').value.trim(),department:document.getElementById('edit-emp-dept').value.trim()||'General',designation:document.getElementById('edit-emp-desig').value.trim()||'Staff',work_type:document.getElementById('edit-emp-worktype').value,status:document.getElementById('edit-emp-status').value,assigned_location:document.getElementById('edit-emp-location').value.trim(),timezone:document.getElementById('edit-emp-timezone').value.trim()||currentCompanyTimezone};
+  const password=document.getElementById('edit-emp-password').value.trim(); if(password)payload.password=password;
+  if(!payload.name||!payload.mobile){showToast('Name and contact number are required','error');return;}
+  btn.disabled=true;btn.textContent='Saving...';
+  try{const res=await fetch('/api/company/employees',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const data=await res.json();if(!data.ok)throw new Error(data.error||'Failed to update employee');showToast(data.message||'Employee details updated successfully','success');closeEditEmployeeModal();await loadCompanyData();}
+  catch(err){showToast(err.message||'Network error updating employee','error');}
+  finally{btn.disabled=false;btn.textContent='Save Employee Details →';}
+}
+
+function openEditEmpMethodsModal(empId, empName, workType, currentMethods) {
+  const emp = (allEmployees || []).find(e => e.emp_id === empId);
+  const activeWorkType = (emp && emp.work_type) || workType || 'Office';
+  const activeName = (emp && emp.name) || empName || empId;
+  const activeMethods = (emp && emp.allowed_methods) || (currentMethods ? (Array.isArray(currentMethods) ? currentMethods : currentMethods.split(',')) : ['Face', 'OTP']);
+  
+  currentEditingEmployee = { emp_id: empId, name: activeName, work_type: activeWorkType, allowed_methods: activeMethods };
+
+  document.getElementById('edit-methods-emp-id').value = empId;
+  document.getElementById('edit-methods-emp-name').textContent = activeName;
+  document.getElementById('edit-methods-emp-meta').textContent = `${empId} • ${activeWorkType} Workforce`;
+  document.getElementById('edit-methods-worktype-badge').textContent = activeWorkType;
+
+  const permitted = (currentCompanyPermissions && currentCompanyPermissions.allowed_methods) || ['Face', 'OTP', 'WiFi', 'GPS'];
+
+  const methodMapping = [
+    { id: 'edit-method-face', key: 'Face', lblId: 'edit-lbl-face' },
+    { id: 'edit-method-otp', key: 'OTP', lblId: 'edit-lbl-otp' },
+    { id: 'edit-method-wifi', key: 'WiFi', lblId: 'edit-lbl-wifi' },
+    { id: 'edit-method-gps', key: 'GPS', lblId: 'edit-lbl-gps' }
+  ];
+
+  methodMapping.forEach(m => {
+    const el = document.getElementById(m.id);
+    const lbl = document.getElementById(m.lblId);
+    if (!el) return;
+    const isCompanyAllowed = permitted.includes(m.key);
+    if (!isCompanyAllowed) {
+      el.checked = false;
+      el.disabled = true;
+      if (lbl) {
+        lbl.style.opacity = '0.35';
+        lbl.style.pointerEvents = 'none';
+        lbl.title = `${m.key} is disabled by Super Admin for this company`;
+      }
+    } else {
+      el.disabled = false;
+      el.checked = activeMethods.includes(m.key);
+      if (lbl) {
+        lbl.style.opacity = '1';
+        lbl.style.pointerEvents = 'auto';
+        lbl.title = '';
+      }
+    }
+  });
+
+  document.getElementById('edit-emp-methods-modal').classList.add('active');
+}
+
+function closeEditEmpMethodsModal() {
+  document.getElementById('edit-emp-methods-modal').classList.remove('active');
+}
+
+function applyWorkTypeDefaultMethods() {
+  if (!currentEditingEmployee) return;
+  const wt = currentEditingEmployee.work_type || 'Office';
+  const defaults = {
+    'Office': ['OTP', 'WiFi', 'Face'],
+    'WFH': ['Face', 'OTP', 'GPS'],
+    'Field': ['GPS', 'Face', 'OTP']
+  };
+  const targetDefaults = defaults[wt] || ['Face', 'OTP'];
+  const permitted = (currentCompanyPermissions && currentCompanyPermissions.allowed_methods) || ['Face', 'OTP', 'WiFi', 'GPS'];
+
+  const methodMapping = [
+    { id: 'edit-method-face', key: 'Face' },
+    { id: 'edit-method-otp', key: 'OTP' },
+    { id: 'edit-method-wifi', key: 'WiFi' },
+    { id: 'edit-method-gps', key: 'GPS' }
+  ];
+
+  methodMapping.forEach(m => {
+    const el = document.getElementById(m.id);
+    if (!el || el.disabled) return;
+    el.checked = permitted.includes(m.key) && targetDefaults.includes(m.key);
+  });
+  showToast(`Applied default methods for ${wt} workforce`, 'info');
+}
+
+async function handleSaveEmpMethods(e) {
+  e.preventDefault();
+  const empId = document.getElementById('edit-methods-emp-id').value;
+  if (!empId) return;
+
+  const btn = document.getElementById('btn-save-methods');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  const selected = [];
+  ['Face', 'OTP', 'WiFi', 'GPS'].forEach(m => {
+    const el = document.getElementById(`edit-method-${m.toLowerCase()}`);
+    if (el && el.checked && !el.disabled) {
+      selected.push(m);
+    }
+  });
+
+  if (selected.length === 0) {
+    showToast('Select at least one attendance verification method', 'error');
+    btn.disabled = false;
+    btn.textContent = 'Save Methods →';
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/company/employees/${encodeURIComponent(empId)}/attendance-methods?company_id=${currentCompanyId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ allowed_methods: selected })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      showToast(`Updated attendance methods for ${empId}`, 'success');
+      closeEditEmpMethodsModal();
+      await loadEmployees();
+    } else {
+      showToast(data.error || 'Failed to update methods', 'error');
+    }
+  } catch (err) {
+    showToast('Network error updating methods', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save Methods →';
+  }
+}
 
 async function handleCreateEmployee(e) {
   e.preventDefault();
@@ -1611,6 +2765,11 @@ async function handleCreateEmployee(e) {
     document.getElementById('emp-pass').value = 'emp123';
     showToast('Empty password — using default (emp123). You can change it after creation.', 'info');
   }
+
+  const selectedMethods = Array.from(
+    document.querySelectorAll('#add-emp-methods-grid input[type="checkbox"]:checked')
+  ).map(cb => cb.value);
+
   const payload = {
     company_id: currentCompanyId,
     emp_id: document.getElementById('emp-id').value.trim().toUpperCase(),
@@ -1620,7 +2779,8 @@ async function handleCreateEmployee(e) {
     department: document.getElementById('emp-dept').value.trim(),
     designation: document.getElementById('emp-desig').value.trim(),
     work_type: document.getElementById('emp-worktype').value,
-    password: empPassword
+    password: empPassword,
+    allowed_methods: selectedMethods
   };
 
   try {
@@ -1762,9 +2922,22 @@ function showToast(msg, type = 'info') {
   }, 4000);
 }
 
-window.onload = loadCompanyData;
+window.onload = () => {
+  initTimingsPanel();
+  loadCompanyData();
+  if (window.ArdhnarishwarRuntime) {
+    ArdhnarishwarRuntime.registerTask("company_data", loadCompanyData);
+    ArdhnarishwarRuntime.registerTask("monthly_matrix", loadMonthlyAttendance);
+    ArdhnarishwarRuntime.registerTask("late_early", loadLateEarlyRecords);
+    ArdhnarishwarRuntime.registerTask("pending_emps", loadPendingEmployees);
+    ArdhnarishwarRuntime.registerTask("checkin_checkout", refreshTimingsIfVisible);
+  }
+  if (new URLSearchParams(window.location.search).get('tab') === 'timings') switchView('timings');
+};
 </script>
+<script src="/static/js/checkin_checkout.js"></script>
 <script src="/static/js/theme.js"></script>
 <script src="/static/js/telemetry.js"></script>
+<script src="/static/js/ardhnarishwar_runtime.js"></script>
 </body>
 </html>

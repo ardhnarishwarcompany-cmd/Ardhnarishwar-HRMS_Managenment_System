@@ -250,7 +250,7 @@ export default function CreateProposal() {
   const isRevision = existing?.status === "REVISION";
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6">
       <PageHeader title="Proposals" desc="Draft quotations for your clients and send them for approval" />
 
       <ModuleHeading

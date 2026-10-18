@@ -156,8 +156,8 @@ export const updateEOD = async (
     `
     UPDATE eod_reports
     SET ?
-    WHERE id = ?
+    WHERE id = ? AND employee_id = ?
     `,
-    [payload, id]
+    [payload, id, employeeId]
   );
 };

@@ -58,7 +58,7 @@ export default function WorkPolicy() {
   }, [filters]);
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6">
       <PageHeader
         title="Work Policy Sheet"
         desc="Company work guidelines & policies"

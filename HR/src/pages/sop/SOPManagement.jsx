@@ -14,6 +14,8 @@ import {
   Clock,
 } from "lucide-react";
 import API from "../../api/axios";
+import PageHeader from "../../components/common/PageHeader";
+import { BookOpen as HrPageIcon } from "lucide-react";
 const API_ORIGIN = (import.meta.env.VITE_API_BASE_URL || "").replace(
   /\/api\/?$/,
   "",
@@ -210,41 +212,16 @@ export default function SOPManagement() {
   return (
     <div className="min-h-screen bg-slate-100 pb-24">
 <div className="px-3 sm:px-6 lg:px-8 pt-6 max-w-7xl mx-auto">
-        {/* header */}
-        <div className="relative overflow-hidden rounded-3xl bg-slate-900 px-8 py-8 md:px-10 mb-6">
-          <div
-            className="absolute inset-0 opacity-[0.06]"
-            style={{
-              backgroundImage:
-                "linear-gradient(to right, #818cf8 1px, transparent 1px), linear-gradient(to bottom, #818cf8 1px, transparent 1px)",
-              backgroundSize: "44px 44px",
-            }}
-          />
-          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-violet-600/25 blur-3xl" />
-          <div className="absolute -bottom-24 -left-12 h-56 w-56 rounded-full bg-indigo-600/20 blur-3xl" />
-
-          <div className="relative flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-indigo-300">
-                Knowledge Base
-              </p>
-              <h1 className="mt-2 text-2xl font-bold text-white md:text-3xl text-balance">
-                SOP Management
-              </h1>
-              <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-400">
-                Internal SOP library, version control, acknowledgement &amp;
-                training tracking.
-              </p>
-            </div>
-            <button
-              onClick={openCreate}
-              className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/40 transition-colors hover:bg-indigo-500"
-            >
-              <Upload size={16} />
-              Upload SOP
-            </button>
-          </div>
-        </div>
+        <PageHeader
+          icon={HrPageIcon}
+          title="SOP Management"
+          subtitle="Internal SOP library, version control, acknowledgement &amp; training tracking."
+        >
+          <button type="button" onClick={openCreate} className="hr-btn">
+            <Upload size={16} aria-hidden="true" />
+            Upload SOP
+          </button>
+        </PageHeader>
 
         {/* tabs */}
         <div className="flex gap-2 mb-4">

@@ -30,8 +30,8 @@ export default function LeadList() {
   }, []);
 
   return (
-    <div className="space-y-6 p-6">
-      <PageHeader title="Assigned Leads" desc="Your all Leads is here" />
+    <div className="space-y-6">
+      <PageHeader title="Assigned Leads" desc="All leads assigned to you, in one place" />
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
         {batches.map((b) => {

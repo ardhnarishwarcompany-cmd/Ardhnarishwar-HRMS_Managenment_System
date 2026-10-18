@@ -20,69 +20,56 @@ import { useAuth } from "../../context/AuthContext";
 /* ---------- tiny UI helpers ---------- */
 
 const STAT_THEMES = {
-  indigo: { tile: "bg-indigo-600", soft: "bg-indigo-50", text: "text-indigo-700", bar: "from-indigo-500 to-violet-500" },
-  emerald: { tile: "bg-emerald-600", soft: "bg-emerald-50", text: "text-emerald-700", bar: "from-emerald-500 to-teal-500" },
-  amber: { tile: "bg-amber-500", soft: "bg-amber-50", text: "text-amber-700", bar: "from-amber-400 to-orange-500" },
-  rose: { tile: "bg-rose-500", soft: "bg-rose-50", text: "text-rose-700", bar: "from-rose-400 to-pink-500" },
+  indigo: { tile: "var(--grad-tile)", fg: "#fff", shadow: "0 8px 18px rgba(124,58,237,.3)" },
+  emerald: { tile: "linear-gradient(135deg,#059669,#34d399)", fg: "#fff", shadow: "0 8px 18px rgba(5,150,105,.3)" },
+  amber: { tile: "linear-gradient(135deg,#d97706,#fbbf24)", fg: "#fff", shadow: "0 8px 18px rgba(217,119,6,.3)" },
+  rose: { tile: "linear-gradient(135deg,#e11d48,#fb7185)", fg: "#fff", shadow: "0 8px 18px rgba(225,29,72,.3)" },
 };
 
 function StatCard({ icon: Icon, label, value, sub, theme = "indigo" }) {
-  const t = STAT_THEMES[theme];
+  const t = STAT_THEMES[theme] || STAT_THEMES.indigo;
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-      <div
-        className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${t.bar} opacity-0 transition-opacity duration-300 group-hover:opacity-100`}
-      />
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
-          <p className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900">{value}</p>
-          {sub && <p className="mt-1 truncate text-xs text-slate-500">{sub}</p>}
-        </div>
-        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${t.tile} text-white shadow-md`}>
+    <div className="adm-k">
+      <div className="adm-k-top">
+        <p className="adm-k-label">{label}</p>
+        <span className="adm-k-ic" style={{ background: t.tile, color: t.fg, boxShadow: t.shadow }}>
           <Icon size={20} />
-        </div>
+        </span>
       </div>
+      <strong className="adm-k-value">{value}</strong>
+      {sub && <p className="adm-k-sub">{sub}</p>}
     </div>
   );
 }
 
 function SectionCard({ icon: Icon, title, sub, children, action }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
-            <Icon size={18} />
-          </div>
-          <div className="min-w-0">
-            <h3 className="truncate text-sm font-bold text-slate-900">{title}</h3>
-            {sub && <p className="truncate text-xs text-slate-500">{sub}</p>}
-          </div>
+    <section className="adm-card is-flush">
+      <div className="adm-card-h">
+        <span className="adm-card-ic">
+          <Icon size={22} />
+        </span>
+        <div className="min-w-0">
+          <b>{title}</b>
+          {sub && <small>{sub}</small>}
         </div>
-        {action}
+        {action ? <div className="adm-card-actions">{action}</div> : null}
       </div>
-      <div className="p-5">{children}</div>
-    </div>
+      <div className="p-6">{children}</div>
+    </section>
   );
 }
 
 const STATUS_STYLES = {
-  PRESENT: "bg-emerald-50 text-emerald-700",
-  LATE: "bg-amber-50 text-amber-700",
-  Pending: "bg-amber-50 text-amber-700",
-  Approved: "bg-emerald-50 text-emerald-700",
-  Rejected: "bg-rose-50 text-rose-700",
+  PRESENT: "is-ok",
+  LATE: "is-warn",
+  Pending: "is-warn",
+  Approved: "is-ok",
+  Rejected: "is-bad",
 };
 
 function Pill({ children }) {
-  return (
-    <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_STYLES[children] || "bg-slate-100 text-slate-600"}`}
-    >
-      {children}
-    </span>
-  );
+  return <span className={`adm-status ${STATUS_STYLES[children] || ""}`}>{children}</span>;
 }
 
 /* ---------- main dashboard ---------- */
@@ -129,40 +116,41 @@ export default function TeamDashboard({ role = "MANAGER" }) {
   const t = data?.totals || {};
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       {/* Hero */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-700 p-6 text-white shadow-lg sm:p-8">
-        <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-white/10" />
-        <div className="pointer-events-none absolute -bottom-20 right-24 h-40 w-40 rounded-full bg-white/5" />
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15">
-                <RoleIcon size={18} />
-              </span>
-              <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide">
-                {roleLabel} Dashboard
-              </span>
-            </div>
-            <h1 className="mt-3 text-2xl font-extrabold tracking-tight text-balance sm:text-3xl">
-              Welcome, {auth?.user?.name || roleLabel}
-            </h1>
-            <p className="mt-1 text-sm text-indigo-100">
-              Your team&apos;s attendance, leaves and headcount — live.
-            </p>
+      <div className="adm-hero adm-hero-lg">
+        <div className="min-w-0 flex-1 basis-[320px]">
+          <span className="adm-chip" style={{ padding: "7px 14px", fontSize: 12.5, letterSpacing: ".06em", textTransform: "uppercase" }}>
+            <RoleIcon size={15} />
+            {roleLabel} Dashboard
+          </span>
+          <h1 className="adm-hero-title mt-4">Welcome, {auth?.user?.name || roleLabel}</h1>
+          <p className="adm-hero-sub">Your team&apos;s attendance, leaves and headcount — live.</p>
+          <div className="adm-hero-chips">
+            <span className="adm-chip">
+              <Users size={16} />
+              {loading ? "…" : (t.employees ?? 0)} Team Members
+            </span>
+            <span className="adm-chip">
+              <CalendarCheck size={16} />
+              {loading ? "…" : (t.presentToday ?? 0)} Present Today
+            </span>
+            <span className="adm-chip">
+              <ClipboardList size={16} />
+              {loading ? "…" : (t.pendingLeaves ?? 0)} Pending Leaves
+            </span>
           </div>
-          <button
-            onClick={load}
-            className="inline-flex w-fit items-center gap-2 rounded-xl bg-white/15 px-4 py-2 text-sm font-semibold backdrop-blur transition hover:bg-white/25"
-          >
-            <RefreshCw size={15} className={loading ? "animate-spin" : ""} />
+        </div>
+        <div className="adm-hero-actions">
+          <button type="button" onClick={load} className="adm-wb">
+            <RefreshCw size={18} className={loading ? "animate-spin" : ""} />
             Refresh
           </button>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard icon={Users} label="Team Members" value={loading ? "…" : (t.employees ?? 0)} sub="Total employees" theme="indigo" />
         <StatCard icon={CalendarCheck} label="Present Today" value={loading ? "…" : (t.presentToday ?? 0)} sub={`${t.lateToday ?? 0} late check-ins`} theme="emerald" />
         <StatCard icon={CalendarX} label="Not Checked In" value={loading ? "…" : (t.absentToday ?? 0)} sub="No attendance yet today" theme="rose" />

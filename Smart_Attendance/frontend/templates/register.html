@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Register • Global Attendance Management System</title>
-<link rel="icon" type="image/svg+xml" href="/favicon.ico">
+<title>Register • Ardhnarishwar Global Workforce Platform</title>
+<link rel="icon" type="image/png" href="/static/images/ardhnarishwar_logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/css/theme.css">
+<link rel="stylesheet" href="/static/css/ardhnarishwar_3d.css">
 <style>
 .reg-wrapper {
   min-height: 100vh;
@@ -106,33 +107,28 @@
   flex-shrink: 0;
 }
 </style>
+<link rel="stylesheet" href="/static/css/ardh_logo.css?v=1">
 </head>
 <body>
 <div class="reg-wrapper">
   <!-- Brand Header -->
   <div style="text-align:center; margin-bottom:24px;">
-    <a href="/" style="display:inline-flex; align-items:center; gap:12px; text-decoration:none; color:var(--text-primary); margin-bottom:12px;">
-      <div style="width:40px; height:40px; border-radius:12px; background:linear-gradient(135deg, var(--emerald), var(--indigo)); display:flex; align-items:center; justify-content:center; box-shadow:0 0 20px var(--glow-primary);">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24" height="24">
-          <circle cx="24" cy="24" r="18" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
-          <ellipse cx="24" cy="24" rx="9" ry="18" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-dasharray="2 1"/>
-          <line x1="6" y1="24" x2="42" y2="24" stroke="#FFFFFF" stroke-width="1.8"/>
-          <circle cx="24" cy="24" r="5.5" fill="#FFFFFF"/>
-          <path d="M24 20v4l3 2" fill="none" stroke="#070B14" stroke-width="2" stroke-linecap="round"/>
-        </svg>
+    <a href="/" style="display:inline-flex; align-items:center; gap:14px; text-decoration:none; color:var(--text-primary); margin-bottom:12px;">
+      <div class="ardh-medallion-nav" style="width:52px; height:52px;">
+        <img src="/static/images/ardhnarishwar_logo_emblem.png" alt="Ardhnarishwar Logo" class="ardh-medallion-img">
       </div>
       <div style="text-align:left;">
-        <div style="font-size:17px; font-weight:800; letter-spacing:-0.3px;">Global Attendance Management System</div>
-        <div style="font-size:11px; color:var(--cyan); font-family:var(--font-mono); letter-spacing:0.5px;">ENTERPRISE ONBOARDING</div>
+        <div style="font-size:19px; font-weight:900; letter-spacing:0.5px; background: linear-gradient(135deg, #C084FC, #38BDF8, #FBBF24); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">ARDHNARISHWAR</div>
+        <div style="font-size:11px; color:var(--cyan); font-family:var(--font-mono); letter-spacing:0.5px;">GLOBAL ENTERPRISE ONBOARDING</div>
       </div>
     </a>
-    <h1 style="font-size:24px; font-weight:800; letter-spacing:-0.4px;">Join the Global Platform</h1>
+    <h1 style="font-size:24px; font-weight:800; letter-spacing:-0.4px;">Join the Ardhnarishwar Global Platform</h1>
     <p style="font-size:13.5px; color:var(--text-secondary); max-width:440px; margin:0 auto;">
       All client organizations and staff registrations are protected by verification and administrator approval.
     </p>
   </div>
 
-  <div class="reg-card">
+  <div class="reg-card card-3d">
     <!-- Registration Tab Switcher -->
     <div class="tab-nav">
       <button class="tab-nav-btn active" id="btn-tab-company" onclick="switchRegTab('company')">
@@ -526,5 +522,7 @@ window.onload = () => {
   else if (params.get('tab') === 'status') switchRegTab('status');
 };
 </script>
+<script src="/static/js/ardhnarishwar_runtime.js"></script>
+<script src="/static/js/ardh_logo.js?v=1"></script>
 </body>
 </html>

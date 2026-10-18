@@ -1,0 +1,611 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   ARDHNARISHWAR GLOBAL SAAS ATTENDANCE PLATFORM
+   ULTRA 3D DESIGN SYSTEM & RUNTIME LIVE VISUAL ENGINE
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Color Palette Tokens: Ardhnarishwar Mystical (Purple + Teal + Gold) ── */
+:root {
+  --ardh-purple: #A855F7;
+  --ardh-purple-glow: rgba(168, 85, 247, 0.4);
+  --ardh-purple-deep: #7C3AED;
+  --ardh-teal: #06B6D4;
+  --ardh-teal-glow: rgba(6, 182, 212, 0.4);
+  --ardh-teal-deep: #0891B2;
+  --ardh-gold: #F59E0B;
+  --ardh-gold-light: #FCD34D;
+  --ardh-gold-glow: rgba(245, 158, 11, 0.35);
+  --ardh-dark-bg: #0A0818;
+  --ardh-card-bg: rgba(16, 14, 34, 0.85);
+  --ardh-border-3d: rgba(168, 85, 247, 0.25);
+}
+
+/* ── 2. Ardhnarishwar 3D Emblem & Medallion ────────────────────────────────── */
+.ardh-emblem-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1000px;
+}
+
+.ardh-medallion-nav {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #F59E0B 0%, #A855F7 50%, #06B6D4 100%);
+  padding: 2.5px;
+  box-shadow: 0 4px 14px rgba(168, 85, 247, 0.35), 0 0 10px rgba(6, 182, 212, 0.25);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease;
+  flex-shrink: 0;
+}
+
+.ardh-medallion-nav:hover {
+  transform: rotate(8deg) scale(1.1);
+  box-shadow: 0 8px 24px rgba(168, 85, 247, 0.5), 0 0 20px rgba(245, 158, 11, 0.4);
+}
+
+.ardh-medallion-nav img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Large 3D Hero Medallion */
+.ardh-hero-3d-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1200px;
+  margin: 20px auto;
+  width: 100%;
+  max-width: 420px;
+  height: 380px;
+}
+
+.ardh-hero-medallion {
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #F59E0B 0%, #EAB308 25%, #A855F7 60%, #06B6D4 100%);
+  padding: 6px;
+  box-shadow: 
+    0 25px 60px -10px rgba(0, 0, 0, 0.8),
+    0 0 45px rgba(168, 85, 247, 0.45),
+    0 0 30px rgba(6, 182, 212, 0.35),
+    inset 0 2px 6px rgba(255, 255, 255, 0.6);
+  transform-style: preserve-3d;
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+  cursor: pointer;
+  animation: ardhFloat 5s ease-in-out infinite;
+}
+
+.ardh-hero-medallion img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
+}
+
+/* 3D Orbiting Glow Rings */
+.ardh-orbit-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(245, 158, 11, 0.35);
+  pointer-events: none;
+  animation: ardhSpinSlow 24s linear infinite;
+}
+
+.ardh-orbit-ring-1 {
+  width: 320px;
+  height: 320px;
+  border-color: rgba(168, 85, 247, 0.3);
+  animation-duration: 28s;
+  animation-direction: reverse;
+}
+
+.ardh-orbit-ring-2 {
+  width: 380px;
+  height: 380px;
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  animation-duration: 35s;
+}
+
+@keyframes ardhFloat {
+  0%, 100% {
+    transform: translateY(0px) rotateY(0deg) rotateX(0deg);
+  }
+  50% {
+    transform: translateY(-14px) rotateY(6deg) rotateX(4deg);
+  }
+}
+
+@keyframes ardhSpinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ── 3. 3D Card Architecture (Tilt & Depth) ────────────────────────────────── */
+.card-3d-wrap {
+  perspective: 1000px;
+}
+
+.card-3d {
+  background: var(--ardh-card-bg);
+  border: 1px solid var(--ardh-border-3d);
+  border-radius: var(--radius-xl, 24px);
+  backdrop-filter: blur(20px);
+  box-shadow: 
+    0 15px 35px -5px rgba(0, 0, 0, 0.5),
+    0 0 25px rgba(168, 85, 247, 0.12);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+}
+
+.card-3d:hover {
+  transform: translateY(-8px) scale3d(1.015, 1.015, 1.015);
+  border-color: rgba(168, 85, 247, 0.6);
+  box-shadow: 
+    0 24px 50px -10px rgba(0, 0, 0, 0.7),
+    0 0 40px rgba(168, 85, 247, 0.35),
+    0 0 25px rgba(6, 182, 212, 0.25);
+}
+
+/* 3D Metallic Accent Header */
+.card-3d::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #F59E0B, #A855F7, #06B6D4);
+  opacity: 0.8;
+  transition: opacity 0.3s;
+}
+
+.card-3d:hover::before {
+  opacity: 1;
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.7);
+}
+
+/* ── 4. Runtime Live Engine & Synchronizer Styles ──────────────────────────── */
+.runtime-hud-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(15, 12, 33, 0.85);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 9999px;
+  padding: 6px 16px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 12px rgba(168, 85, 247, 0.15);
+  flex-wrap: wrap;
+}
+
+.runtime-live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34D399;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-family: var(--font-mono, monospace);
+}
+
+.runtime-live-pill .pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 10px #10B981;
+  animation: pulseLive 1.5s infinite;
+}
+
+@keyframes pulseLive {
+  0% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 4px #10B981; }
+  50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 12px #10B981, 0 0 20px rgba(16, 185, 129, 0.5); }
+  100% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 4px #10B981; }
+}
+
+/* Master 3D Runtime Refresh Button */
+.btn-runtime-refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(6, 182, 212, 0.25));
+  border: 1px solid rgba(168, 85, 247, 0.5);
+  color: #FFFFFF;
+  padding: 7px 16px;
+  border-radius: 9999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 4px 14px rgba(168, 85, 247, 0.25);
+  user-select: none;
+}
+
+.btn-runtime-refresh:hover {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.45), rgba(6, 182, 212, 0.45));
+  border-color: #A855F7;
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.45), 0 0 15px rgba(6, 182, 212, 0.3);
+}
+
+.btn-runtime-refresh:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.btn-runtime-refresh.syncing .refresh-icon {
+  animation: spinSmooth 0.7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes spinSmooth {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Auto-Refresh Toggle Pill */
+.auto-refresh-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  padding: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-secondary, #CBD5E1);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.auto-refresh-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #FFF;
+}
+
+.auto-refresh-toggle.active {
+  background: rgba(6, 182, 212, 0.18);
+  border-color: rgba(6, 182, 212, 0.5);
+  color: #67E8F9;
+}
+
+/* Last Synced Text */
+.runtime-last-sync {
+  font-size: 11px;
+  color: #94A3B8;
+  font-family: var(--font-mono, monospace);
+  white-space: nowrap;
+}
+
+/* ── 5. 3D Interactive Feature Matrix Grid ─────────────────────────────────── */
+.ardh-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin: 32px 0;
+}
+
+.ardh-feature-card {
+  background: rgba(18, 14, 38, 0.75);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-radius: 20px;
+  padding: 24px;
+  backdrop-filter: blur(16px);
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.ardh-feature-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  border-color: rgba(6, 182, 212, 0.6);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(6, 182, 212, 0.25);
+}
+
+.ardh-feature-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.ardh-feature-icon.purple {
+  background: linear-gradient(135deg, #7C3AED, #A855F7);
+  box-shadow: 0 6px 18px rgba(168, 85, 247, 0.4);
+}
+
+.ardh-feature-icon.teal {
+  background: linear-gradient(135deg, #0891B2, #06B6D4);
+  box-shadow: 0 6px 18px rgba(6, 182, 212, 0.4);
+}
+
+.ardh-feature-icon.gold {
+  background: linear-gradient(135deg, #D97706, #F59E0B);
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.4);
+}
+
+.ardh-feature-icon.emerald {
+  background: linear-gradient(135deg, #059669, #10B981);
+  box-shadow: 0 6px 18px rgba(168, 85, 129, 0.4);
+}
+
+.ardh-feature-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 8px;
+}
+
+.ardh-feature-desc {
+  font-size: 13.5px;
+  color: #94A3B8;
+  line-height: 1.55;
+  margin-bottom: 14px;
+}
+
+.ardh-feature-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #E2E8F0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── 6. 3D Portal Launcher Hub ─────────────────────────────────────────────── */
+.ardh-portals-hub {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+  margin: 28px 0;
+}
+
+.ardh-portal-card {
+  background: linear-gradient(160deg, rgba(26, 20, 56, 0.85) 0%, rgba(13, 10, 28, 0.95) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  border-radius: 20px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.ardh-portal-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  border-color: #F59E0B;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5), 0 0 25px rgba(245, 158, 11, 0.25);
+}
+
+.ardh-portal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.ardh-portal-icon {
+  font-size: 28px;
+}
+
+.ardh-portal-pill {
+  font-size: 10.5px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  color: #C084FC;
+}
+
+.ardh-portal-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #FFF;
+  margin-bottom: 6px;
+}
+
+.ardh-portal-desc {
+  font-size: 12.5px;
+  color: #94A3B8;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.ardh-portal-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #38BDF8;
+}
+
+/* ── 7. Interactive 3D Biometric Scanner Simulation ────────────────────────── */
+.ardh-biometric-scanner {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  height: 240px;
+  margin: 16px auto;
+  border-radius: 20px;
+  background: rgba(7, 11, 20, 0.85);
+  border: 2px solid rgba(6, 182, 212, 0.4);
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(6, 182, 212, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ardh-scanner-laser {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #06B6D4, #A855F7, transparent);
+  box-shadow: 0 0 16px #06B6D4, 0 0 8px #A855F7;
+  animation: laserScan 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes laserScan {
+  0% { top: 5%; }
+  100% { top: 92%; }
+}
+
+.ardh-scanner-face-overlay {
+  width: 140px;
+  height: 180px;
+  border-radius: 50% 50% 45% 45%;
+  border: 1.5px dashed rgba(168, 85, 247, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.ardh-scanner-face-overlay::after {
+  content: '3D BIOMETRIC READY';
+  position: absolute;
+  bottom: -22px;
+  font-size: 10px;
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  color: #38BDF8;
+  letter-spacing: 1px;
+}
+
+/* ── 8. Runtime Notification Toast ─────────────────────────────────────────── */
+.runtime-toast-portal {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.runtime-toast-item {
+  background: rgba(16, 13, 36, 0.95);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  border-radius: 14px;
+  padding: 12px 18px;
+  color: #FFFFFF;
+  font-size: 13.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(168, 85, 247, 0.25);
+  backdrop-filter: blur(20px);
+  pointer-events: auto;
+  animation: slideInToast 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.3s;
+}
+
+@keyframes slideInToast {
+  from { opacity: 0; transform: translateX(50px) scale(0.9); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+.runtime-toast-item.success {
+  border-color: rgba(16, 185, 129, 0.5);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(16, 185, 129, 0.25);
+}
+
+.runtime-toast-item.error {
+  border-color: rgba(244, 63, 94, 0.5);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(244, 63, 94, 0.25);
+}
+
+/* ── 9. Sound FX Toggle Button ─────────────────────────────────────────────── */
+.btn-sound-fx {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #CBD5E1;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.btn-sound-fx:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFF;
+}
+
+.btn-sound-fx.muted {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+/* ── 10. Responsive Tweaks ─────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .ardh-hero-3d-stage {
+    height: 300px;
+  }
+  .ardh-hero-medallion {
+    width: 200px;
+    height: 200px;
+  }
+  .ardh-orbit-ring-1 {
+    width: 250px;
+    height: 250px;
+  }
+  .ardh-orbit-ring-2 {
+    width: 290px;
+    height: 290px;
+  }
+  .runtime-hud-container {
+    padding: 6px 12px;
+    gap: 8px;
+  }
+}

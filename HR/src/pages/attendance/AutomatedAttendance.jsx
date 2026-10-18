@@ -14,7 +14,9 @@ import {
   AlarmClock,
   Palmtree,
 } from "lucide-react";
+import PageHeader from "../../components/common/PageHeader";
 
+import { ClipboardCheck as HrPageIcon } from "lucide-react";
 /* ═══════════════ keyframes ═══════════════ */
 const styles = `
 @keyframes axRise {
@@ -112,6 +114,9 @@ export default function AutomatedAttendance() {
     status: "",
   });
 
+  // HR sees the whole company by default; "me" narrows to personal records.
+  const [scope, setScope] = useState("all");
+
   const [activeTab, setActiveTab] = useState("attendance");
   const [officeLocations, setOfficeLocations] = useState([]);
   const [currentLocation, setCurrentLocation] = useState(null);
@@ -129,6 +134,7 @@ export default function AutomatedAttendance() {
       if (filters.fromDate) params.append("fromDate", filters.fromDate);
       if (filters.toDate) params.append("toDate", filters.toDate);
       if (filters.status) params.append("status", filters.status);
+      params.append("scope", scope);
 
       const res = await axios.get(`${BASE}/hr/attendance?${params}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -197,11 +203,16 @@ export default function AutomatedAttendance() {
   useEffect(() => {
     fetchAttendance();
     fetchShiftTimings();
-  }, [filters]);
+  }, [filters, scope]);
 
   const tabs = [
     { id: "attendance", label: "Attendance", icon: Users },
     { id: "shifts", label: "Shift Timings", icon: Clock },
+  ];
+
+  const scopeOptions = [
+    { id: "all", label: "All employees" },
+    { id: "me", label: "My records" },
   ];
 
   return (
@@ -238,57 +249,13 @@ export default function AutomatedAttendance() {
 
       <div className="relative z-10">
 <div className="mx-auto mt-6 max-w-[1600px] space-y-6">
-          {/* ── HERO BAND (stays dark in both themes) ─────────── */}
-          <div className="ax-rise relative overflow-hidden rounded-3xl p-[1.5px]">
-            <div
-              className="absolute inset-0 rounded-3xl"
-              style={{
-                background:
-                  "linear-gradient(120deg, rgba(139,92,246,0.55), rgba(232,121,249,0.65), rgba(99,102,241,0.55))",
-              }}
-              aria-hidden="true"
-            />
-            <div className="relative overflow-hidden rounded-[calc(1.5rem-1.5px)] bg-[#0d0918] px-8 py-9 md:px-12">
-              <div
-                className="absolute inset-0 opacity-[0.06]"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(to right, #a78bfa 1px, transparent 1px), linear-gradient(to bottom, #a78bfa 1px, transparent 1px)",
-                  backgroundSize: "44px 44px",
-                }}
-                aria-hidden="true"
-              />
-              <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-fuchsia-600/25 blur-3xl" aria-hidden="true" />
-              <div className="absolute -bottom-24 -left-12 h-56 w-56 rounded-full bg-violet-600/25 blur-3xl" aria-hidden="true" />
-              {/* sheen */}
-              <span className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-                <span className="ax-anim absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" style={{ animation: "axSheen 6s ease-in-out infinite" }} />
-              </span>
-
-              <div className="relative flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-                <div>
-                  <p className="inline-flex items-center gap-2 rounded-full border border-fuchsia-400/25 bg-fuchsia-500/10 px-3.5 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-fuchsia-300">
-                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-fuchsia-400" />
-                    Workforce
-                  </p>
-                  <h2 className="mt-3 text-3xl font-black tracking-tight text-white md:text-4xl text-balance">
-                    Automated{" "}
-                    <span className="bg-gradient-to-r from-violet-300 via-fuchsia-300 to-indigo-300 bg-clip-text text-transparent">
-                      Attendance
-                    </span>
-                  </h2>
-                  <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/45">
-                    Daily presence, late arrivals, and shift schedules — tracked
-                    automatically for the whole team.
-                  </p>
-                </div>
-                <p className="inline-flex shrink-0 items-center gap-2 self-start rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 text-xs font-medium text-white/50 backdrop-blur-md md:self-auto">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-                  Last updated: {new Date().toLocaleString()}
-                </p>
-              </div>
-            </div>
-          </div>
+          <PageHeader
+            icon={HrPageIcon}
+            title="Automated Attendance"
+            subtitle={"Daily presence, late arrivals, and shift schedules \u2014 tracked automatically for the whole team."}
+          >
+            <span className="hr-ph-pill">Last updated: {new Date().toLocaleString()}</span>
+          </PageHeader>
 
           {/* ── TABS ──────────────────────────────────────────── */}
           <div className="ax-rise inline-flex rounded-xl border border-slate-200 bg-white p-1 shadow-sm dark:border-white/10 dark:bg-white/[0.04] dark:shadow-none dark:backdrop-blur-xl" style={{ animationDelay: "0.1s" }}>
@@ -310,6 +277,28 @@ export default function AutomatedAttendance() {
 
           {activeTab === "attendance" && (
             <>
+              <div
+                className="ax-rise inline-flex rounded-xl border border-slate-200 bg-white p-1 shadow-sm dark:border-white/10 dark:bg-white/[0.04] dark:shadow-none dark:backdrop-blur-xl"
+                role="group"
+                aria-label="Attendance scope"
+              >
+                {scopeOptions.map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => setScope(option.id)}
+                    aria-pressed={scope === option.id}
+                    className={`rounded-lg px-4 py-2 text-xs font-semibold transition-all duration-300 ${
+                      scope === option.id
+                        ? "bg-slate-900 text-white shadow-sm dark:bg-white dark:text-slate-900"
+                        : "text-slate-500 hover:text-slate-900 dark:text-white/40 dark:hover:text-white"
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <StatTile
                   title="Present"
@@ -362,6 +351,7 @@ export default function AutomatedAttendance() {
                   loading={loading}
                   onRefresh={fetchAttendance}
                   shifts={shiftTimings}
+                  scope={scope}
                 />
               </div>
             </>
@@ -433,7 +423,7 @@ export default function AutomatedAttendance() {
           )}
 
           {activeTab === "shifts" && (
-            <div className="max-w-3xl">
+            <div className="w-full">
               <ShiftTimings
                 onSave={saveShiftTimings}
                 initialShifts={shiftTimings}

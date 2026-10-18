@@ -9,7 +9,9 @@ import {
   Globe,
   Send,
 } from "lucide-react";
+import PageHeader from "../../components/common/PageHeader";
 
+import { MessageCircleWarning as HrPageIcon } from "lucide-react";
 const PRIORITIES = [
   {
     value: "low",
@@ -106,32 +108,11 @@ export default function ComplaintList() {
   return (
     <div className="min-h-screen bg-slate-100 p-3 sm:p-4 lg:p-6">
 <div className="mx-auto mt-6 max-w-[1600px] space-y-6">
-        {/* ── HERO BAND ─────────────────────────────────────── */}
-        <div className="relative overflow-hidden rounded-3xl bg-slate-900 px-8 py-9 md:px-12">
-          <div
-            className="absolute inset-0 opacity-[0.06]"
-            style={{
-              backgroundImage:
-                "linear-gradient(to right, #818cf8 1px, transparent 1px), linear-gradient(to bottom, #818cf8 1px, transparent 1px)",
-              backgroundSize: "44px 44px",
-            }}
-          />
-          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-violet-600/25 blur-3xl" />
-          <div className="absolute -bottom-24 -left-12 h-56 w-56 rounded-full bg-indigo-600/20 blur-3xl" />
-
-          <div className="relative">
-            <p className="text-xs font-semibold uppercase tracking-widest text-indigo-300">
-              Support
-            </p>
-            <h2 className="mt-2 text-2xl font-bold text-white md:text-3xl text-balance">
-              Complaints
-            </h2>
-            <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-400">
-              Raise issues and track complaints across every portal in one
-              place.
-            </p>
-          </div>
-        </div>
+        <PageHeader
+          icon={HrPageIcon}
+          title="Complaints"
+          subtitle="Raise issues and track complaints across every portal in one place."
+        />
 
         {/* ── NEW COMPLAINT FORM ────────────────────────────── */}
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">

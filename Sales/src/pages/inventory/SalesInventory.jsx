@@ -176,28 +176,28 @@ export default function SalesInventory() {
           value={stats ? stats.total_items : "—"}
           subText="Distinct products"
           icon={<Package className="text-blue-600" size={22} />}
-          gradient="bg-blue-200"
+          gradient="bg-gradient-to-br from-blue-500 to-blue-700"
         />
         <StatCard
           title="Stock Value"
           value={stats ? `₹${inr(stats.total_value)}` : "—"}
           subText="Quantity × price"
           icon={<IndianRupee className="text-emerald-600" size={22} />}
-          gradient="bg-emerald-200"
+          gradient="bg-gradient-to-br from-emerald-500 to-green-700"
         />
         <StatCard
           title="Total Units"
           value={stats ? stats.total_units : "—"}
           subText="Units in stock"
           icon={<Layers className="text-indigo-600" size={22} />}
-          gradient="bg-indigo-200"
+          gradient="bg-gradient-to-br from-indigo-500 to-indigo-700"
         />
         <StatCard
           title="Low Stock"
           value={stats ? (stats.low_stock_count ?? 0) : "—"}
           subText="At or below threshold"
           icon={<AlertTriangle className="text-amber-600" size={22} />}
-          gradient="bg-amber-200"
+          gradient="bg-gradient-to-br from-orange-500 to-amber-700"
         />
       </div>
 
@@ -232,7 +232,7 @@ export default function SalesInventory() {
 
         <button
           onClick={openAdd}
-          className="inline-flex items-center gap-1.5 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-700 transition"
+          className="btn-primary"
         >
           <Plus size={16} /> Add Item
         </button>
@@ -523,7 +523,7 @@ export default function SalesInventory() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-900 text-white hover:bg-gray-700 disabled:opacity-50"
+                  className="btn-primary"
                 >
                   {saving
                     ? "Saving..."

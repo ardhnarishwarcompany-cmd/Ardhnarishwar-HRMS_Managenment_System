@@ -40,6 +40,7 @@ export default function AddInterviewModal({
   const token = localStorage.getItem("hrms_hr_Token");
   const [languages, setLanguages] = useState([]);
   const [fetchedLocations, setFetchedLocations] = useState([]);
+  const [clients, setClients] = useState([]);
   const BASE = import.meta.env.VITE_API_BASE_URL;
 
   // Use locations from props if provided, otherwise fall back to self-fetched
@@ -66,6 +67,21 @@ export default function AddInterviewModal({
 
   useEffect(() => {
     fetchLanguages();
+  }, []);
+
+  const fetchClients = async () => {
+    try {
+      const res = await axios.get(`${BASE}/hr/interviews/clients`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setClients(Array.isArray(res?.data?.data) ? res.data.data : []);
+    } catch (err) {
+      console.error("Clients fetch error:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchClients();
   }, []);
 
   const fetchLocations = async () => {
@@ -286,19 +302,40 @@ export default function AddInterviewModal({
             />
           </div>
 
-          {/* Client Code */}
+          {/* Client */}
           <div>
             <label className={labelCls}>
-              Client Code <span className="text-rose-500">*</span>
+              Client <span className="text-rose-500">*</span>
             </label>
-            <input
-              name="client_code"
-              value={form.client_code}
-              onChange={handleChange}
-              placeholder="Enter client code"
-              className={inputCls}
-              required
-            />
+            {clients.length ? (
+              <select
+                name="client_code"
+                value={form.client_code}
+                onChange={handleChange}
+                className={inputCls}
+                required
+              >
+                <option value="">Select client</option>
+                {clients.map((c) => (
+                  <option key={c.id} value={c.client_code}>
+                    {c.client_code} — {c.company_name || "Unnamed client"}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                name="client_code"
+                value={form.client_code}
+                onChange={handleChange}
+                placeholder="Enter client code (e.g. C1001)"
+                className={inputCls}
+                required
+              />
+            )}
+            <p className="mt-1 text-xs text-slate-400">
+              The interview appears in this client&apos;s Interview Tracker once the
+              call status is set to INTERVIEW SCHEDULED.
+            </p>
           </div>
 
           <div>

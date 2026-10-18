@@ -5,11 +5,13 @@ import * as service from "./attendance.service.js";
 GET ATTENDANCE
 ========================================= */
 export const getAttendance = asyncHandler(async (req, res) => {
-  const data = await service.getAttendance(req);
+  const { rows, scope, viewer } = await service.getAttendanceFeed(req);
 
   res.json({
     success: true,
-    data,
+    data: rows,
+    scope,
+    viewer,
   });
 });
 

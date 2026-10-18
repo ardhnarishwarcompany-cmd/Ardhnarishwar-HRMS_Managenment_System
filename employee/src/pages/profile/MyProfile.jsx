@@ -69,8 +69,8 @@ export default function MyProfile() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50/40 to-white pb-10 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
-      <main className="mx-auto w-full max-w-6xl px-3 pt-5 sm:px-4 lg:px-6">
+    <div className="w-full pb-10">
+      <main className="w-full">
         {loading ? (
           <ProfileSkeleton />
         ) : !data ? (
@@ -81,7 +81,7 @@ export default function MyProfile() {
           <>
             <HeroCard data={data} onAvatarChanged={load} onEdit={() => setEditing(true)} onPassword={() => setPwOpen(true)} />
 
-            <div className="mt-5 grid gap-5 lg:grid-cols-3">
+            <div className="mt-5 grid items-start gap-5 lg:grid-cols-3">
               <div className="flex flex-col gap-5 lg:col-span-2">
                 <Section title="Contact" icon={Phone} action={<TextBtn onClick={() => setEditing(true)}><Pencil size={13} /> Edit</TextBtn>}>
                   <Grid>
@@ -188,8 +188,9 @@ export default function MyProfile() {
                   <button
                     type="button"
                     onClick={() => setPwOpen(true)}
-                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-indigo-300 hover:text-indigo-600"
+                    className="w-full rounded-xl border border-purple-200 bg-purple-50/60 hover:bg-purple-100/70 px-4 py-2.5 text-sm font-bold text-purple-700 shadow-sm transition active:scale-[0.99] flex items-center justify-center gap-2"
                   >
+                    <KeyRound size={15} />
                     Change password
                   </button>
                 </Section>
@@ -239,10 +240,10 @@ function HeroCard({ data, onAvatarChanged, onEdit, onPassword }) {
 
   return (
     <section className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/80 shadow-xl backdrop-blur-xl dark:border-gray-800 dark:bg-gray-900/80">
-      <div className="h-24 bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-500" aria-hidden="true" />
-      <div className="flex flex-col gap-4 px-5 pb-5 sm:flex-row sm:items-end sm:justify-between sm:px-7">
-        <div className="-mt-12 flex items-end gap-4">
-          <div className="relative">
+      <div className="h-28 bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-500" aria-hidden="true" />
+      <div className="flex flex-col gap-4 px-5 pb-5 sm:flex-row sm:items-start sm:justify-between sm:px-7">
+        <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-start sm:gap-5">
+          <div className="relative -mt-14 shrink-0">
             {employee.avatar ? (
               <>
               <img
@@ -274,12 +275,12 @@ function HeroCard({ data, onAvatarChanged, onEdit, onPassword }) {
             </button>
             <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={upload} />
           </div>
-          <div className="pb-1">
-            <h1 className="text-2xl font-black tracking-tight text-gray-900 dark:text-white">{employee.name}</h1>
-            <p className="text-sm text-gray-500">
-              {[employee.designation, employee.department].filter(Boolean).join(" - ") || "Employee"}
+          <div className="pt-1 text-center sm:pt-3 sm:text-left">
+            <h1 className="text-2xl font-black capitalize tracking-tight text-gray-900 dark:text-white">{employee.name}</h1>
+            <p className="mt-0.5 text-sm font-medium text-gray-500">
+              {[...new Set([employee.designation, employee.department].filter(Boolean))].join(" \u2022 ") || "Employee"}
             </p>
-            <div className="mt-2 flex flex-wrap items-center gap-2">
+            <div className="mt-2 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
               <span className="rounded-md bg-gray-100 px-2 py-0.5 font-mono text-[11px] font-semibold text-gray-700">{employee.employeeCode}</span>
               <span className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-semibold ring-1 ${badge.cls}`}>
                 <badge.Icon size={12} /> {badge.label}
@@ -292,11 +293,20 @@ function HeroCard({ data, onAvatarChanged, onEdit, onPassword }) {
             </div>
           </div>
         </div>
-        <div className="flex gap-2">
-          <button type="button" onClick={onEdit} className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-indigo-700">
+        <div className="flex gap-2 self-center sm:self-start sm:pt-3">
+          <button
+            type="button"
+            onClick={onEdit}
+            className="inline-flex items-center gap-1.5 rounded-xl text-white px-4 py-2 text-sm font-bold shadow-md hover:opacity-95 transition active:scale-[0.98]"
+            style={{ background: "linear-gradient(135deg, #6d28d9, #c026d3)", boxShadow: "0 8px 18px rgba(124, 58, 237, 0.3)" }}
+          >
             <Pencil size={14} /> Edit contact
           </button>
-          <button type="button" onClick={onPassword} className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-indigo-300">
+          <button
+            type="button"
+            onClick={onPassword}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-purple-200 bg-white px-4 py-2 text-sm font-bold text-purple-700 shadow-sm transition hover:bg-purple-50 active:scale-[0.98]"
+          >
             <KeyRound size={14} /> Password
           </button>
         </div>
@@ -474,10 +484,15 @@ function Modal({ title, onClose, children }) {
 
 function ModalActions({ onClose, saving, label }) {
   return (
-    <div className="mt-2 flex justify-end gap-2">
-      <button type="button" onClick={onClose} className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50">Cancel</button>
-      <button type="submit" disabled={saving} className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-indigo-700 disabled:opacity-60">
-        {saving ? "Saving" : label}
+    <div className="mt-4 flex justify-end gap-2.5">
+      <button type="button" onClick={onClose} className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition active:scale-[0.98]">Cancel</button>
+      <button
+        type="submit"
+        disabled={saving}
+        className="rounded-xl text-white px-5 py-2 text-sm font-bold shadow-md hover:opacity-95 transition disabled:opacity-60 active:scale-[0.98]"
+        style={{ background: "linear-gradient(135deg, #6d28d9, #c026d3)", boxShadow: "0 8px 18px rgba(124, 58, 237, 0.25)" }}
+      >
+        {saving ? "Saving..." : label}
       </button>
     </div>
   );
@@ -544,7 +559,7 @@ function ProfileSkeleton() {
   return (
     <div className="animate-pulse">
       <div className="h-48 rounded-3xl bg-gray-200/70" />
-      <div className="mt-5 grid gap-5 lg:grid-cols-3">
+      <div className="mt-5 grid items-start gap-5 lg:grid-cols-3">
         <div className="h-64 rounded-2xl bg-gray-200/70 lg:col-span-2" />
         <div className="h-64 rounded-2xl bg-gray-200/70" />
       </div>

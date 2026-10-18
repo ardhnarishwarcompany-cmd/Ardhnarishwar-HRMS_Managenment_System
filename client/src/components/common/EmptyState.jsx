@@ -6,24 +6,22 @@ function RenderIcon({ icon, size }) {
   if (!icon) return null;
   if (isValidElement(icon)) return icon;
   const Icon = icon;
-  return <Icon size={size} />;
+  return <Icon size={size} strokeWidth={1.8} />;
 }
 
-// Shared premium empty state: soft icon chip + message + optional action.
+// Shared empty state: soft rounded icon box + message + optional action.
 export default function EmptyState({ icon, title, message, action }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 py-12 px-4 text-center">
+    <div className="empty-state">
       {icon ? (
-        <span className="icon-chip !w-14 !h-14 !rounded-2xl">
-          <RenderIcon icon={icon} size={26} />
+        <span className="empty-state-icon">
+          <RenderIcon icon={icon} size={30} />
         </span>
       ) : null}
       <div>
-        <p className="text-sm font-semibold text-slate-700">{title}</p>
+        <p className="empty-state-title">{title}</p>
         {message ? (
-          <p className="mt-1 text-xs text-slate-400 text-pretty max-w-xs mx-auto">
-            {message}
-          </p>
+          <p className="empty-state-message text-pretty">{message}</p>
         ) : null}
       </div>
       {action || null}

@@ -113,8 +113,20 @@ export default function MyPerformance() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (!viewModal) return undefined;
+
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") setViewModal(false);
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [viewModal]);
+
   return (
-    <div className="space-y-6 p-4">
+    <div className="flex flex-col gap-6">
       <PageHeader
         title="My Performance Reviews"
         desc="View all your performance evaluations"
@@ -230,10 +242,19 @@ export default function MyPerformance() {
 
       {/* VIEW MODAL */}
       {viewModal && selectedRecord && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
-          <div className="max-h-[92vh] w-full max-w-4xl overflow-hidden rounded-3xl bg-white shadow-2xl">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm"
+          onClick={() => setViewModal(false)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="performance-review-title"
+            onClick={(event) => event.stopPropagation()}
+            className="flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl"
+          >
             {/* HEADER */}
-            <div className="relative overflow-hidden bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 px-8 py-7 text-white">
+            <div className="relative shrink-0 overflow-hidden bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 px-6 py-5 text-white md:px-8 md:py-6">
               <div className="absolute inset-0 opacity-10" aria-hidden="true">
                 <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white" />
                 <div className="absolute bottom-0 left-0 h-24 w-24 rounded-full bg-white" />
@@ -246,7 +267,10 @@ export default function MyPerformance() {
                   </div>
 
                   <div>
-                    <h2 className="text-2xl font-extrabold tracking-tight md:text-3xl">
+                    <h2
+                      id="performance-review-title"
+                      className="text-2xl font-extrabold tracking-tight md:text-3xl"
+                    >
                       Performance Review
                     </h2>
 
@@ -267,7 +291,7 @@ export default function MyPerformance() {
             </div>
 
             {/* BODY */}
-            <div className="max-h-[70vh] overflow-y-auto p-8">
+            <div className="min-h-0 flex-1 overflow-y-auto p-6 md:p-8">
               {/* SCORE */}
               <div className="mb-6 rounded-3xl border border-indigo-100 bg-gradient-to-br from-indigo-50 to-white p-6">
                 <div className="flex items-center justify-between">
@@ -344,8 +368,9 @@ export default function MyPerformance() {
             </div>
 
             {/* FOOTER */}
-            <div className="flex justify-end border-t border-slate-100 bg-slate-50/60 px-8 py-5">
+            <div className="flex shrink-0 justify-end border-t border-slate-100 bg-slate-50/60 px-6 py-4 md:px-8">
               <button
+                type="button"
                 onClick={() => setViewModal(false)}
                 className="rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-indigo-200 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-300"
               >

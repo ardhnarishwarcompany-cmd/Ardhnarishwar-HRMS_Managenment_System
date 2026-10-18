@@ -1,5 +1,7 @@
 flask>=3.0.0
 flask-cors>=4.0.0
+pymysql>=1.1.0
+cryptography>=42.0.0
 pymongo>=4.7.0
 mongomock>=4.3.0
 pytz>=2024.1
